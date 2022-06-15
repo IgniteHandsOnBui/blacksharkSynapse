@@ -1,0 +1,1499 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"type": "string",
+			"metadata": "Workspace name",
+			"defaultValue": "innosyn-pipeline-syn-ws"
+		},
+		"Stellar Airbus v2 FS_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Stellar Airbus v2 FS'"
+		},
+		"Stellar Data Storage Account v2_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Stellar Data Storage Account v2'"
+		},
+		"innosyn-pipeline-syn-ws-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'innosyn-pipeline-syn-ws-WorkspaceDefaultSqlServer'"
+		},
+		"Stellar Airbus v2_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://rawdatajbqezt.dfs.core.windows.net"
+		},
+		"Stellar Pipeline Key Vault_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://innosyn-pipeline-kv.vault.azure.net/"
+		},
+		"innosyn-pipeline-syn-ws-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://synhnsdl2xmc.dfs.core.windows.net/"
+		}
+	},
+	"variables": {
+		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/stacapipool')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Blackshark Building Detection')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Wait for Blackshark Model",
+						"type": "Until",
+						"dependsOn": [
+							{
+								"activity": "Blackshark Model",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@and(and(not(equals(string(variables('FunctionCompleted')), 'running')), not(equals(string(variables('FunctionCompleted')), 'active'))), not(equals(string(variables('FunctionCompleted')), 'preparing')))",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Wait for Blackshark",
+									"type": "Wait",
+									"dependsOn": [
+										{
+											"activity": "Set FunctionCompleted Custom Vision",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"waitTimeInSeconds": 30
+									}
+								},
+								{
+									"name": "Check Status Blackshark",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"url": {
+											"value": "@concat('https://',pipeline().parameters.BatchName,'.',pipeline().parameters.BatchLocation,'.batch.azure.com/jobs/',pipeline().parameters.JobName,'/tasks/stllr-bshrk-task-', pipeline().RunId, '?api-version=2022-01-01.15.0')",
+											"type": "Expression"
+										},
+										"connectVia": {
+											"referenceName": "AutoResolveIntegrationRuntime",
+											"type": "IntegrationRuntimeReference"
+										},
+										"method": "GET",
+										"headers": {},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://batch.core.windows.net/"
+										}
+									}
+								},
+								{
+									"name": "Set FunctionCompleted Custom Vision",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Check Status Blackshark",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "FunctionCompleted",
+										"value": {
+											"value": "@activity('Check Status Blackshark').output['state']",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set FunctionError",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Check Status Blackshark",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "FunctionError",
+										"value": {
+											"value": "@activity('Check Status Blackshark').output['executionInfo']['failureInfo']",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"timeout": "7.00:00:00"
+						}
+					},
+					{
+						"name": "Blackshark Model",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "Copy Config file",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@concat('https://',pipeline().parameters.BatchName,'.',pipeline().parameters.BatchLocation,'.batch.azure.com/jobs/',pipeline().parameters.JobName,'/tasks?api-version=2020-03-01.11.0')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"method": "POST",
+							"headers": {
+								"Content-type": "application/json; odata=minimalmetadata; charset=utf-8"
+							},
+							"body": {
+								"value": "@json(concat('{\n  \"id\": \"stllr-bshrk-task-', pipeline().RunId, '\",\n  \"commandLine\": \"\",\n  \"containerSettings\": {\n    \"imageName\": \"', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['algImageName'],'\",\n    \"containerRunOptions\": \"--rm --workdir / -v /mnt/batch/tasks/fsmounts/S/', pipeline().parameters.Prefix, ':', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['mountedDirectory'], '\",\n    \"registry\": {\n        \"registryServer\": \"', split(activity('Read Spec Document').output['runStatus'].output.sink.value[0]['algImageName'], '/')[0], '\",\n        \"username\": \"external-msft\",\n        \"password\": \"9STIVwl2RiaQqDABXghQa7Xtliwz=JoY\"\n    }\n  },\n  \"userIdentity\": {\n        \"autoUser\": {\n            \"scope\": \"pool\",\n            \"elevationLevel\": \"admin\"\n        }\n    }\n}'))",
+								"type": "Expression"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://batch.core.windows.net/"
+							}
+						}
+					},
+					{
+						"name": "Copy GeoTiff",
+						"type": "SparkJob",
+						"dependsOn": [
+							{
+								"activity": "Read Spec Document",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"sparkJob": {
+								"referenceName": "Copy noop",
+								"type": "SparkJobDefinitionReference"
+							},
+							"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/copy_noop/src/main.py",
+							"args": [
+								"--storage_account_name",
+								"@pipeline().parameters.StorageAccountName",
+								"--src_container",
+								"@pipeline().parameters.Prefix",
+								"--src_folder",
+								"warp",
+								"--storage_account_key",
+								"@pipeline().parameters.StorageAccountKey",
+								"--dst_fileshare",
+								"volume-a",
+								"--dst_folder",
+								"@concat(pipeline().parameters.Prefix,'/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['submissionDirectory'])",
+								"--folders_to_create",
+								"@concat(pipeline().parameters.Prefix,'/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['mountedDirectory'])",
+								"--folders_to_create",
+								"@concat(pipeline().parameters.Prefix,'/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['resultsDirectory'])",
+								"--folders_to_create",
+								"@concat(pipeline().parameters.Prefix,'/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['logsDirectory'])"
+							],
+							"targetBigDataPool": {
+								"referenceName": "pooldl2xmc",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Medium",
+							"conf": {
+								"spark.dynamicAllocation.minExecutors": 2,
+								"spark.dynamicAllocation.maxExecutors": 3
+							},
+							"driverSize": "Medium",
+							"numExecutors": 2
+						}
+					},
+					{
+						"name": "Copy Config file",
+						"type": "SparkJob",
+						"dependsOn": [
+							{
+								"activity": "Copy GeoTiff",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"sparkJob": {
+								"referenceName": "Copy noop",
+								"type": "SparkJobDefinitionReference"
+							},
+							"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/copy_noop/src/main.py",
+							"args": [
+								"--storage_account_name",
+								"@pipeline().parameters.StorageAccountName",
+								"--src_container",
+								"@pipeline().parameters.Prefix",
+								"--src_folder",
+								"@concat('config/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['contextFileName'])",
+								"--storage_account_key",
+								"@pipeline().parameters.StorageAccountKey",
+								"--dst_fileshare",
+								"volume-a",
+								"--dst_folder",
+								"@concat(pipeline().parameters.Prefix,'/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['contextFileName'])"
+							],
+							"targetBigDataPool": {
+								"referenceName": "pooldl2xmc",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Medium",
+							"conf": {
+								"spark.dynamicAllocation.minExecutors": 2,
+								"spark.dynamicAllocation.maxExecutors": 3
+							},
+							"driverSize": "Medium",
+							"numExecutors": 2
+						}
+					},
+					{
+						"name": "Copy Raster and Vector Output",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Wait for Blackshark Model",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureFileStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": {
+										"value": "@concat(pipeline().parameters.Prefix, '/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['resultsDirectory'])",
+										"type": "Expression"
+									},
+									"wildcardFileName": "*.*",
+									"deleteFilesAfterCompletion": false
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "gls",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "gld",
+								"type": "DatasetReference",
+								"parameters": {
+									"DestinationFolderPath": "detections",
+									"DestinationContainerName": {
+										"value": "@pipeline().parameters.Prefix",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					},
+					{
+						"name": "Read Spec Document",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "1.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "ReadSpecDocumentFlow",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source": {
+										"filename": "bshrk-building.json",
+										"folderpath": "config",
+										"containername": {
+											"value": "@pipeline().parameters.Prefix",
+											"type": "Expression"
+										}
+									},
+									"sink": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "None",
+							"cacheSinks": {
+								"firstRowOnly": true
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"Prefix": {
+						"type": "string"
+					},
+					"BatchName": {
+						"type": "string"
+					},
+					"BatchLocation": {
+						"type": "string"
+					},
+					"JobName": {
+						"type": "string"
+					},
+					"StorageAccountName": {
+						"type": "string"
+					},
+					"StorageAccountKey": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"FunctionCompleted": {
+						"type": "String"
+					},
+					"FunctionError": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2022-05-31T20:09:05Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
+				"[concat(variables('workspaceId'), '/sparkJobDefinitions/Copy noop')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/pooldl2xmc')]",
+				"[concat(variables('workspaceId'), '/datasets/gls')]",
+				"[concat(variables('workspaceId'), '/datasets/gld')]",
+				"[concat(variables('workspaceId'), '/dataflows/ReadSpecDocumentFlow')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Blackshark Model Transforms')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Warp to change CRS",
+						"type": "SparkJob",
+						"dependsOn": [
+							{
+								"activity": "Crop",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"sparkJob": {
+								"referenceName": "Warp",
+								"type": "SparkJobDefinitionReference"
+							},
+							"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/raster_warp/src/warp.py",
+							"args": [
+								"--storage_account_name",
+								"@pipeline().parameters.StorageAccountName",
+								"--storage_account_key",
+								"@pipeline().parameters.StorageAccountKey",
+								"--storage_container",
+								"@pipeline().parameters.Prefix",
+								"--src_folder_name",
+								"crop"
+							],
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"numExecutors": null
+						}
+					},
+					{
+						"name": "Crop",
+						"type": "SparkJob",
+						"dependsOn": [
+							{
+								"activity": "More than one GeoTiff",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"sparkJob": {
+								"referenceName": "Crop",
+								"type": "SparkJobDefinitionReference"
+							},
+							"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/raster_crop/src/crop.py",
+							"args": [
+								"--storage_account_name",
+								"@pipeline().parameters.StorageAccountName",
+								"--storage_account_key",
+								"@pipeline().parameters.StorageAccountKey",
+								"--storage_container",
+								"@pipeline().parameters.Prefix",
+								"--src_folder_name",
+								"@variables('CropSourceFolder')",
+								"--config_file_name",
+								"config-naip.json",
+								"--linked_service_name",
+								"Stellar Airbus v2"
+							],
+							"targetBigDataPool": {
+								"referenceName": "pooldl2xmc",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Medium",
+							"conf": {
+								"spark.dynamicAllocation.minExecutors": 2,
+								"spark.dynamicAllocation.maxExecutors": 3
+							},
+							"driverSize": "Medium",
+							"numExecutors": 2
+						}
+					},
+					{
+						"name": "GetFilesToMosaic",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "rawtifs",
+								"type": "DatasetReference",
+								"parameters": {
+									"containername": {
+										"value": "@pipeline().parameters.Prefix",
+										"type": "Expression"
+									},
+									"folderpath": "raw"
+								}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobStorageReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "BinaryReadSettings"
+							}
+						}
+					},
+					{
+						"name": "More than one GeoTiff",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "For Each File to Mosaic",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@greater(length(activity('GetFilesToMosaic').output.childItems),1)",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "Set Crop Source Folder to raw",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "CropSourceFolder",
+										"value": "raw"
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "Mosaic",
+									"type": "SparkJob",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"sparkJob": {
+											"referenceName": "Mosaic",
+											"type": "SparkJobDefinitionReference"
+										},
+										"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/raster_mosaic/src/mosaic.py",
+										"args": [
+											"--storage_account_name",
+											"@pipeline().parameters.StorageAccountName",
+											"--storage_account_key",
+											"@pipeline().parameters.StorageAccountKey",
+											"--storage_container",
+											"@pipeline().parameters.Prefix",
+											"--src_folder_name",
+											"raw"
+										],
+										"targetBigDataPool": {
+											"referenceName": "pooldl2xmc",
+											"type": "BigDataPoolReference"
+										},
+										"executorSize": "Medium",
+										"conf": {
+											"spark.dynamicAllocation.minExecutors": 2,
+											"spark.dynamicAllocation.maxExecutors": 3
+										},
+										"driverSize": "Medium",
+										"numExecutors": 2
+									}
+								},
+								{
+									"name": "Set Crop Source Folder to mosaic",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Mosaic",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "CropSourceFolder",
+										"value": "mosaic"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "For Each File to Mosaic",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetFilesToMosaic",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetFilesToMosaic').output.childItems",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "Set Mosaic File Names",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Store Temp Mosaic File Names",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "MosaicFileNames",
+										"value": {
+											"value": "@concat(variables('TempMosaicFileNames'), if(equals(variables('TempMosaicFileNames'), ''),'',','), item().name)",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Store Temp Mosaic File Names",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "TempMosaicFileNames",
+										"value": {
+											"value": "@variables('MosaicFileNames')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"Prefix": {
+						"type": "string"
+					},
+					"StorageAccountName": {
+						"type": "string"
+					},
+					"StorageAccountKey": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"FunctionCompleted": {
+						"type": "String",
+						"defaultValue": "None"
+					},
+					"FunctionError": {
+						"type": "String"
+					},
+					"MosaicFileNames": {
+						"type": "String"
+					},
+					"TempMosaicFileNames": {
+						"type": "String"
+					},
+					"CropSourceFolder": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2022-05-31T15:14:13Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/sparkJobDefinitions/Warp')]",
+				"[concat(variables('workspaceId'), '/sparkJobDefinitions/Crop')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/pooldl2xmc')]",
+				"[concat(variables('workspaceId'), '/datasets/rawtifs')]",
+				"[concat(variables('workspaceId'), '/sparkJobDefinitions/Mosaic')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/E2E Blackshark Model Flow v2')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Blackshark Model Transforms",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Blackshark Model Transforms",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Prefix": {
+									"value": "@pipeline().parameters.Prefix",
+									"type": "Expression"
+								},
+								"StorageAccountName": {
+									"value": "@pipeline().parameters.StorageAccountName",
+									"type": "Expression"
+								},
+								"StorageAccountKey": {
+									"value": "@pipeline().parameters.StorageAccountKey",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Blackshark Building Detection",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Blackshark Model Transforms",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Blackshark Building Detection",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Prefix": {
+									"value": "@pipeline().parameters.Prefix",
+									"type": "Expression"
+								},
+								"BatchName": {
+									"value": "@pipeline().parameters.BatchAccountName",
+									"type": "Expression"
+								},
+								"BatchLocation": {
+									"value": "@pipeline().parameters.BatchLocation",
+									"type": "Expression"
+								},
+								"JobName": {
+									"value": "@pipeline().parameters.BatchJobName",
+									"type": "Expression"
+								},
+								"StorageAccountName": {
+									"value": "@pipeline().parameters.StorageAccountName",
+									"type": "Expression"
+								},
+								"StorageAccountKey": {
+									"value": "@pipeline().parameters.StorageAccountKey",
+									"type": "Expression"
+								}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"Prefix": {
+						"type": "string"
+					},
+					"StorageAccountName": {
+						"type": "string",
+						"defaultValue": "rawdatajbqezt"
+					},
+					"StorageAccountKey": {
+						"type": "string"
+					},
+					"BatchAccountName": {
+						"type": "string",
+						"defaultValue": "innosynorcbatchact"
+					},
+					"BatchJobName": {
+						"type": "string"
+					},
+					"BatchLocation": {
+						"type": "string",
+						"defaultValue": "southcentralus"
+					}
+				},
+				"variables": {
+					"StorageAccountConnString": {
+						"type": "String"
+					},
+					"StorageAccountName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2022-05-31T20:09:08Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/Blackshark Model Transforms')]",
+				"[concat(variables('workspaceId'), '/pipelines/Blackshark Building Detection')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/gld')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Stellar Airbus v2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"DestinationFolderPath": {
+						"type": "string"
+					},
+					"DestinationContainerName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().DestinationFolderPath",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().DestinationContainerName",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Stellar Airbus v2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/gls')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Stellar Airbus v2 FS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureFileStorageLocation"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Stellar Airbus v2 FS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/rawtifs')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Stellar Data Storage Account v2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"containername": {
+						"type": "string"
+					},
+					"folderpath": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": {
+							"value": "@dataset().folderpath",
+							"type": "Expression"
+						},
+						"container": {
+							"value": "@dataset().containername",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Stellar Data Storage Account v2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/spec_doc_specification')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Stellar Data Storage Account v2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"filename": {
+						"type": "string"
+					},
+					"folderpath": {
+						"type": "string"
+					},
+					"containername": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().filename",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().folderpath",
+							"type": "Expression"
+						},
+						"container": {
+							"value": "@dataset().containername",
+							"type": "Expression"
+						}
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Stellar Data Storage Account v2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Stellar Airbus v2 FS')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureFileStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('Stellar Airbus v2 FS_connectionString')]",
+					"accountKey": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Stellar Pipeline Key Vault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "AirbusStorageAccountKey"
+					},
+					"fileShare": "volume-a"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
+				"[concat(variables('workspaceId'), '/linkedServices/Stellar Pipeline Key Vault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Stellar Airbus v2')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('Stellar Airbus v2_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Stellar Data Storage Account v2')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('Stellar Data Storage Account v2_connectionString')]",
+					"accountKey": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Stellar Pipeline Key Vault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "AirbusStorageAccountKey"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
+				"[concat(variables('workspaceId'), '/linkedServices/Stellar Pipeline Key Vault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Stellar Pipeline Key Vault')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('Stellar Pipeline Key Vault_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/innosyn-pipeline-syn-ws-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('innosyn-pipeline-syn-ws-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/innosyn-pipeline-syn-ws-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('innosyn-pipeline-syn-ws-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ReadSpecDocumentFlow')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "spec_doc_specification",
+								"type": "DatasetReference"
+							},
+							"name": "source"
+						}
+					],
+					"sinks": [
+						{
+							"name": "sink"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     documentForm: 'arrayOfDocuments') ~> source",
+						"source sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     store: 'cache',",
+						"     format: 'inline',",
+						"     output: true,",
+						"     saveOrder: 1) ~> sink"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/spec_doc_specification')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Copy noop')]",
+			"type": "Microsoft.Synapse/workspaces/sparkJobDefinitions",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"targetBigDataPool": {
+					"referenceName": "pooldl2xmc",
+					"type": "BigDataPoolReference"
+				},
+				"requiredSparkVersion": "3.1",
+				"language": "python",
+				"jobProperties": {
+					"name": "Copy noop",
+					"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/copy_noop/src/mosaic.py",
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "1",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "01767b3a-cede-4abf-8b79-52cb6d0ff80d"
+					},
+					"args": [],
+					"jars": [],
+					"files": [],
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Crop')]",
+			"type": "Microsoft.Synapse/workspaces/sparkJobDefinitions",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"targetBigDataPool": {
+					"referenceName": "pooldl2xmc",
+					"type": "BigDataPoolReference"
+				},
+				"requiredSparkVersion": "3.1",
+				"language": "python",
+				"jobProperties": {
+					"name": "Crop",
+					"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/raster_crop/src/crop.py",
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "1",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "f4cbbafe-9d98-476f-9bd4-e5bfc7bad06c"
+					},
+					"args": [],
+					"jars": [],
+					"files": [
+						"abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/raster_crop/src/utils.py"
+					],
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Mosaic')]",
+			"type": "Microsoft.Synapse/workspaces/sparkJobDefinitions",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"targetBigDataPool": {
+					"referenceName": "pooldl2xmc",
+					"type": "BigDataPoolReference"
+				},
+				"requiredSparkVersion": "3.1",
+				"language": "python",
+				"jobProperties": {
+					"name": "Mosaic",
+					"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/raster_mosaic/src/mosaic.py",
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "3",
+						"spark.dynamicAllocation.maxExecutors": "3",
+						"spark.autotune.trackingId": "811de002-982f-4b4b-9732-147d3565c502"
+					},
+					"args": [],
+					"jars": [],
+					"files": [],
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 3
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Warp')]",
+			"type": "Microsoft.Synapse/workspaces/sparkJobDefinitions",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"targetBigDataPool": {
+					"referenceName": "pooldl2xmc",
+					"type": "BigDataPoolReference"
+				},
+				"requiredSparkVersion": "3.1",
+				"language": "python",
+				"jobProperties": {
+					"name": "Warp",
+					"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/raster_warp/src/warp.py",
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "3",
+						"spark.dynamicAllocation.maxExecutors": "3",
+						"spark.autotune.trackingId": "335dd1ad-fc75-4734-ad92-03a79e9ad399"
+					},
+					"args": [],
+					"jars": [],
+					"files": [],
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 3
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/pooldl2xmc')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"autoPause": {
+					"enabled": true,
+					"delayInMinutes": 15
+				},
+				"autoScale": {
+					"enabled": true,
+					"maxNodeCount": 5,
+					"minNodeCount": 1
+				},
+				"nodeCount": 0,
+				"nodeSize": "Medium",
+				"nodeSizeFamily": "MemoryOptimized",
+				"sparkVersion": "3.1",
+				"libraryRequirements": {
+					"content": "name: aoi-env\nchannels:\n  - conda-forge\n  - defaults\ndependencies:\n  - gdal=3.3.0\n  - pip>=20.1.1\n  - azure-storage-file-datalake\n  - libgdal\n  - shapely\n  - pyproj\n  - pip:\n    - rasterio\n    - geopandas\n",
+					"filename": "/home/anthonyb/Azure-Orbital-Analytics-Samples/deploy/environment.yml",
+					"time": "2022-05-10T15:53:25.0987366Z"
+				},
+				"isComputeIsolationEnabled": false,
+				"sessionLevelPackagesEnabled": false,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "southcentralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Geospatialspark')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"autoPause": {
+					"enabled": true,
+					"delayInMinutes": 15
+				},
+				"autoScale": {
+					"enabled": true,
+					"maxNodeCount": 8,
+					"minNodeCount": 3
+				},
+				"nodeCount": 10,
+				"nodeSize": "Medium",
+				"nodeSizeFamily": "MemoryOptimized",
+				"sparkVersion": "3.1",
+				"libraryRequirements": {
+					"content": "name: aoi-env\r\nchannels:\r\n  - defaults\r\ndependencies:\r\n  - azure-storage-file-datalake\r\n  - gdal=3.3.0\r\n  - libgdal\r\n  - pip>=20.1.1\r\n  - pyproj\r\n  - shapely\r\n  - pip:\r\n      - \"rasterio\"\r\n      - \"geopandas\"",
+					"filename": "environment.yml",
+					"time": "2022-06-06T15:15:28.7036181Z"
+				},
+				"isComputeIsolationEnabled": false,
+				"sessionLevelPackagesEnabled": false,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "southcentralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/poolYLQS')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"autoPause": {
+					"enabled": true,
+					"delayInMinutes": 15
+				},
+				"autoScale": {
+					"enabled": true,
+					"maxNodeCount": 10,
+					"minNodeCount": 3
+				},
+				"nodeCount": 10,
+				"nodeSize": "Medium",
+				"nodeSizeFamily": "MemoryOptimized",
+				"sparkVersion": "3.1",
+				"libraryRequirements": {
+					"content": "name: aoi-env\r\nchannels:\r\n  - defaults\r\ndependencies:\r\n  - azure-storage-file-datalake\r\n  - gdal=3.3.0\r\n  - libgdal\r\n  - pip>=20.1.1\r\n  - pyproj\r\n  - shapely\r\n  - pip:\r\n      - \"rasterio\"\r\n      - \"geopandas\"",
+					"filename": "environment.yml",
+					"time": "2022-06-08T16:08:46.0952706Z"
+				},
+				"isComputeIsolationEnabled": false,
+				"sessionLevelPackagesEnabled": true,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "southcentralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/stacapipool')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"autoPause": {
+					"enabled": true,
+					"delayInMinutes": 15
+				},
+				"autoScale": {
+					"enabled": true,
+					"maxNodeCount": 10,
+					"minNodeCount": 3
+				},
+				"nodeCount": 10,
+				"nodeSize": "Medium",
+				"nodeSizeFamily": "MemoryOptimized",
+				"sparkVersion": "3.1",
+				"libraryRequirements": {
+					"content": "name: aoi-env\r\nchannels:\r\n  - defaults\r\ndependencies:\r\n  - pystac-client",
+					"filename": "environment.yml",
+					"time": "2022-06-15T18:27:06.2278271Z"
+				},
+				"isComputeIsolationEnabled": false,
+				"sessionLevelPackagesEnabled": false,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "southcentralus"
+		}
+	]
+}
