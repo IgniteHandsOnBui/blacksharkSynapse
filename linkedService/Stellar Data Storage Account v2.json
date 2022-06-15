@@ -1,0 +1,23 @@
+{
+    "name": "Stellar Data Storage Account v2",
+    "type": "Microsoft.Synapse/workspaces/linkedservices",
+    "properties": {
+        "annotations": [],
+        "type": "AzureBlobStorage",
+        "typeProperties": {
+            "connectionString": "DefaultEndpointsProtocol=https;AccountName=rawdatajbqezt;EndpointSuffix=core.windows.net;",
+            "accountKey": {
+                "type": "AzureKeyVaultSecret",
+                "store": {
+                    "referenceName": "Stellar Pipeline Key Vault",
+                    "type": "LinkedServiceReference"
+                },
+                "secretName": "AirbusStorageAccountKey"
+            }
+        },
+        "connectVia": {
+            "referenceName": "AutoResolveIntegrationRuntime",
+            "type": "IntegrationRuntimeReference"
+        }
+    }
+}

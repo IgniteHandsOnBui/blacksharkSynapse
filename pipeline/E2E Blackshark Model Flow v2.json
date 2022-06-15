@@ -1,0 +1,117 @@
+{
+    "name": "E2E Blackshark Model Flow v2",
+    "properties": {
+        "activities": [
+            {
+                "name": "Blackshark Model Transforms",
+                "type": "ExecutePipeline",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "Blackshark Model Transforms",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true,
+                    "parameters": {
+                        "Prefix": {
+                            "value": "@pipeline().parameters.Prefix",
+                            "type": "Expression"
+                        },
+                        "StorageAccountName": {
+                            "value": "@pipeline().parameters.StorageAccountName",
+                            "type": "Expression"
+                        },
+                        "StorageAccountKey": {
+                            "value": "@pipeline().parameters.StorageAccountKey",
+                            "type": "Expression"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "Blackshark Building Detection",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "Blackshark Model Transforms",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "Blackshark Building Detection",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true,
+                    "parameters": {
+                        "Prefix": {
+                            "value": "@pipeline().parameters.Prefix",
+                            "type": "Expression"
+                        },
+                        "BatchName": {
+                            "value": "@pipeline().parameters.BatchAccountName",
+                            "type": "Expression"
+                        },
+                        "BatchLocation": {
+                            "value": "@pipeline().parameters.BatchLocation",
+                            "type": "Expression"
+                        },
+                        "JobName": {
+                            "value": "@pipeline().parameters.BatchJobName",
+                            "type": "Expression"
+                        },
+                        "StorageAccountName": {
+                            "value": "@pipeline().parameters.StorageAccountName",
+                            "type": "Expression"
+                        },
+                        "StorageAccountKey": {
+                            "value": "@pipeline().parameters.StorageAccountKey",
+                            "type": "Expression"
+                        }
+                    }
+                }
+            }
+        ],
+        "parameters": {
+            "Prefix": {
+                "type": "string",
+                "defaultValue": ""
+            },
+            "StorageAccountName": {
+                "type": "string",
+                "defaultValue": "rawdatajbqezt"
+            },
+            "StorageAccountKey": {
+                "type": "string",
+                "defaultValue": ""
+            },
+            "BatchAccountName": {
+                "type": "string",
+                "defaultValue": "innosynorcbatchact"
+            },
+            "BatchJobName": {
+                "type": "string",
+                "defaultValue": ""
+            },
+            "BatchLocation": {
+                "type": "string",
+                "defaultValue": "southcentralus"
+            }
+        },
+        "variables": {
+            "StorageAccountConnString": {
+                "type": "String"
+            },
+            "StorageAccountName": {
+                "type": "String"
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2022-05-31T20:09:08Z"
+    },
+    "type": "Microsoft.Synapse/workspaces/pipelines"
+}

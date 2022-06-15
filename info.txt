@@ -1,0 +1,6 @@
+selected resource name:		E2E Blackshark Model Flow v2
+selected resource type:		pipeline
+workspace name:			aoai-synapse
+workspace location:		eastus
+subscription id:		fcdfe1b7-8458-44e1-be61-1422e03cb202
+time of download (UTC):		Mon, 13 Jun 2022 16:19:15 GMT

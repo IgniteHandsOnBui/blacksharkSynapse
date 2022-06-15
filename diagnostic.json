@@ -1,0 +1,22 @@
+{
+    "now": "2022-06-13T16:19:15.786Z",
+    "perfNow": 136278.80000007153,
+    "diagnosticCorrelation": "e43c3fb8-639e-40ca-8e15-56d1e415960b",
+    "source": "DownloadSupportFiles",
+    "environment": {
+        "productName": "a365",
+        "buildVersion": "22.0605.02",
+        "environmentType": 9,
+        "resourceName": "kndemo-aoai-synapse",
+        "resourceRegion": "eastus",
+        "resourceGroup": "kndemo-aoai-pipeline-rg",
+        "subscriptionId": "fcdfe1b7-8458-44e1-be61-1422e03cb202",
+        "sessionId": "vujH+",
+        "operationId": "MJdzB",
+        "gitType": "live"
+    },
+    "additionalInfo": {
+        "selectedResource": "E2E Blackshark Model Flow v2",
+        "selectedResourceType": "pipeline"
+    }
+}
