@@ -1,0 +1,176 @@
+{
+	"name": "stac-computer-planetary-nb",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "stacapipool",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "56g",
+			"driverCores": 8,
+			"executorMemory": "56g",
+			"executorCores": 8,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "6e715ca6-8e59-4198-a595-9945bdab892d"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/stacapipool",
+				"name": "stacapipool",
+				"type": "Spark",
+				"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/stacapipool",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 8,
+				"memory": 56,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from pystac_client import Client\r\n",
+					"catalog = Client.open(\"https://planetarycomputer.microsoft.com/api/stac/v1\")"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"time_range = \"2020-12-01/2020-12-31\"\r\n",
+					"bbox = [-122.2751, 47.5469, -121.9613, 47.7458]\r\n",
+					"\r\n",
+					"search = catalog.search(collections=[\"landsat-8-c2-l2\"], bbox=bbox, datetime=time_range)\r\n",
+					"items = search.get_all_items()\r\n",
+					"len(items)"
+				],
+				"execution_count": 4
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"area_of_interest = {\r\n",
+					"    \"type\": \"Polygon\",\r\n",
+					"    \"coordinates\": [\r\n",
+					"        [\r\n",
+					"            [-122.2751, 47.5469],\r\n",
+					"            [-121.9613, 47.9613],\r\n",
+					"            [-121.9613, 47.9613],\r\n",
+					"            [-122.2751, 47.9613],\r\n",
+					"            [-122.2751, 47.5469],\r\n",
+					"        ]\r\n",
+					"    ],\r\n",
+					"}\r\n",
+					"\r\n",
+					"time_range = \"2020-12-01/2020-12-31\"\r\n",
+					"\r\n",
+					"search = catalog.search(\r\n",
+					"    collections=[\"landsat-8-c2-l2\"], intersects=area_of_interest, datetime=time_range\r\n",
+					")"
+				],
+				"execution_count": 5
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import geopandas\r\n",
+					"df = geopandas.GeoDataFrame.from_features(items.to_dict(), crs=\"epsg:4326\")\r\n",
+					"df"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"selected_item = min(items, key=lambda item: item.properties[\"eo:cloud_cover\"])\r\n",
+					"selected_item"
+				],
+				"execution_count": 12
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
