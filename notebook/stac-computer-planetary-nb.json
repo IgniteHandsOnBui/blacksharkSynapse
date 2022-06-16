@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6e715ca6-8e59-4198-a595-9945bdab892d"
+				"spark.autotune.trackingId": "83a59bc5-1ea2-443c-90a5-c8ced399f0c7"
 			}
 		},
 		"metadata": {
@@ -54,7 +54,7 @@
 					"from pystac_client import Client\r\n",
 					"catalog = Client.open(\"https://planetarycomputer.microsoft.com/api/stac/v1\")"
 				],
-				"execution_count": 1
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -77,7 +77,7 @@
 					"items = search.get_all_items()\r\n",
 					"len(items)"
 				],
-				"execution_count": 4
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -112,7 +112,7 @@
 					"    collections=[\"landsat-8-c2-l2\"], intersects=area_of_interest, datetime=time_range\r\n",
 					")"
 				],
-				"execution_count": 5
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -132,7 +132,7 @@
 					"df = geopandas.GeoDataFrame.from_features(items.to_dict(), crs=\"epsg:4326\")\r\n",
 					"df"
 				],
-				"execution_count": null
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -151,7 +151,7 @@
 					"selected_item = min(items, key=lambda item: item.properties[\"eo:cloud_cover\"])\r\n",
 					"selected_item"
 				],
-				"execution_count": 12
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -167,9 +167,52 @@
 					}
 				},
 				"source": [
-					""
+					"import rich.table\r\n",
+					"table = rich.table.Table(\"Asset Key\", \"Descripiption\")\r\n",
+					"for asset_key, asset in selected_item.assets.items():\r\n",
+					"    # print(f\"{asset_key:<25} - {asset.title}\")\r\n",
+					"    table.add_row(asset_key, asset.title)\r\n",
+					"\r\n",
+					"table"
 				],
-				"execution_count": null
+				"execution_count": 24
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"selected_item.assets[\"rendered_preview\"].to_dict()"
+				],
+				"execution_count": 25
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from IPython.display import Image\r\n",
+					"Image(url=selected_item.assets[\"rendered_preview\"].href, width=500)"
+				],
+				"execution_count": 27
 			}
 		]
 	}
