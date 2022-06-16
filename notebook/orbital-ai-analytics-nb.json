@@ -1,0 +1,151 @@
+{
+	"name": "orbital-ai-analytics-nb",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "Geospatialspark",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "56g",
+			"driverCores": 8,
+			"executorMemory": "56g",
+			"executorCores": 8,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "9a4f458c-ada6-4e3c-8401-c9b797fb7b9b"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+				"name": "Geospatialspark",
+				"type": "Spark",
+				"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 8,
+				"memory": 56,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"#Print information from the raster data\r\n",
+					"from osgeo import gdal  \r\n",
+					"gdal.UseExceptions()\r\n",
+					"access_key = TokenLibrary.getSecret('innosyn-pipeline-kv','GeospatialStorageAccountKey')\r\n",
+					"gdal.SetConfigOption('AZURE_STORAGE_ACCOUNT', 'rawdatajbqezt')\r\n",
+					"gdal.SetConfigOption('AZURE_STORAGE_ACCESS_KEY', access_key)  \r\n",
+					"dataset_info = gdal.Info('/vsiadls/innosyn/raw/sample_4326.tif')\r\n",
+					"print(dataset_info)\r\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Convert GeoTiff to PNG by using GDAL\r\n",
+					"tiff_in = \"/vsiadls/innosyn/raw/sample_4326.tif\"\r\n",
+					"png_out = \"/vsiadls/innosyn/raw/sample_4326.png\"\r\n",
+					"options = gdal.TranslateOptions(format='PNG')\r\n",
+					"gdal.Translate(png_out, tiff_in, options=options)"
+				],
+				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Store geotif image in Azure Data Lake Storage\r\n",
+					"import shutil\r\n",
+					"import sys\r\n",
+					"from osgeo import gdal\r\n",
+					"from notebookutils import mssparkutils\r\n",
+					"mssparkutils.fs.unmount('/test')\r\n",
+					"gdal.UseExceptions()\r\n",
+					"mssparkutils.fs.mount(\r\n",
+					"    \"abfss://innosyn@rawdatajbqezt.dfs.core.windows.net\",\r\n",
+					"    \"/test\",\r\n",
+					"    {\"linkedService\":\"innosyn_ajvt_linked_service\"}\r\n",
+					")\r\n",
+					"access_key = TokenLibrary.getSecret('innosyn-pipeline-kv','GeospatialStorageAccountKey')\r\n",
+					"gdal.SetConfigOption('AZURE_STORAGE_ACCOUNT', 'rawdatajbqezt')\r\n",
+					"gdal.SetConfigOption('AZURE_STORAGE_ACCESS_KEY', access_key)\r\n",
+					"options = gdal.WarpOptions(options=['tr'])\r\n",
+					"gdal.Warp('ajvt_image.tif', '/vsiadls/innosyn/raw/sample_4326.tif', options=options)\r\n",
+					"jobId = mssparkutils.env.getJobId()\r\n",
+					"shutil.copy(\"ajvt_image.tif\", f\"/synfs/{jobId}/test/ajvt_image.tif\")\r\n",
+					""
+				],
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Plot geotif image from blob storage container\r\n",
+					"import rasterio\r\n",
+					"from matplotlib import pyplot\r\n",
+					"img_path = 'https://rawdatajbqezt.blob.core.windows.net/innosyn/raw/Manufacturing_ElSegundo_LSFO_SNR5H2S.tif?sp=r&st=2022-06-14T13:50:50Z&se=2022-06-17T21:50:50Z&spr=https&sv=2021-06-08&sr=b&sig=XInwNf3pYSrmhMovMbPbk8G9tVQ9KzzwO3cbBhKCwMo%3D'\r\n",
+					"src = rasterio.open(img_path)\r\n",
+					"pyplot.imshow(src.read(1), cmap='pink')\r\n",
+					"pyplot.show()"
+				],
+				"execution_count": 12
+			}
+		]
+	}
+}
