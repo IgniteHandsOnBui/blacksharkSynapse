@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "03aab21a-a199-4694-8fc5-1a8e2c1e7e2f"
+				"spark.autotune.trackingId": "febd3d25-a839-4785-aaef-49cbff6b3df8"
 			}
 		},
 		"metadata": {
@@ -198,14 +198,14 @@
 					"    print(item.datetime)\r\n",
 					"    href = pc.sign(item.assets[\"image\"].href)\r\n",
 					"\r\n",
-					"    ds = rioxarray.open_rasterio(href).sel(band=[1, 2, 3])\r\n",
+					"    ds = rioxarray.open_rasterio(href).sel(band=[4, 2, 3])\r\n",
 					"    img = ds.rio.clip([area_of_interest], crs=\"epsg:4326\").plot.imshow(\r\n",
 					"        rgb=\"band\", aspect=1.5, size=12\r\n",
 					"    )\r\n",
 					"    img.axes.set_axis_off()\r\n",
 					"    return img.axes"
 				],
-				"execution_count": 15
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -223,7 +223,7 @@
 				"source": [
 					"create_image(item_old);"
 				],
-				"execution_count": 16
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -241,7 +241,7 @@
 				"source": [
 					"create_image(item_new);"
 				],
-				"execution_count": 17
+				"execution_count": 20
 			}
 		]
 	}
