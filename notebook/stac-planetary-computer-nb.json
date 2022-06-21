@@ -1,5 +1,5 @@
 {
-	"name": "stac-computer-planetary-nb",
+	"name": "stac-planetary-computer-nb",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cb06fe4d-fbb1-496b-9d73-effe826c1421"
+				"spark.autotune.trackingId": "9efa31ee-ae56-4e84-bf7d-bfce6d91ad82"
 			}
 		},
 		"metadata": {
