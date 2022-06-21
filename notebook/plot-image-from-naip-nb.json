@@ -1,0 +1,248 @@
+{
+	"name": "plot-image-from-naip-nb",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "stacapipool",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "56g",
+			"driverCores": 8,
+			"executorMemory": "56g",
+			"executorCores": 8,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "03aab21a-a199-4694-8fc5-1a8e2c1e7e2f"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/stacapipool",
+				"name": "stacapipool",
+				"type": "Spark",
+				"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/stacapipool",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 8,
+				"memory": 56,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from pystac_client import Client\r\n",
+					"import planetary_computer as pc"
+				],
+				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"area_of_interest = {\r\n",
+					"    \"type\": \"Polygon\",\r\n",
+					"    \"coordinates\": [\r\n",
+					"        [\r\n",
+					"            [-111.9839859008789, 40.5389819819361],\r\n",
+					"            [-111.90502166748045, 40.5389819819361],\r\n",
+					"            [-111.90502166748045, 40.57015381856105],\r\n",
+					"            [-111.9839859008789, 40.57015381856105],\r\n",
+					"            [-111.9839859008789, 40.5389819819361],\r\n",
+					"        ]\r\n",
+					"    ],\r\n",
+					"}"
+				],
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"range_old = \"2010-01-01/2013-01-01\"\r\n",
+					"range_new = \"2018-01-01/2021-01-01\""
+				],
+				"execution_count": 12
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"catalog = Client.open(\"https://planetarycomputer.microsoft.com/api/stac/v1\")\r\n",
+					"\r\n",
+					"search_old = catalog.search(\r\n",
+					"    collections=[\"naip\"], intersects=area_of_interest, datetime=range_old\r\n",
+					")\r\n",
+					"\r\n",
+					"search_new = catalog.search(\r\n",
+					"    collections=[\"naip\"], intersects=area_of_interest, datetime=range_new\r\n",
+					")\r\n",
+					"\r\n",
+					"items_old = list(search_old.get_items())\r\n",
+					"items_new = list(search_new.get_items())\r\n",
+					"\r\n",
+					"print(f\"{len(items_old)} Items found in the 'old' range\")\r\n",
+					"print(f\"{len(items_new)} Items found in the 'new' range\")"
+				],
+				"execution_count": 13
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from shapely.geometry import shape\r\n",
+					"\r\n",
+					"area_shape = shape(area_of_interest)\r\n",
+					"target_area = area_shape.area\r\n",
+					"\r\n",
+					"\r\n",
+					"def area_of_overlap(item):\r\n",
+					"    overlap_area = shape(item.geometry).intersection(shape(area_of_interest)).area\r\n",
+					"    return overlap_area / target_area\r\n",
+					"\r\n",
+					"\r\n",
+					"item_old = sorted(items_old, key=area_of_overlap, reverse=True)[0]\r\n",
+					"item_new = sorted(items_new, key=area_of_overlap, reverse=True)[0]"
+				],
+				"execution_count": 14
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import rioxarray\r\n",
+					"\r\n",
+					"\r\n",
+					"def create_image(item):\r\n",
+					"    print(item.datetime)\r\n",
+					"    href = pc.sign(item.assets[\"image\"].href)\r\n",
+					"\r\n",
+					"    ds = rioxarray.open_rasterio(href).sel(band=[1, 2, 3])\r\n",
+					"    img = ds.rio.clip([area_of_interest], crs=\"epsg:4326\").plot.imshow(\r\n",
+					"        rgb=\"band\", aspect=1.5, size=12\r\n",
+					"    )\r\n",
+					"    img.axes.set_axis_off()\r\n",
+					"    return img.axes"
+				],
+				"execution_count": 15
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"create_image(item_old);"
+				],
+				"execution_count": 16
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"create_image(item_new);"
+				],
+				"execution_count": 17
+			}
+		]
+	}
+}
