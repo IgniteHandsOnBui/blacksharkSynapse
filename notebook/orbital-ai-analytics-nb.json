@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9a4f458c-ada6-4e3c-8401-c9b797fb7b9b"
+				"spark.autotune.trackingId": "e9f8b3a4-e808-4668-bc6c-fbd977602877"
 			}
 		},
 		"metadata": {
@@ -61,7 +61,7 @@
 					"print(dataset_info)\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -83,7 +83,7 @@
 					"options = gdal.TranslateOptions(format='PNG')\r\n",
 					"gdal.Translate(png_out, tiff_in, options=options)"
 				],
-				"execution_count": 10
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -120,7 +120,7 @@
 					"shutil.copy(\"ajvt_image.tif\", f\"/synfs/{jobId}/test/ajvt_image.tif\")\r\n",
 					""
 				],
-				"execution_count": 11
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
