@@ -14,6 +14,9 @@
 		"innosyn-pipeline-syn-ws-WorkspaceDefaultSqlServer_connectionString": {
 			"value": ""
 		},
+		"LiamTest_connectionString": {
+			"value": ""
+		},
 		"Stellar Airbus v2_properties_typeProperties_url": {
 			"value": "https://rawdatajbqezt.dfs.core.windows.net"
 		},
