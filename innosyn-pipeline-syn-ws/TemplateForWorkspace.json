@@ -1260,10 +1260,11 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/orbital-ai-analytics-nb')]",
+			"name": "[concat(parameters('workspaceName'), '/cv_pumjack_clip')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
+				"description": "Working document for clipping pumpjacks - trying to replicate FME job",
 				"nbformat": 4,
 				"nbformat_minor": 2,
 				"bigDataPool": {
@@ -1271,16 +1272,16 @@
 					"type": "BigDataPoolReference"
 				},
 				"sessionProperties": {
-					"driverMemory": "56g",
-					"driverCores": 8,
-					"executorMemory": "56g",
-					"executorCores": 8,
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
 					"numExecutors": 2,
 					"conf": {
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "91786c9a-a9b0-466e-879f-9429d09e33a1"
+						"spark.autotune.trackingId": "4e2d830a-31f8-4093-bed5-0d972d52b229"
 					}
 				},
 				"metadata": {
@@ -1314,6 +1315,137 @@
 					{
 						"cell_type": "code",
 						"metadata": {},
+						"source": [
+							"from notebookutils import mssparkutils\r\n",
+							"mssparkutils.fs.mount(\r\n",
+							"    \"abfss://azureml-blobstore-91aa9420-fbec-40ef-91e9-982a277c80cf@dinnot101mlcvx.dfs.core.windows.net\",\r\n",
+							"    \"/test\",\r\n",
+							"    {\"linkedService\":\"LiamTest\"}\r\n",
+							")"
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"jobId = mssparkutils.env.getJobId()\r\n",
+							"print(jobId)\r\n",
+							"mssparkutils.fs.ls(\"synfs:/\"+jobId+\"/test/UI/geotagged_subset_pumpjacks_clip/06-23-2022_015728_UTC/2022_SJVBU_KernRiverAFlight1_6-15-2022\")"
+						],
+						"outputs": [],
+						"execution_count": 40
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import rasterio\r\n",
+							"imagepath = r\"synfs:/36/test/UI/geotagged_subset_pumpjacks_clip/06-23-2022_015728_UTC/2022_SJVBU_KernRiverAFlight1_6-15-2022/2022_SJVBU_Kern_River_A_Flight_01_00459_2.jpg\"\r\n",
+							"\r\n",
+							"#image = mssparkutils.fs.head(\"synfs:/\"+jobId+\"/test/UI/geotagged_subset_pumpjacks_clip/06-23-2022_015728_UTC/2022_SJVBU_KernRiverAFlight1_6-15-2022/2022_SJVBU_Kern_River_A_Flight_01_00469_2.jpg\")\r\n",
+							"rasterio.open(imagepath)"
+						],
+						"outputs": [],
+						"execution_count": 45
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"mssparkutils.fs.unmount(\"/test\") "
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/orbital-ai-analytics-nb')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "Geospatialspark",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "9ad09075-f965-4ce7-b29a-b8ab30d70903"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+						"name": "Geospatialspark",
+						"type": "Spark",
+						"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
 						"source": [
 							"#Print information from the raster data\r\n",
 							"from osgeo import gdal  \r\n",
@@ -1405,13 +1537,35 @@
 							"#Plot geotif image from blob storage container\r\n",
 							"import rasterio\r\n",
 							"from matplotlib import pyplot\r\n",
-							"img_path = 'https://dinnot101mlcvx.blob.core.windows.net/azureml-blobstore-91aa9420-fbec-40ef-91e9-982a277c80cf/UI/05-25-2022_044402_UTC/2022_SJVBU_Kern_River_A%20Flight%2001_OUTPUT_geotagged_254/2022_SJVBU_Kern_River_A_Flight_01_00011.JPG?sv=2021-06-08&ss=bfqt&srt=co&sp=rwdlacupitfx&se=2022-06-30T21:28:32Z&st=2022-06-23T13:28:32Z&spr=https&sig=G0uIqReJKkC7C5y7UmBBR%2Fy9DwdjHRxRqgfgYi7m7ZA%3D'\r\n",
+							"file_name = \"2022_SJVBU_Kern_River_A_Flight_01_00011.JPG\"\r\n",
+							"img_path = \"https://dinnot101mlcvx.blob.core.windows.net/azureml-blobstore-91aa9420-fbec-40ef-91e9-982a277c80cf/UI/05-25-2022_044402_UTC/2022_SJVBU_Kern_River_A%20Flight%2001_OUTPUT_geotagged_254/\" + file_name + \"?sv=2021-06-08&ss=bfqt&srt=co&sp=rwdlacupitfx&se=2022-06-30T21:28:32Z&st=2022-06-23T13:28:32Z&spr=https&sig=G0uIqReJKkC7C5y7UmBBR%2Fy9DwdjHRxRqgfgYi7m7ZA%3D\"\r\n",
 							"src = rasterio.open(img_path)\r\n",
-							"pyplot.imshow(src.read(1), cmap='pink')\r\n",
+							"pyplot.imshow(src.read(3))\r\n",
 							"pyplot.show()"
 						],
 						"outputs": [],
-						"execution_count": 6
+						"execution_count": 18
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"CloudStorageAccount storageAccount1 = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting(\"ConnString\"))\r\n",
+							"CloudBlobContainer container1 = blobClient.GetContainerReference(imageFolder)\r\n",
+							"blobs = container1.ListBlobs().OfType<CloudBlobBlob>().OrderByDescending(b => b.Name).Where(b => b.Name.EndsWith(\".jpg\"))"
+						],
+						"outputs": [],
+						"execution_count": null
 					}
 				]
 			},
@@ -1438,7 +1592,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "66ad01da-c0c6-4616-b9ac-eae2b0a99e18"
+						"spark.autotune.trackingId": "48c71761-da5c-4184-b40e-909b4b2c2bf0"
 					}
 				},
 				"metadata": {
