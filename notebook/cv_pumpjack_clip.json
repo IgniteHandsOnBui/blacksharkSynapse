@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "eb7f6cb8-efc0-47e7-bc30-3f542e8cdf79"
+				"spark.autotune.trackingId": "e553d6c9-5a3d-41ad-b8c5-2f7fe528a143"
 			}
 		},
 		"metadata": {
@@ -142,10 +142,14 @@
 					}
 				},
 				"source": [
+					"import json\r\n",
+					"\r\n",
 					"def parse_AML_json(json_path):\r\n",
-					"    print(\"howdy\")"
+					"    with open(json_path, 'r') as json_file:\r\n",
+					"        json_list = list(json_file)\r\n",
+					"        print(json_list)"
 				],
-				"execution_count": 126
+				"execution_count": 134
 			},
 			{
 				"cell_type": "code",
@@ -162,11 +166,13 @@
 				},
 				"source": [
 					"img_dir = f'/synfs/'+jobId+'/testliam/UI/06-13-2022_075155_UTC/'\r\n",
-					"aml_json_path =  \r\n",
+					"aml_json_path = f'/synfs/'+jobId+'/testliam/Labeling/export/dataset/b2efe480-107f-e1c2-5e78-7af2427f8f00/b5779ff4-ec96-455f-82df-92de2386cafd/labeledDatapoints_1.jsonl'\r\n",
 					"\r\n",
-					"get_blob_file_list(img_dir)"
+					"parse_AML_json(aml_json_path)\r\n",
+					"\r\n",
+					"#get_blob_file_list(img_dir)"
 				],
-				"execution_count": 124
+				"execution_count": 135
 			},
 			{
 				"cell_type": "code",
