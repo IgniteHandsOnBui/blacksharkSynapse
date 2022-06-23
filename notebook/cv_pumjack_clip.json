@@ -1,5 +1,5 @@
 {
-	"name": "cv_pumpack_clip",
+	"name": "cv_pumjack_clip",
 	"properties": {
 		"description": "Working document for clipping pumpjacks - trying to replicate FME job",
 		"nbformat": 4,
@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2fdeae81-8914-49e1-a67a-b88af4d3c0b0"
+				"spark.autotune.trackingId": "bdec89a6-1884-4b96-a034-8118de80e7ae"
 			}
 		},
 		"metadata": {
@@ -59,7 +59,7 @@
 					"    {\"linkedService\":\"LiamTest\"}\r\n",
 					")"
 				],
-				"execution_count": 33
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
