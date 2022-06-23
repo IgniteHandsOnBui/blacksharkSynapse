@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e9f8b3a4-e808-4668-bc6c-fbd977602877"
+				"spark.autotune.trackingId": "e814276d-e2ab-459c-9787-89b82e54f511"
 			}
 		},
 		"metadata": {
@@ -117,8 +117,7 @@
 					"options = gdal.WarpOptions(options=['tr'])\r\n",
 					"gdal.Warp('ajvt_image.tif', '/vsiadls/innosyn/raw/sample_4326.tif', options=options)\r\n",
 					"jobId = mssparkutils.env.getJobId()\r\n",
-					"shutil.copy(\"ajvt_image.tif\", f\"/synfs/{jobId}/test/ajvt_image.tif\")\r\n",
-					""
+					"shutil.copy(\"ajvt_image.tif\", f\"/synfs/{jobId}/test/ajvt_image.tif\")"
 				],
 				"execution_count": 3
 			},
@@ -139,12 +138,12 @@
 					"#Plot geotif image from blob storage container\r\n",
 					"import rasterio\r\n",
 					"from matplotlib import pyplot\r\n",
-					"img_path = 'https://rawdatajbqezt.blob.core.windows.net/innosyn/raw/Manufacturing_ElSegundo_LSFO_SNR5H2S.tif?sp=r&st=2022-06-14T13:50:50Z&se=2022-06-17T21:50:50Z&spr=https&sv=2021-06-08&sr=b&sig=XInwNf3pYSrmhMovMbPbk8G9tVQ9KzzwO3cbBhKCwMo%3D'\r\n",
+					"img_path = 'https://dinnot101mlcvx.blob.core.windows.net/azureml-blobstore-91aa9420-fbec-40ef-91e9-982a277c80cf/UI/05-25-2022_044402_UTC/2022_SJVBU_Kern_River_A%20Flight%2001_OUTPUT_geotagged_254/2022_SJVBU_Kern_River_A_Flight_01_00011.JPG?sv=2021-06-08&ss=bfqt&srt=co&sp=rwdlacupitfx&se=2022-06-30T21:28:32Z&st=2022-06-23T13:28:32Z&spr=https&sig=G0uIqReJKkC7C5y7UmBBR%2Fy9DwdjHRxRqgfgYi7m7ZA%3D'\r\n",
 					"src = rasterio.open(img_path)\r\n",
 					"pyplot.imshow(src.read(1), cmap='pink')\r\n",
 					"pyplot.show()"
 				],
-				"execution_count": 12
+				"execution_count": 6
 			}
 		]
 	}
