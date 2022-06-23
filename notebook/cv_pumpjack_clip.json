@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cc084fb3-574d-46e3-972a-145a5f7a226f"
+				"spark.autotune.trackingId": "d8a54f4f-77ca-47cf-8962-3d89464a3753"
 			}
 		},
 		"metadata": {
@@ -95,42 +95,14 @@
 					}
 				},
 				"source": [
-					"import os\r\n",
-					"print(jobId)\r\n",
-					"\r\n",
-					"local = f'/synfs/40/testliam/testfile.txt'\r\n",
-					"\r\n",
-					"with open(local) as f:\r\n",
-					"    print(f.read())\r\n",
-					"\r\n",
-					"# local_dir = os.listdir(local)\r\n",
-					"# print(local_dir)"
-				],
-				"execution_count": 89
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
 					"#Plot jpeg image from blob storage container\r\n",
 					"import rasterio\r\n",
-					"from matplotlib import pyplot\r\n",
+					"from rasterio.plot import show\r\n",
 					"img_path = f'/synfs/40/testliam/UI/geotagged_subset_pumpjacks_clip/06-23-2022_015728_UTC/2022_SJVBU_KernRiverAFlight1_6-15-2022/2022_SJVBU_Kern_River_D_backup_Flight_02_01140.jpg'\r\n",
 					"src = rasterio.open(img_path)\r\n",
-					"pyplot.imshow(src.read(3))\r\n",
-					"pyplot.show()"
+					"show(src)"
 				],
-				"execution_count": 90
+				"execution_count": 99
 			},
 			{
 				"cell_type": "code",
