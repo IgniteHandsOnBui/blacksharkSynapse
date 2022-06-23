@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e814276d-e2ab-459c-9787-89b82e54f511"
+				"spark.autotune.trackingId": "9ad09075-f965-4ce7-b29a-b8ab30d70903"
 			}
 		},
 		"metadata": {
@@ -138,12 +138,33 @@
 					"#Plot geotif image from blob storage container\r\n",
 					"import rasterio\r\n",
 					"from matplotlib import pyplot\r\n",
-					"img_path = 'https://dinnot101mlcvx.blob.core.windows.net/azureml-blobstore-91aa9420-fbec-40ef-91e9-982a277c80cf/UI/05-25-2022_044402_UTC/2022_SJVBU_Kern_River_A%20Flight%2001_OUTPUT_geotagged_254/2022_SJVBU_Kern_River_A_Flight_01_00011.JPG?sv=2021-06-08&ss=bfqt&srt=co&sp=rwdlacupitfx&se=2022-06-30T21:28:32Z&st=2022-06-23T13:28:32Z&spr=https&sig=G0uIqReJKkC7C5y7UmBBR%2Fy9DwdjHRxRqgfgYi7m7ZA%3D'\r\n",
+					"file_name = \"2022_SJVBU_Kern_River_A_Flight_01_00011.JPG\"\r\n",
+					"img_path = \"https://dinnot101mlcvx.blob.core.windows.net/azureml-blobstore-91aa9420-fbec-40ef-91e9-982a277c80cf/UI/05-25-2022_044402_UTC/2022_SJVBU_Kern_River_A%20Flight%2001_OUTPUT_geotagged_254/\" + file_name + \"?sv=2021-06-08&ss=bfqt&srt=co&sp=rwdlacupitfx&se=2022-06-30T21:28:32Z&st=2022-06-23T13:28:32Z&spr=https&sig=G0uIqReJKkC7C5y7UmBBR%2Fy9DwdjHRxRqgfgYi7m7ZA%3D\"\r\n",
 					"src = rasterio.open(img_path)\r\n",
-					"pyplot.imshow(src.read(1), cmap='pink')\r\n",
+					"pyplot.imshow(src.read(3))\r\n",
 					"pyplot.show()"
 				],
-				"execution_count": 6
+				"execution_count": 18
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"CloudStorageAccount storageAccount1 = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting(\"ConnString\"))\r\n",
+					"CloudBlobContainer container1 = blobClient.GetContainerReference(imageFolder)\r\n",
+					"blobs = container1.ListBlobs().OfType<CloudBlobBlob>().OrderByDescending(b => b.Name).Where(b => b.Name.EndsWith(\".jpg\"))"
+				],
+				"execution_count": null
 			}
 		]
 	}
