@@ -1260,7 +1260,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/cv_pumjack_clip')]",
+			"name": "[concat(parameters('workspaceName'), '/cv_pumpjack_clip')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -1281,7 +1281,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "4e2d830a-31f8-4093-bed5-0d972d52b229"
+						"spark.autotune.trackingId": "4ef67758-b95b-4c19-b6e5-39af09c6c7e6"
 					}
 				},
 				"metadata": {
@@ -1592,7 +1592,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "48c71761-da5c-4184-b40e-909b4b2c2bf0"
+						"spark.autotune.trackingId": "368b1763-9b52-4829-92cc-056ec99e90cb"
 					}
 				},
 				"metadata": {
