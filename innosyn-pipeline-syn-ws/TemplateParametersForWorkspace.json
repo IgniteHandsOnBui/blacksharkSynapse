@@ -5,6 +5,9 @@
 		"workspaceName": {
 			"value": "innosyn-pipeline-syn-ws"
 		},
+		"LiamTest_connectionString": {
+			"value": ""
+		},
 		"Stellar Airbus v2 FS_connectionString": {
 			"value": ""
 		},
@@ -12,9 +15,6 @@
 			"value": ""
 		},
 		"innosyn-pipeline-syn-ws-WorkspaceDefaultSqlServer_connectionString": {
-			"value": ""
-		},
-		"LiamTest_connectionString": {
 			"value": ""
 		},
 		"Stellar Airbus v2_properties_typeProperties_url": {
