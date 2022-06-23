@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e4d231d5-ca44-4ead-b79e-1cd59ba5bfd1"
+				"spark.autotune.trackingId": "eb7f6cb8-efc0-47e7-bc30-3f542e8cdf79"
 			}
 		},
 		"metadata": {
@@ -59,7 +59,7 @@
 					"    {\"linkedService\":\"LiamTest\"}\r\n",
 					")"
 				],
-				"execution_count": 81
+				"execution_count": 107
 			},
 			{
 				"cell_type": "code",
@@ -76,10 +76,10 @@
 				},
 				"source": [
 					"jobId = mssparkutils.env.getJobId()\r\n",
-					"print(jobId)\r\n",
-					"mssparkutils.fs.ls(\"synfs:/\"+jobId+\"/testliam/UI/geotagged_subset_pumpjacks_clip/06-23-2022_015728_UTC/2022_SJVBU_KernRiverAFlight1_6-15-2022\")"
+					"# print(jobId)\r\n",
+					"# mssparkutils.fs.ls(\"synfs:/\"+jobId+\"/testliam/UI/geotagged_subset_pumpjacks_clip/06-23-2022_015728_UTC/2022_SJVBU_KernRiverAFlight1_6-15-2022\")"
 				],
-				"execution_count": 104
+				"execution_count": 114
 			},
 			{
 				"cell_type": "code",
@@ -98,11 +98,11 @@
 					"#Plot jpeg image from blob storage container\r\n",
 					"import rasterio\r\n",
 					"from rasterio.plot import show\r\n",
-					"img_path = f'/synfs/40/testliam/UI/geotagged_subset_pumpjacks_clip/06-23-2022_015728_UTC/2022_SJVBU_KernRiverAFlight1_6-15-2022/2022_SJVBU_Kern_River_D_backup_Flight_02_01140.jpg'\r\n",
+					"img_path = f'/synfs/'+jobId+'/testliam/UI/06-13-2022_075155_UTC/2022_SJVBU_Kern_River_A_Flight_01_00217.jpg'\r\n",
 					"src = rasterio.open(img_path)\r\n",
 					"show(src)"
 				],
-				"execution_count": 99
+				"execution_count": 123
 			},
 			{
 				"cell_type": "code",
@@ -119,11 +119,54 @@
 				},
 				"source": [
 					"import os\r\n",
-					"img_dir = f'/synfs/40/testliam/UI/geotagged_subset_pumpjacks_clip/06-23-2022_015728_UTC/'\r\n",
-					"for i in os.listdir(img_dir):\r\n",
-					"    print(img_dir+\"/\"+i)"
+					"import rasterio\r\n",
+					"\r\n",
+					"def get_blob_file_list(directory):\r\n",
+					"    for f in os.listdir(directory):\r\n",
+					"        f_img = img_dir+f\r\n",
+					"        print(f_img)"
 				],
-				"execution_count": null
+				"execution_count": 119
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"def parse_AML_json(json_path):\r\n",
+					"    print(\"howdy\")"
+				],
+				"execution_count": 126
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"img_dir = f'/synfs/'+jobId+'/testliam/UI/06-13-2022_075155_UTC/'\r\n",
+					"aml_json_path =  \r\n",
+					"\r\n",
+					"get_blob_file_list(img_dir)"
+				],
+				"execution_count": 124
 			},
 			{
 				"cell_type": "code",
