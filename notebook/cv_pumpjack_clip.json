@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6776bcce-72ed-49e4-9059-40345bb0063f"
+				"spark.autotune.trackingId": "c876c8cd-bc3e-4207-b93e-51a70f4ef4b2"
 			}
 		},
 		"metadata": {
@@ -52,34 +52,21 @@
 			{
 				"cell_type": "code",
 				"source": [
+					"#Mounting the AML blob storage located in dinnot101mlcvx to this notebook so we can reference it as if it was a filepath\r\n",
+					"#The 'wasbs' is for blob storage. There is another prefix for file storage, etc ...\r\n",
+					"\r\n",
 					"from notebookutils import mssparkutils\r\n",
-					"mssparkutils.fs.mount(\r\n",
-					"    \"wasbs://azureml-blobstore-91aa9420-fbec-40ef-91e9-982a277c80cf@dinnot101mlcvx.blob.core.windows.net\",\r\n",
-					"    \"/testliam\",\r\n",
-					"    {\"linkedService\":\"LiamTest\"}\r\n",
-					")"
+					"try:\r\n",
+					"    mssparkutils.fs.mount(\r\n",
+					"        \"wasbs://azureml-blobstore-91aa9420-fbec-40ef-91e9-982a277c80cf@dinnot101mlcvx.blob.core.windows.net\",\r\n",
+					"        \"/testliam\",\r\n",
+					"        {\"linkedService\":\"LiamTest\"}\r\n",
+					"    )\r\n",
+					"except:\r\n",
+					"    print(\"FAILED TO MOUNT\")\r\n",
+					"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
 				],
-				"execution_count": 60
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"jobId = mssparkutils.env.getJobId()\r\n",
-					"# print(jobId)\r\n",
-					"# mssparkutils.fs.ls(\"synfs:/\"+jobId+\"/testliam/UI/geotagged_subset_pumpjacks_clip/06-23-2022_015728_UTC/2022_SJVBU_KernRiverAFlight1_6-15-2022\")"
-				],
-				"execution_count": null
+				"execution_count": 185
 			},
 			{
 				"cell_type": "code",
@@ -96,6 +83,10 @@
 				},
 				"source": [
 					"#Plot jpeg image from blob storage container\r\n",
+					"\r\n",
+					"#This is a proof of concept of how rasterio/other python tools access files via blob storage/notebook mount.\r\n",
+					"#Note 'jobId' which will change every instance\r\n",
+					"\r\n",
 					"import rasterio\r\n",
 					"from rasterio.plot import show\r\n",
 					"img_path = f'/synfs/'+jobId+'/testliam/UI/06-13-2022_075155_UTC/2022_SJVBU_Kern_River_A_Flight_01_00217.jpg'\r\n",
@@ -182,9 +173,41 @@
 					}
 				},
 				"source": [
-					"import rasterio\r\n",
+					"#https://stackoverflow.com/questions/13852700/create-file-but-if-name-exists-add-number\r\n",
+					"def uniquify(path):\r\n",
+					"    filename, extension = os.path.splitext(path)\r\n",
+					"    counter = 1\r\n",
 					"\r\n",
-					"def clip_pumpjacks(pumpjack_list, img_dir):\r\n",
+					"    while os.path.exists(path):\r\n",
+					"        path = filename + \"_\" + str(counter) + extension\r\n",
+					"        counter += 1\r\n",
+					"\r\n",
+					"    return path"
+				],
+				"execution_count": 175
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import rasterio\r\n",
+					"from osgeo import gdal\r\n",
+					"from os.path import exists\r\n",
+					"\r\n",
+					"gdal.UseExceptions()\r\n",
+					"\r\n",
+					"def clip_pumpjacks(pumpjack_list, img_dir, img_dir_out):\r\n",
+					"    count = 20\r\n",
 					"    for pumpjack in pumpjack_list:\r\n",
 					"        if pumpjack[0] == 'name':\r\n",
 					"            continue\r\n",
@@ -206,8 +229,20 @@
 					"        bottomY_pixel = int(int(img_height)*float(bottomY))\r\n",
 					"\r\n",
 					"        middleX_pixel = int(topX_pixel + .5*(bottomX_pixel-topX_pixel))\r\n",
-					"        middleY_pixel = int(bottomY_pixel + .5*(bottomY_pixel-topY_pixel))\r\n",
+					"        middleY_pixel = int(topY_pixel + .5*(bottomY_pixel-topY_pixel))\r\n",
 					"\r\n",
+					"        new_topX_pixel = middleX_pixel - 750\r\n",
+					"        new_topY_pixel = middleY_pixel - 750\r\n",
+					"\r\n",
+					"        jpg_in = img_file\r\n",
+					"        jpg_out_nonunique = img_dir_out + pumpjack[0] +\".jpg\"\r\n",
+					"        jpg_out = uniquify(jpg_out_nonunique)\r\n",
+					"        print(jpg_out)\r\n",
+					"        srcWin_option = [new_topX_pixel, new_topY_pixel, 1500, 1500]\r\n",
+					"        options = gdal.TranslateOptions(format='JPEG', srcWin = srcWin_option)\r\n",
+					"        gdal.Translate(jpg_out, jpg_in, options=options)\r\n",
+					"\r\n",
+					"        count = count + 1\r\n",
 					"        # print(\"topX = \"+ str(topX_pixel))\r\n",
 					"        # print(\"topY = \"+ str(topY_pixel))\r\n",
 					"        # print(\"bottomX_pixel = \"+ str(bottomX_pixel))\r\n",
@@ -215,11 +250,13 @@
 					"        # print(\" \")\r\n",
 					"        # print(\"middleX_pixel = \"+ str(middleX_pixel))\r\n",
 					"        # print(\"middleY_pixel = \"+ str(middleY_pixel))\r\n",
+					"        # print('')\r\n",
+					"        # print(str(bottomY_pixel-topY_pixel))\r\n",
 					"\r\n",
 					"\r\n",
 					"        img.close()"
 				],
-				"execution_count": 129
+				"execution_count": 182
 			},
 			{
 				"cell_type": "code",
@@ -235,16 +272,19 @@
 					}
 				},
 				"source": [
+					"jobId = mssparkutils.env.getJobId()\r\n",
+					"\r\n",
 					"img_dir = f'/synfs/'+jobId+'/testliam/UI/06-15-2022_053557_UTC/geotagged_subset/'\r\n",
 					"aml_json_path = f'/synfs/'+jobId+'/testliam/Labeling/export/dataset/b2efe480-107f-e1c2-5e78-7af2427f8f00/b5779ff4-ec96-455f-82df-92de2386cafd/labeledDatapoints_1.jsonl'\r\n",
+					"img_dir_out = f'/synfs/'+jobId+'/testliam/UI/geotagged_subset_pumpjacks_clip/python_out/'\r\n",
 					"\r\n",
 					"#pumpjack_list = parse_AML_json(aml_json_path)\r\n",
 					"\r\n",
 					"#get_blob_file_list(img_dir)\r\n",
 					"\r\n",
-					"clip_pumpjacks(pumpjack_list, img_dir)"
+					"clip_pumpjacks(pumpjack_list, img_dir, img_dir_out)"
 				],
-				"execution_count": 130
+				"execution_count": 183
 			},
 			{
 				"cell_type": "code",
