@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c876c8cd-bc3e-4207-b93e-51a70f4ef4b2"
+				"spark.autotune.trackingId": "237f2ce2-59ad-4ce1-b686-0ffda4686c78"
 			}
 		},
 		"metadata": {
@@ -85,7 +85,9 @@
 					"#Plot jpeg image from blob storage container\r\n",
 					"\r\n",
 					"#This is a proof of concept of how rasterio/other python tools access files via blob storage/notebook mount.\r\n",
-					"#Note 'jobId' which will change every instance\r\n",
+					"\r\n",
+					"#Note 'jobId' which will change every notebook instance\r\n",
+					"jobId = mssparkutils.env.getJobId()\r\n",
 					"\r\n",
 					"import rasterio\r\n",
 					"from rasterio.plot import show\r\n",
@@ -109,15 +111,15 @@
 					}
 				},
 				"source": [
+					"#This function is not used during the cv_pumpjack_clip workflow, just wrote it for reference on which files were in a directory.\r\n",
 					"import os\r\n",
-					"import rasterio\r\n",
 					"\r\n",
 					"def get_blob_file_list(directory):\r\n",
 					"    for f in os.listdir(directory):\r\n",
 					"        f_img = img_dir+f\r\n",
 					"        print(f_img)"
 				],
-				"execution_count": null
+				"execution_count": 186
 			},
 			{
 				"cell_type": "code",
@@ -137,6 +139,15 @@
 					"import numpy as np\r\n",
 					"\r\n",
 					"def parse_AML_json(json_path):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to parse the Azure Machine Learning (AML) JSONL output. \r\n",
+					"    Arguments:\r\n",
+					"        json_path: The filepath to the AML jsonl file. This file should contain name, topX, topY, bottomX, and bottomY\r\n",
+					"    Returns:\r\n",
+					"        A numpy array of all labels from AML jsonl file in this format - [filename, topX, topyY, bottomX, bottomY]\r\n",
+					"    \r\n",
+					"    \"\"\"\r\n",
+					"\r\n",
 					"    parsed_list = np.array(['name','topX','topY','bottomX','bottomY'])\r\n",
 					"\r\n",
 					"    with open(json_path, 'r') as json_file:\r\n",
