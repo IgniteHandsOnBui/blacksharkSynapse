@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "237f2ce2-59ad-4ce1-b686-0ffda4686c78"
+				"spark.autotune.trackingId": "f77778cf-e11e-4ed6-b21c-1078475daf16"
 			}
 		},
 		"metadata": {
@@ -186,6 +186,13 @@
 				"source": [
 					"#https://stackoverflow.com/questions/13852700/create-file-but-if-name-exists-add-number\r\n",
 					"def uniquify(path):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to return a unique path name if there is already a file that exists at path\r\n",
+					"    Arguments:\r\n",
+					"        path: a full directory and file name with extention\r\n",
+					"    Returns:\r\n",
+					"        path but with _x at the end with x being a unique number if there already exists a file with the suffix of _1, _2, _3 and so on.\r\n",
+					"    \"\"\"\r\n",
 					"    filename, extension = os.path.splitext(path)\r\n",
 					"    counter = 1\r\n",
 					"\r\n",
@@ -211,28 +218,38 @@
 					}
 				},
 				"source": [
-					"import rasterio\r\n",
 					"from osgeo import gdal\r\n",
 					"from os.path import exists\r\n",
 					"\r\n",
 					"gdal.UseExceptions()\r\n",
 					"\r\n",
 					"def clip_pumpjacks(pumpjack_list, img_dir, img_dir_out):\r\n",
-					"    count = 20\r\n",
+					"    \"\"\"\r\n",
+					"    Function for clipping images 1500, 1500 from Azure Machine Learning provided bonding box. Currently the read/writes of images are done via GDAL\r\n",
+					"    Arguments:\r\n",
+					"        pumpjack_list: list of pumpjacks returned from parse_AML_json function\r\n",
+					"        img_dir: directory of where the pumpjack images to be clipped are located\r\n",
+					"        img_dir_out: directory of where the clipped images will go container_tokens\r\n",
+					"    Returns:\r\n",
+					"        True if the function was completed.\r\n",
+					"    \"\"\"\r\n",
+					"\r\n",
 					"    for pumpjack in pumpjack_list:\r\n",
 					"        if pumpjack[0] == 'name':\r\n",
-					"            continue\r\n",
-					"        \r\n",
+					"            continue     \r\n",
+					"\r\n",
 					"        img_file = img_dir + pumpjack[0]\r\n",
-					"        print(img_file)\r\n",
+					"\r\n",
 					"        topX = pumpjack[1]\r\n",
 					"        topY = pumpjack[2]\r\n",
 					"        bottomX = pumpjack[3]\r\n",
 					"        bottomY = pumpjack[4]\r\n",
 					"\r\n",
-					"        img = rasterio.open(img_file)\r\n",
-					"        img_width = img.width\r\n",
-					"        img_height = img.height\r\n",
+					"        g = gdal.OpenEx(img_file)\r\n",
+					"        img_width = g.RasterXSize\r\n",
+					"        img_height = g.RasterYSize\r\n",
+					"\r\n",
+					"        g = None\r\n",
 					"\r\n",
 					"        topX_pixel = int(int(img_width)*float(topX))\r\n",
 					"        topY_pixel = int(int(img_height)*float(topY))\r\n",
@@ -253,7 +270,6 @@
 					"        options = gdal.TranslateOptions(format='JPEG', srcWin = srcWin_option)\r\n",
 					"        gdal.Translate(jpg_out, jpg_in, options=options)\r\n",
 					"\r\n",
-					"        count = count + 1\r\n",
 					"        # print(\"topX = \"+ str(topX_pixel))\r\n",
 					"        # print(\"topY = \"+ str(topY_pixel))\r\n",
 					"        # print(\"bottomX_pixel = \"+ str(bottomX_pixel))\r\n",
@@ -263,11 +279,9 @@
 					"        # print(\"middleY_pixel = \"+ str(middleY_pixel))\r\n",
 					"        # print('')\r\n",
 					"        # print(str(bottomY_pixel-topY_pixel))\r\n",
-					"\r\n",
-					"\r\n",
-					"        img.close()"
+					"    return True"
 				],
-				"execution_count": 182
+				"execution_count": 203
 			},
 			{
 				"cell_type": "code",
@@ -295,7 +309,7 @@
 					"\r\n",
 					"clip_pumpjacks(pumpjack_list, img_dir, img_dir_out)"
 				],
-				"execution_count": 183
+				"execution_count": 201
 			},
 			{
 				"cell_type": "code",
