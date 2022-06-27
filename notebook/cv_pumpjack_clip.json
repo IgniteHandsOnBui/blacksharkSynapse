@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "16e1f3d7-e542-40b2-b5ee-459f2cf775a4"
+				"spark.autotune.trackingId": "6776bcce-72ed-49e4-9059-40345bb0063f"
 			}
 		},
 		"metadata": {
@@ -166,7 +166,7 @@
 					"                parsed_list = np.vstack([parsed_list, parsed_row])\r\n",
 					"    return parsed_list"
 				],
-				"execution_count": 64
+				"execution_count": 96
 			},
 			{
 				"cell_type": "code",
@@ -182,15 +182,69 @@
 					}
 				},
 				"source": [
-					"img_dir = f'/synfs/'+jobId+'/testliam/UI/06-13-2022_075155_UTC/'\r\n",
+					"import rasterio\r\n",
+					"\r\n",
+					"def clip_pumpjacks(pumpjack_list, img_dir):\r\n",
+					"    for pumpjack in pumpjack_list:\r\n",
+					"        if pumpjack[0] == 'name':\r\n",
+					"            continue\r\n",
+					"        \r\n",
+					"        img_file = img_dir + pumpjack[0]\r\n",
+					"        print(img_file)\r\n",
+					"        topX = pumpjack[1]\r\n",
+					"        topY = pumpjack[2]\r\n",
+					"        bottomX = pumpjack[3]\r\n",
+					"        bottomY = pumpjack[4]\r\n",
+					"\r\n",
+					"        img = rasterio.open(img_file)\r\n",
+					"        img_width = img.width\r\n",
+					"        img_height = img.height\r\n",
+					"\r\n",
+					"        topX_pixel = int(int(img_width)*float(topX))\r\n",
+					"        topY_pixel = int(int(img_height)*float(topY))\r\n",
+					"        bottomX_pixel = int(int(img_width)*float(bottomX))\r\n",
+					"        bottomY_pixel = int(int(img_height)*float(bottomY))\r\n",
+					"\r\n",
+					"        middleX_pixel = int(topX_pixel + .5*(bottomX_pixel-topX_pixel))\r\n",
+					"        middleY_pixel = int(bottomY_pixel + .5*(bottomY_pixel-topY_pixel))\r\n",
+					"\r\n",
+					"        # print(\"topX = \"+ str(topX_pixel))\r\n",
+					"        # print(\"topY = \"+ str(topY_pixel))\r\n",
+					"        # print(\"bottomX_pixel = \"+ str(bottomX_pixel))\r\n",
+					"        # print(\"bottomY_pixel = \"+ str(bottomY_pixel))\r\n",
+					"        # print(\" \")\r\n",
+					"        # print(\"middleX_pixel = \"+ str(middleX_pixel))\r\n",
+					"        # print(\"middleY_pixel = \"+ str(middleY_pixel))\r\n",
+					"\r\n",
+					"\r\n",
+					"        img.close()"
+				],
+				"execution_count": 129
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"img_dir = f'/synfs/'+jobId+'/testliam/UI/06-15-2022_053557_UTC/geotagged_subset/'\r\n",
 					"aml_json_path = f'/synfs/'+jobId+'/testliam/Labeling/export/dataset/b2efe480-107f-e1c2-5e78-7af2427f8f00/b5779ff4-ec96-455f-82df-92de2386cafd/labeledDatapoints_1.jsonl'\r\n",
 					"\r\n",
-					"pumpjack_list = parse_AML_json(aml_json_path)\r\n",
-					"print(pumpjack_list)\r\n",
+					"#pumpjack_list = parse_AML_json(aml_json_path)\r\n",
 					"\r\n",
-					"#get_blob_file_list(img_dir)"
+					"#get_blob_file_list(img_dir)\r\n",
+					"\r\n",
+					"clip_pumpjacks(pumpjack_list, img_dir)"
 				],
-				"execution_count": 65
+				"execution_count": 130
 			},
 			{
 				"cell_type": "code",
