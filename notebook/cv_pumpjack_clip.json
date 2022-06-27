@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e553d6c9-5a3d-41ad-b8c5-2f7fe528a143"
+				"spark.autotune.trackingId": "16e1f3d7-e542-40b2-b5ee-459f2cf775a4"
 			}
 		},
 		"metadata": {
@@ -59,7 +59,7 @@
 					"    {\"linkedService\":\"LiamTest\"}\r\n",
 					")"
 				],
-				"execution_count": 107
+				"execution_count": 60
 			},
 			{
 				"cell_type": "code",
@@ -79,7 +79,7 @@
 					"# print(jobId)\r\n",
 					"# mssparkutils.fs.ls(\"synfs:/\"+jobId+\"/testliam/UI/geotagged_subset_pumpjacks_clip/06-23-2022_015728_UTC/2022_SJVBU_KernRiverAFlight1_6-15-2022\")"
 				],
-				"execution_count": 114
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -102,7 +102,7 @@
 					"src = rasterio.open(img_path)\r\n",
 					"show(src)"
 				],
-				"execution_count": 123
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -126,7 +126,7 @@
 					"        f_img = img_dir+f\r\n",
 					"        print(f_img)"
 				],
-				"execution_count": 119
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -143,13 +143,30 @@
 				},
 				"source": [
 					"import json\r\n",
+					"import numpy as np\r\n",
 					"\r\n",
 					"def parse_AML_json(json_path):\r\n",
+					"    parsed_list = np.array(['name','topX','topY','bottomX','bottomY'])\r\n",
+					"\r\n",
 					"    with open(json_path, 'r') as json_file:\r\n",
 					"        json_list = list(json_file)\r\n",
-					"        print(json_list)"
+					"        for pumpjack in json_list:\r\n",
+					"            pumpjack_json = json.loads(pumpjack)\r\n",
+					"\r\n",
+					"            pumpjack_img = os.path.basename(pumpjack_json['image_url'])\r\n",
+					"            \r\n",
+					"            for pumpjack_label in pumpjack_json['label']:\r\n",
+					"                topX = pumpjack_label['topX']\r\n",
+					"                topY = pumpjack_label['topY']\r\n",
+					"                bottomX = pumpjack_label['bottomX']\r\n",
+					"                bottomY = pumpjack_label['bottomY']\r\n",
+					"                \r\n",
+					"                parsed_row = np.array([pumpjack_img,topX,topY,bottomX,bottomY])\r\n",
+					"                #print(parsed_row)\r\n",
+					"                parsed_list = np.vstack([parsed_list, parsed_row])\r\n",
+					"    return parsed_list"
 				],
-				"execution_count": 134
+				"execution_count": 64
 			},
 			{
 				"cell_type": "code",
@@ -168,11 +185,12 @@
 					"img_dir = f'/synfs/'+jobId+'/testliam/UI/06-13-2022_075155_UTC/'\r\n",
 					"aml_json_path = f'/synfs/'+jobId+'/testliam/Labeling/export/dataset/b2efe480-107f-e1c2-5e78-7af2427f8f00/b5779ff4-ec96-455f-82df-92de2386cafd/labeledDatapoints_1.jsonl'\r\n",
 					"\r\n",
-					"parse_AML_json(aml_json_path)\r\n",
+					"pumpjack_list = parse_AML_json(aml_json_path)\r\n",
+					"print(pumpjack_list)\r\n",
 					"\r\n",
 					"#get_blob_file_list(img_dir)"
 				],
-				"execution_count": 135
+				"execution_count": 65
 			},
 			{
 				"cell_type": "code",
