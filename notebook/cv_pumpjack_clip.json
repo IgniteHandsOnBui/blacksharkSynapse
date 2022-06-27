@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d0675a5e-ffd6-4411-99dc-df1f829af7a7"
+				"spark.autotune.trackingId": "9e25753f-5af8-417a-b8d5-e30402ca4c87"
 			}
 		},
 		"metadata": {
@@ -325,8 +325,7 @@
 					}
 				},
 				"source": [
-					"mssparkutils.fs.unmount(\"/test\")\r\n",
-					"mssparkutils.fs.unmount(\"/test_liam\")"
+					"mssparkutils.fs.unmount(\"/testliam\")"
 				],
 				"execution_count": null
 			}
