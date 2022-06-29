@@ -1,0 +1,67 @@
+{
+	"name": "STAC_PreProcessing_Guide",
+	"properties": {
+		"description": "Guide for documenting and sharing pre-processing steps required prior to the STAC ingestion process. This guide will use JPGs as an example",
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "Geospatialspark",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "56g",
+			"driverCores": 8,
+			"executorMemory": "56g",
+			"executorCores": 8,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "b219f4b5-edc2-4133-9af5-6c9766c24ae8"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+				"name": "Geospatialspark",
+				"type": "Spark",
+				"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 8,
+				"memory": 56,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"#TODO:\r\n",
+					"\"\"\"\r\n",
+					"Prepare step-by step notebook with all STAC pre-processing steps that include all transformations and metadata creation steps. \r\n",
+					"Use markdown text for instructions.\r\n",
+					"Stretch - automate services requires via email generation ITFP GTA\r\n",
+					"Demo Notebook stakeholders: DnI-GIS, GTA, DINNO.\r\n",
+					"\"\"\""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
