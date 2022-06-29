@@ -1,24 +1,24 @@
 {
-    "name": "Stellar Airbus v2 FS",
-    "type": "Microsoft.Synapse/workspaces/linkedservices",
-    "properties": {
-        "annotations": [],
-        "type": "AzureFileStorage",
-        "typeProperties": {
-            "connectionString": "DefaultEndpointsProtocol=https;AccountName=rawdatajbqezt;EndpointSuffix=core.windows.net;",
-            "accountKey": {
-                "type": "AzureKeyVaultSecret",
-                "store": {
-                    "referenceName": "Stellar Pipeline Key Vault",
-                    "type": "LinkedServiceReference"
-                },
-                "secretName": "AirbusStorageAccountKey"
-            },
-            "fileShare": "volume-a"
-        },
-        "connectVia": {
-            "referenceName": "AutoResolveIntegrationRuntime",
-            "type": "IntegrationRuntimeReference"
-        }
-    }
+	"name": "Stellar Airbus v2 FS",
+	"properties": {
+		"annotations": [],
+		"type": "AzureFileStorage",
+		"typeProperties": {
+			"connectionString": "DefaultEndpointsProtocol=https;AccountName=rawdatajbqezt;EndpointSuffix=core.windows.net;",
+			"accountKey": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Stellar Pipeline Key Vault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "GeospatialStorageAccountKey"
+			},
+			"fileShare": "volume-a"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/linkedservices"
 }
