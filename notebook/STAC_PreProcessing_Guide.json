@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f3100b8c-34a1-485e-bf80-681bf4ce144f"
+				"spark.autotune.trackingId": "efdc0d3d-01e2-419f-800e-66ac82b6c802"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,7 @@
 					"Demo Notebook stakeholders: DnI-GIS, GTA, DINNO.\r\n",
 					"\"\"\""
 				],
-				"execution_count": 1
+				"execution_count": 3
 			},
 			{
 				"cell_type": "markdown",
@@ -73,11 +73,17 @@
 				},
 				"source": [
 					"# STAC Ingestion Synapse Notebook Guide\r\n",
-					"Stac is in development from the ...\r\n",
+					"This guide will demonstrate the data processing steps of rich media data into STAC. \r\n",
+					"\r\n",
+					"For more information on Chevron's STAC implementation - **[Chevron Atlas](https://atlas-dev.azure.chevron.com/)**\r\n",
+					"\r\n",
+					"This guide follows recommendations provided in CDAS - **[Data Preparation](https://cdas.azure.chevron.com/Data-Insights/Geospatial-Technology-And-Analytics/Chevron-Atlas/Getting-Started/Data-Preparation.html)**\r\n",
 					"## Sections:\r\n",
 					"### 1. Mount blob storages\r\n",
-					"### 2. TestTest\r\n",
-					"### 3. Test Test Test"
+					"### 2. Get list of all images in source container\r\n",
+					"### 3. Setting up the collection\r\n",
+					"### 4. Extract EXIF Header information\r\n",
+					"### 5. Add Bounding Box, DateTime, CRS, and sensor"
 				]
 			},
 			{
@@ -173,17 +179,20 @@
 					}
 				},
 				"source": [
-					"#Open first 5 images in blob storage\r\n",
+					"#Dispay first 5 images in blob storage\r\n",
 					"import rasterio\r\n",
 					"from rasterio.plot import show\r\n",
 					"\r\n",
 					"def view_images(directory):\r\n",
+					"    count = 0\r\n",
 					"    for image in get_blob_file_list(directory):\r\n",
-					"    src = rasterio.open(directory+image)\r\n",
-					"    show(src)\r\n",
-					"    src.close()"
+					"        if count >=5:\r\n",
+					"            src = rasterio.open(directory+image)\r\n",
+					"            show(src)\r\n",
+					"            src.close()\r\n",
+					"            count = count + 1"
 				],
-				"execution_count": 13
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
