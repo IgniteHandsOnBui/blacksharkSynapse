@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "844e1461-768d-4b54-a834-a369d4cb2249"
+				"spark.autotune.trackingId": "751dfee5-41e2-4771-a34b-7ea9265e1ae9"
 			}
 		},
 		"metadata": {
@@ -82,8 +82,8 @@
 					"### 1. Mount blob storages\r\n",
 					"### 2. Get list of all images in source container\r\n",
 					"### 3. Setting up the collection\r\n",
-					"### 4. Extract EXIF Header information\r\n",
-					"### 5. Add Bounding Box, DateTime, CRS, and sensor\r\n",
+					"### 4. Extract file header information\r\n",
+					"### 5. Add Metadata to file header\r\n",
 					"### 6. Determine if Mobile, or Aerial image\r\n",
 					"### 7. Write to destination folder"
 				]
@@ -383,6 +383,74 @@
 					"extract_EXIF(f'/synfs/61/STAC_Source/RBU_STAC_SOURCE/202002280104265320_skilpatrick_S3_7-15-19_DJI_0256.JPG')"
 				],
 				"execution_count": 66
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## 5. Add Metadata\r\n",
+					"### 5.1 Add Bounding Box\r\n",
+					"### 5.2 Add DateTime\r\n",
+					"### 5.3 Add CRS\r\n",
+					"### 5.4 Add Sensor Type"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"def calculate_boundingbox()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import pyproj\r\n",
+					"from shapely.ops import transform\r\n",
+					"from shapely.geometry import Point\r\n",
+					"\r\n",
+					"def create_bb(lat, lon):\r\n",
+					"    proj_wgs84 = pyproj.Proj('+proj=longlat +datum=WGS84')\r\n",
+					"    \r\n",
+					"    # Azimuthal equidistant projection\r\n",
+					"    aeqd_proj = '+proj=aeqd +lat_0={lat} +lon_0={lon} +x_0=0 +y_0=0'\r\n",
+					"    project = partial(\r\n",
+					"        pyproj.transform,\r\n",
+					"        pyproj.Proj(aeqd_proj.format(lat=lat, lon=lon)),\r\n",
+					"        proj_wgs84)\r\n",
+					"    \r\n",
+					"    buf = Point(0, 0).buffer(1)  # buffers 1 meter\r\n",
+					"    return transform(project, buf).bounds"
+				],
+				"execution_count": 67
 			},
 			{
 				"cell_type": "code",
