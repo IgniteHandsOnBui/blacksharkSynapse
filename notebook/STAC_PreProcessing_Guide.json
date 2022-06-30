@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3d96a014-2c19-4158-9d57-8f07787443ed"
+				"spark.autotune.trackingId": "844e1461-768d-4b54-a834-a369d4cb2249"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,7 @@
 					"Demo Notebook stakeholders: DnI-GIS, GTA, DINNO.\r\n",
 					"\"\"\""
 				],
-				"execution_count": 7
+				"execution_count": 1
 			},
 			{
 				"cell_type": "markdown",
@@ -84,7 +84,8 @@
 					"### 3. Setting up the collection\r\n",
 					"### 4. Extract EXIF Header information\r\n",
 					"### 5. Add Bounding Box, DateTime, CRS, and sensor\r\n",
-					"### 6. Write to destination folder"
+					"### 6. Determine if Mobile, or Aerial image\r\n",
+					"### 7. Write to destination folder"
 				]
 			},
 			{
@@ -97,7 +98,7 @@
 					}
 				},
 				"source": [
-					"### Mounting rich media source and destination storage accounts\r\n",
+					"### 1. Mounting rich media source and destination storage accounts\r\n",
 					"Typically the source will be XXXX and the destination will be YYYY"
 				]
 			},
@@ -140,7 +141,7 @@
 					"    print(\"FAILED TO MOUNT STAC DESTINATION\")\r\n",
 					"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
 				],
-				"execution_count": 8
+				"execution_count": 2
 			},
 			{
 				"cell_type": "markdown",
@@ -152,7 +153,7 @@
 					}
 				},
 				"source": [
-					"## Get list of all rich media data in source folder"
+					"## 2. Get list of all rich media data in source folder"
 				]
 			},
 			{
@@ -177,10 +178,10 @@
 					"    for file in os.listdir(directory):\r\n",
 					"        file_ext = os.path.splitext(file)[1]\r\n",
 					"        if file_ext == filetype:\r\n",
-					"            file_array.append(file)\r\n",
+					"            file_array.append(directory+file)\r\n",
 					"    return file_array"
 				],
-				"execution_count": 18
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -201,7 +202,20 @@
 					"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
 					"outarray"
 				],
-				"execution_count": 19
+				"execution_count": 29
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Lets take a look at what these photos look like:"
+				]
 			},
 			{
 				"cell_type": "code",
@@ -230,7 +244,22 @@
 					"            src.close()\r\n",
 					"            count = count + 1"
 				],
-				"execution_count": 1
+				"execution_count": 24
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## 3. Setting up the collection\r\n",
+					"\r\n",
+					"We have already setup 2 collections in the destination folder titled XXX and YYY"
+				]
 			},
 			{
 				"cell_type": "code",
@@ -246,15 +275,114 @@
 					}
 				},
 				"source": [
-					"#Example of how folder paths work\r\n",
-					"\r\n",
-					"#Note 'jobId' which will change every notebook instance\r\n",
 					"jobId = mssparkutils.env.getJobId()\r\n",
+					"oblique_mobile_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting'\r\n",
+					"oblique_aerial_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting'\r\n",
 					"\r\n",
-					"img_path = f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/'\r\n",
+					"oblique_mobile_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting/rbu_mobile_oblique_imagery_for_ehsr_reporting_mtl.json'\r\n",
+					"oblique_aerial_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting/rbu_aerial_oblique_imagery_for_ehsr_reporting_mtl.json'"
+				],
+				"execution_count": 44
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Take a look at the collection MTL json files\r\n",
+					"import json\r\n",
+					"\r\n",
+					"def check_collection_mtl(jsonpath):\r\n",
+					"    json_open = json.load(open(jsonpath))\r\n",
+					"    print(json_open)\r\n",
+					"    return json_open"
+				],
+				"execution_count": 54
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"mobile_collection = check_collection_mtl(oblique_mobile_collection_json)\r\n",
+					"print(\"\")\r\n",
+					"aerial_collection = check_collection_mtl(oblique_aerial_collection_json)\r\n",
 					""
 				],
-				"execution_count": 12
+				"execution_count": 58
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## 4. Extract EXIF Header Information\r\n",
+					"Depending on the rich media data type, this step will be different. Between LAS files, GEOTIFFs, JPEGs, etc ... this step will have to be re-written to extract metadata from those files. "
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import rasterio\r\n",
+					"def extract_EXIF(jpeg_path):\r\n",
+					"    file = rasterio.open(jpeg_path)\r\n",
+					"    jpeg_EXIF = file.tags()\r\n",
+					"    file.close()\r\n",
+					"    return jpeg_EXIF"
+				],
+				"execution_count": 65
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"extract_EXIF(f'/synfs/61/STAC_Source/RBU_STAC_SOURCE/202002280104265320_skilpatrick_S3_7-15-19_DJI_0256.JPG')"
+				],
+				"execution_count": 66
 			},
 			{
 				"cell_type": "code",
