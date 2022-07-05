@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "751dfee5-41e2-4771-a34b-7ea9265e1ae9"
+				"spark.autotune.trackingId": "b2cab2b3-e3d8-4704-b5e9-6fe53795bf8c"
 			}
 		},
 		"metadata": {
@@ -181,7 +181,7 @@
 					"            file_array.append(directory+file)\r\n",
 					"    return file_array"
 				],
-				"execution_count": 17
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -202,7 +202,7 @@
 					"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
 					"outarray"
 				],
-				"execution_count": 29
+				"execution_count": 6
 			},
 			{
 				"cell_type": "markdown",
@@ -244,7 +244,7 @@
 					"            src.close()\r\n",
 					"            count = count + 1"
 				],
-				"execution_count": 24
+				"execution_count": 7
 			},
 			{
 				"cell_type": "markdown",
@@ -282,7 +282,7 @@
 					"oblique_mobile_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting/rbu_mobile_oblique_imagery_for_ehsr_reporting_mtl.json'\r\n",
 					"oblique_aerial_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting/rbu_aerial_oblique_imagery_for_ehsr_reporting_mtl.json'"
 				],
-				"execution_count": 44
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -306,7 +306,7 @@
 					"    print(json_open)\r\n",
 					"    return json_open"
 				],
-				"execution_count": 54
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -327,7 +327,7 @@
 					"aerial_collection = check_collection_mtl(oblique_aerial_collection_json)\r\n",
 					""
 				],
-				"execution_count": 58
+				"execution_count": 10
 			},
 			{
 				"cell_type": "markdown",
@@ -364,7 +364,7 @@
 					"    file.close()\r\n",
 					"    return jpeg_EXIF"
 				],
-				"execution_count": 65
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -380,9 +380,9 @@
 					}
 				},
 				"source": [
-					"extract_EXIF(f'/synfs/61/STAC_Source/RBU_STAC_SOURCE/202002280104265320_skilpatrick_S3_7-15-19_DJI_0256.JPG')"
+					"extract_EXIF(f'/synfs/62/STAC_Source/RBU_STAC_SOURCE/202002280104265320_skilpatrick_S3_7-15-19_DJI_0256.JPG')"
 				],
-				"execution_count": 66
+				"execution_count": 13
 			},
 			{
 				"cell_type": "markdown",
@@ -402,6 +402,25 @@
 				]
 			},
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#### 5.1 Bounding Box\r\n",
+					"To calculate a bounding box from a JPEG you must first do 3 things:\r\n",
+					"- Extract lat/long from EXIF Header (including if coordinate direction is North/South or East/West)\r\n",
+					"- Convert lat/long from EXIF Header from Degree, Minutes, Seconds to Decimal Degrees\r\n",
+					"- Calculate new bounding box\r\n",
+					"\r\n",
+					"Lastly, the data must be inserted into the \"headers\" of the JPEG. Since JPEG does not natively support adding to headers, a XML file is created via rasterio. This step will be done once we move the new images into the right folder."
+				]
+			},
+			{
 				"cell_type": "code",
 				"metadata": {
 					"jupyter": {
@@ -415,9 +434,51 @@
 					}
 				},
 				"source": [
-					"def calculate_boundingbox()"
+					"import rasterio\r\n",
+					"\r\n",
+					"def get_EXIF_lat(jpeg_path):\r\n",
+					"    jpeg = rasterio.open(jpeg_path)\r\n",
+					"    filetags = jpeg.tags()\r\n",
+					"    GPSLatitude = filetags.get(\"EXIF_GPSLatitude\")\r\n",
+					"    GPSLatitudeRef = filetags.get(\"EXIF_GPSLatitudeRef\")\r\n",
+					"    jpeg.close()\r\n",
+					"    return GPSLatitude, GPSLatitudeRef\r\n",
+					"\r\n",
+					"def get_EXIF_long(jpeg_path):\r\n",
+					"    jpeg = rasterio.open(jpeg_path)\r\n",
+					"    filetags = jpeg.tags()\r\n",
+					"    GPSLongitude = filetags.get(\"EXIF_GPSLongitude\")\r\n",
+					"    GPSLongitudeRef = filetags.get(\"EXIF_GPSLongitudeRef\")\r\n",
+					"\r\n",
+					"    jpeg.close()\r\n",
+					"    return GPSLongitude, GPSLongitudeRef"
 				],
-				"execution_count": null
+				"execution_count": 18
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"def Exif_Cord_Convert(EXIF_Cord, direction):\r\n",
+					"    new_str = EXIF_Cord.replace(\"(\",\"\")\r\n",
+					"    new_str = new_str.replace(\")\",\"\")\r\n",
+					"\r\n",
+					"    split_str = new_str.split(\" \")\r\n",
+					"    \r\n",
+					"    decimaldegrees = (float(split_str[0]) + float(split_str[1])/60 + float(split_str[2])/(60*60)) * (-1 if direction in ['W', 'S'] else 1)\r\n",
+					"    return(decimaldegrees)"
+				],
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -437,7 +498,7 @@
 					"from shapely.ops import transform\r\n",
 					"from shapely.geometry import Point\r\n",
 					"\r\n",
-					"def create_bb(lat, lon):\r\n",
+					"def calculate_bb(lat, lon):\r\n",
 					"    proj_wgs84 = pyproj.Proj('+proj=longlat +datum=WGS84')\r\n",
 					"    \r\n",
 					"    # Azimuthal equidistant projection\r\n",
@@ -450,7 +511,66 @@
 					"    buf = Point(0, 0).buffer(1)  # buffers 1 meter\r\n",
 					"    return transform(project, buf).bounds"
 				],
-				"execution_count": 67
+				"execution_count": 20
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#### 5.2 Add Date Time\r\n",
+					"\r\n",
+					"The STAC spec calls for a datetime to be added to the headers of the files. For this use case, EXIF information includes this data, but we have to get it into the right format. To do this, we will extract the EXIF Datetime and convert it to the STAC-ready format."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from datetime import datetime\r\n",
+					"#Output date time must be in \r\n",
+					"def get_jpeg_datetime(jpeg_path):\r\n",
+					"    jpeg = rasterio.open(jpeg_path)\r\n",
+					"    filetags = jpeg.tags()\r\n",
+					"    EXIF_Datetime = filetags.get(\"EXIF_DateTime\")\r\n",
+					"    EXIF_datetime_obj = datetime.strptime(EXIF_Datetime, '%Y:%m:%d %H:%M:%S')\r\n",
+					"    STAC_datetime = EXIF_datetime_obj.strftime(\"%Y-%m-%dT%H:%M:%S%z\")\r\n",
+					"    return STAC_datetime"
+				],
+				"execution_count": 40
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"get_jpeg_datetime(f'/synfs/62/STAC_Source/RBU_STAC_SOURCE/202002280104265320_skilpatrick_S3_7-15-19_DJI_0256.JPG')"
+				],
+				"execution_count": 41
 			},
 			{
 				"cell_type": "code",
