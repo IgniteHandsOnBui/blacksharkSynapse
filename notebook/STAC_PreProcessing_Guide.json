@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "191b5d2a-d35d-4873-bca0-e04f64c81d68"
+				"spark.autotune.trackingId": "4959daf3-66f7-44dc-a2d5-8ddf2831c7bd"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,7 @@
 					"Demo Notebook stakeholders: DnI-GIS, GTA, DINNO.\r\n",
 					"\"\"\""
 				],
-				"execution_count": 42
+				"execution_count": 1
 			},
 			{
 				"cell_type": "markdown",
@@ -84,8 +84,8 @@
 					"### 3. Setting up the collection\r\n",
 					"### 4. Extract file header information\r\n",
 					"### 5. Create new Metadata from file header\r\n",
-					"### 6. Determine if Mobile, or Aerial image\r\n",
-					"### 7. Write to destination folder"
+					"### 6. Determine if Mobile, or Aerial image (Platform)\r\n",
+					"### 7. Write to destination folder w/Metadata"
 				]
 			},
 			{
@@ -141,7 +141,7 @@
 					"    print(\"FAILED TO MOUNT STAC DESTINATION\")\r\n",
 					"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
 				],
-				"execution_count": 43
+				"execution_count": 2
 			},
 			{
 				"cell_type": "markdown",
@@ -181,7 +181,7 @@
 					"            file_array.append(directory+file)\r\n",
 					"    return file_array"
 				],
-				"execution_count": 44
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -202,7 +202,7 @@
 					"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
 					"outarray"
 				],
-				"execution_count": 45
+				"execution_count": 4
 			},
 			{
 				"cell_type": "markdown",
@@ -282,7 +282,7 @@
 					"oblique_mobile_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting/rbu_mobile_oblique_imagery_for_ehsr_reporting_mtl.json'\r\n",
 					"oblique_aerial_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting/rbu_aerial_oblique_imagery_for_ehsr_reporting_mtl.json'"
 				],
-				"execution_count": 47
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -306,7 +306,7 @@
 					"    print(json_open)\r\n",
 					"    return json_open"
 				],
-				"execution_count": 48
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -327,7 +327,7 @@
 					"aerial_collection = check_collection_mtl(oblique_aerial_collection_json)\r\n",
 					""
 				],
-				"execution_count": 49
+				"execution_count": 7
 			},
 			{
 				"cell_type": "markdown",
@@ -364,7 +364,7 @@
 					"    file.close()\r\n",
 					"    return jpeg_EXIF"
 				],
-				"execution_count": 50
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -382,7 +382,7 @@
 				"source": [
 					"extract_EXIF(f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/202002280104265320_skilpatrick_S3_7-15-19_DJI_0256.JPG')"
 				],
-				"execution_count": 52
+				"execution_count": 9
 			},
 			{
 				"cell_type": "markdown",
@@ -416,6 +416,7 @@
 					"- Extract lat/long from EXIF Header (including if coordinate direction is North/South or East/West)\r\n",
 					"- Convert lat/long from EXIF Header from Degree, Minutes, Seconds to Decimal Degrees\r\n",
 					"- Calculate new bounding box\r\n",
+					"- Return new bounding box\r\n",
 					"\r\n",
 					"Lastly, the data must be inserted into the \"headers\" of the JPEG. Since JPEG does not natively support adding to headers, a XML file is created via rasterio. This step will be done once we move the new images into the right folder."
 				]
@@ -453,7 +454,7 @@
 					"    jpeg.close()\r\n",
 					"    return GPSLongitude, GPSLongitudeRef"
 				],
-				"execution_count": 53
+				"execution_count": 27
 			},
 			{
 				"cell_type": "code",
@@ -478,7 +479,7 @@
 					"    decimaldegrees = (float(split_str[0]) + float(split_str[1])/60 + float(split_str[2])/(60*60)) * (-1 if direction in ['W', 'S'] else 1)\r\n",
 					"    return(decimaldegrees)"
 				],
-				"execution_count": 54
+				"execution_count": 28
 			},
 			{
 				"cell_type": "code",
@@ -497,6 +498,7 @@
 					"import pyproj\r\n",
 					"from shapely.ops import transform\r\n",
 					"from shapely.geometry import Point\r\n",
+					"from functools import partial\r\n",
 					"\r\n",
 					"def calculate_bb(lat, lon):\r\n",
 					"    proj_wgs84 = pyproj.Proj('+proj=longlat +datum=WGS84')\r\n",
@@ -511,7 +513,32 @@
 					"    buf = Point(0, 0).buffer(1)  # buffers 1 meter\r\n",
 					"    return transform(project, buf).bounds"
 				],
-				"execution_count": 55
+				"execution_count": 38
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"def get_bb(jpeg_path):\r\n",
+					"    EXIFlat, latRef = get_EXIF_lat(jpeg_path)\r\n",
+					"    EXIFlong, longRef = get_EXIF_long(jpeg_path)\r\n",
+					"\r\n",
+					"    lat = Exif_Cord_Convert(EXIFlat,latRef)\r\n",
+					"    long = Exif_Cord_Convert(EXIFlong,longRef)\r\n",
+					"\r\n",
+					"    return calculate_bb(lat,long)"
+				],
+				"execution_count": 78
 			},
 			{
 				"cell_type": "markdown",
@@ -547,16 +574,18 @@
 				},
 				"source": [
 					"from datetime import datetime\r\n",
+					"\r\n",
 					"#Output date time must be in \r\n",
 					"def get_jpeg_datetime(jpeg_path):\r\n",
 					"    jpeg = rasterio.open(jpeg_path)\r\n",
 					"    filetags = jpeg.tags()\r\n",
+					"    jpeg.close()\r\n",
 					"    EXIF_Datetime = filetags.get(\"EXIF_DateTime\")\r\n",
 					"    EXIF_datetime_obj = datetime.strptime(EXIF_Datetime, '%Y:%m:%d %H:%M:%S')\r\n",
 					"    STAC_datetime = EXIF_datetime_obj.strftime(\"%Y-%m-%dT%H:%M:%S%z\")\r\n",
 					"    return STAC_datetime"
 				],
-				"execution_count": 56
+				"execution_count": 79
 			},
 			{
 				"cell_type": "markdown",
@@ -592,7 +621,7 @@
 					"    crs = \"EPSG:4326\"\r\n",
 					"    return crs"
 				],
-				"execution_count": 58
+				"execution_count": 80
 			},
 			{
 				"cell_type": "markdown",
@@ -629,6 +658,162 @@
 					"def get_jpeg_sensor(jpeg_path):\r\n",
 					"    sensor_type = \"RGB\"\r\n",
 					"    return sensor_type"
+				],
+				"execution_count": 81
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## 6. Mobile or Aerial image?\r\n",
+					"\r\n",
+					"Based of the proposed architecture, it is important to sort the imagery between \"Mobile\" and \"Drone\" since those are 2 different types of collections. How will we be able to do that on these images?\r\n",
+					"\r\n",
+					"Luckily, we know that in this use case, RBU is using \"DJI\" drones (commerical-company) which use DJI cameras. If you look in the EXIF header of the imagery you can see an attribute called \"EXIF_Make\" which contains the information about the camera maker. This item will contain:\r\n",
+					"1. DJI\r\n",
+					"2. Android\r\n",
+					"3. Apple\r\n",
+					"4. ... other mobile phones\r\n",
+					"5. Blank\r\n",
+					"\r\n",
+					"If we test between all RBU imagery if it is \"DJI imagery\" and \"everything else\" we can then sort between \"drone\" and \"mobile\" respectively"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Return true if image was taken from drone\r\n",
+					"def is_drone(jpeg_path):\r\n",
+					"    jpeg = rasterio.open(jpeg_path)\r\n",
+					"    filetags = jpeg.tags()\r\n",
+					"    jpeg.close()\r\n",
+					"    platform = filetags.get(\"EXIF_Make\")\r\n",
+					"    if platform == 'DJI':\r\n",
+					"        return True\r\n",
+					"    else:\r\n",
+					"        return False    "
+				],
+				"execution_count": 82
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## 7. Write to Collection - w/Added Metadata\r\n",
+					"Finally we get into the big task of reading from the STAC Source and writing to the STAC Destination. Here are the steps we have defined:\r\n",
+					"1. Get list of all JPEGs (using the function in step 2)\r\n",
+					"2. Determine which JPEG fits into which collection (using function in step 6)\r\n",
+					"3. Get list of all metadata components to be added (using function in step 5)\r\n",
+					"4. Write to collection folder w/metadata added\r\n",
+					"5. Celebrate 🙌"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import rasterio\r\n",
+					"def write_to_collection(jpeg_path, collection_path):\r\n",
+					"    BoundingBox = get_bb(jpeg_path)\r\n",
+					"    DateTime = get_jpeg_datetime(jpeg_path)\r\n",
+					"    jpeg_CRS = get_jpeg_crs(jpeg_path)\r\n",
+					"    Sensor = get_jpeg_sensor(jpeg_path)\r\n",
+					"\r\n",
+					"    rasterio.shutil.copy(jpeg_path, collection_path)\r\n",
+					"    print(\"Copy created \" + collection_path)\r\n",
+					"\r\n",
+					"    with rasterio.open(\r\n",
+					"            collection_path,\r\n",
+					"            'r+',\r\n",
+					"            driver='JPEG') as dst:\r\n",
+					"            dst.update_tags(datetime = DateTime, start_datetime = None, end_datetime = None, bbox = BoundingBox, crs = jpeg_CRS, sensor = Sensor)\r\n",
+					"\r\n",
+					"    return True"
+				],
+				"execution_count": 89
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import os\r\n",
+					"jobId = mssparkutils.env.getJobId()\r\n",
+					"img_path = f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/'\r\n",
+					"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
+					"\r\n",
+					"oblique_mobile_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting'\r\n",
+					"oblique_aerial_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting'\r\n",
+					"\r\n",
+					"for jpeg in outarray:\r\n",
+					"    print(jpeg)\r\n",
+					"    filename = os.path.basename(jpeg)\r\n",
+					"\r\n",
+					"    if is_drone(jpeg):\r\n",
+					"        write_to_collection(jpeg, oblique_aerial_path+'/'+filename)\r\n",
+					"\r\n",
+					"    else:\r\n",
+					"        write_to_collection(jpeg, oblique_mobile_path+'/'+filename)"
+				],
+				"execution_count": 90
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
 				],
 				"execution_count": null
 			}
