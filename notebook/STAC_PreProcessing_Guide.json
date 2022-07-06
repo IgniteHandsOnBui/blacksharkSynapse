@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4959daf3-66f7-44dc-a2d5-8ddf2831c7bd"
+				"spark.autotune.trackingId": "5362a702-d7d3-4aa5-a63b-788de72ceeee"
 			}
 		},
 		"metadata": {
@@ -757,13 +757,13 @@
 					"\r\n",
 					"    with rasterio.open(\r\n",
 					"            collection_path,\r\n",
-					"            'r+',\r\n",
+					"            'w',\r\n",
 					"            driver='JPEG') as dst:\r\n",
 					"            dst.update_tags(datetime = DateTime, start_datetime = None, end_datetime = None, bbox = BoundingBox, crs = jpeg_CRS, sensor = Sensor)\r\n",
 					"\r\n",
 					"    return True"
 				],
-				"execution_count": 89
+				"execution_count": 95
 			},
 			{
 				"cell_type": "code",
@@ -783,7 +783,7 @@
 					"jobId = mssparkutils.env.getJobId()\r\n",
 					"img_path = f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/'\r\n",
 					"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
-					"\r\n",
+					"print(outarray)\r\n",
 					"oblique_mobile_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting'\r\n",
 					"oblique_aerial_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting'\r\n",
 					"\r\n",
@@ -795,9 +795,10 @@
 					"        write_to_collection(jpeg, oblique_aerial_path+'/'+filename)\r\n",
 					"\r\n",
 					"    else:\r\n",
-					"        write_to_collection(jpeg, oblique_mobile_path+'/'+filename)"
+					"        write_to_collection(jpeg, oblique_mobile_path+'/'+filename)\r\n",
+					"    continue"
 				],
-				"execution_count": 90
+				"execution_count": 96
 			},
 			{
 				"cell_type": "code",
