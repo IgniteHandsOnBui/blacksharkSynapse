@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1e3bc648-2f99-4c24-8c7f-6276f23c06a2"
+				"spark.autotune.trackingId": "33d163b7-04bc-4cfc-bd23-f84964017332"
 			}
 		},
 		"metadata": {
@@ -544,14 +544,6 @@
 					"from functools import partial\r\n",
 					"\r\n",
 					"def calculate_bb(lat, lon):\r\n",
-					"    \"\"\"\r\n",
-					"    Function to calculate bounding box\r\n",
-					"    Arguments:\r\n",
-					"        EXIF_Cord: return from get_EXIF_long or get_EXIF_lat (first return)\r\n",
-					"        direction: return from get_EXIF_long or get_EXIF_lat (second return) - Either as \"N\",\"S\",\"E\", or \"W\"\r\n",
-					"    Returns:\r\n",
-					"        Decimal Degrees of coordinate.\r\n",
-					"    \"\"\"\r\n",
 					"\r\n",
 					"    proj_wgs84 = pyproj.Proj('+proj=longlat +datum=WGS84')\r\n",
 					"    \r\n",
