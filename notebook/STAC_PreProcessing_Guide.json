@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2c2c5326-b0f1-4546-b2c0-d297b5a4be77"
+				"spark.autotune.trackingId": "1e3bc648-2f99-4c24-8c7f-6276f23c06a2"
 			}
 		},
 		"metadata": {
@@ -49,19 +49,6 @@
 			"sessionKeepAliveTimeout": 30
 		},
 		"cells": [
-			{
-				"cell_type": "code",
-				"source": [
-					"#TODO:\r\n",
-					"\"\"\"\r\n",
-					"Prepare step-by step notebook with all STAC pre-processing steps that include all transformations and metadata creation steps. \r\n",
-					"Use markdown text for instructions.\r\n",
-					"Stretch - automate services requires via email generation ITFP GTA\r\n",
-					"Demo Notebook stakeholders: DnI-GIS, GTA, DINNO.\r\n",
-					"\"\"\""
-				],
-				"execution_count": 2
-			},
 			{
 				"cell_type": "markdown",
 				"metadata": {
@@ -153,7 +140,8 @@
 					}
 				},
 				"source": [
-					"## 2. Get list of all rich media data in source folder"
+					"## 2. Get list of all rich media data in source folder\r\n",
+					"This function is used to list out all the "
 				]
 			},
 			{
@@ -174,6 +162,14 @@
 					"import os\r\n",
 					"\r\n",
 					"def get_blob_file_list(directory, filetype):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to get a full list of files in a directory based on file type\r\n",
+					"    Arguments:\r\n",
+					"        directory: Directory path of folder you want to pull files from\r\n",
+					"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\"\r\n",
+					"    Returns:\r\n",
+					"        Array of filepaths/filename w/extension\r\n",
+					"    \"\"\"\r\n",
 					"    file_array = []\r\n",
 					"    for file in os.listdir(directory):\r\n",
 					"        file_ext = os.path.splitext(file)[1]\r\n",
@@ -236,6 +232,14 @@
 					"from rasterio.plot import show\r\n",
 					"\r\n",
 					"def view_images(directory):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to view 5 images from a directory. Not used in the final workflow - just for show.\r\n",
+					"    Arguments:\r\n",
+					"        directory: Directory path of folder you want to display images of. Typically JPEG, GEOTIFF, etc ...\r\n",
+					"    Returns:\r\n",
+					"        Nothing\r\n",
+					"    \"\"\"\r\n",
+					"\r\n",
 					"    count = 0\r\n",
 					"    for image in get_blob_file_list(directory):\r\n",
 					"        if count >=5:\r\n",
@@ -302,6 +306,14 @@
 					"import json\r\n",
 					"\r\n",
 					"def check_collection_mtl(jsonpath):\r\n",
+					"    \"\"\"\r\n",
+					"    Print and return collection_mtl. Not used in the final workflow - just for show.\r\n",
+					"    Arguments:\r\n",
+					"        jsonpath: Path to json_mtl file\r\n",
+					"    Returns:\r\n",
+					"        json json_mtl file\r\n",
+					"    \"\"\"\r\n",
+					"\r\n",
 					"    json_open = json.load(open(jsonpath))\r\n",
 					"    print(json_open)\r\n",
 					"    return json_open"
@@ -359,6 +371,14 @@
 				"source": [
 					"import rasterio\r\n",
 					"def extract_EXIF(jpeg_path):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to list EXIF header information from the supplied JPEG. Not used in the final workflow - just for show.\r\n",
+					"    Arguments:\r\n",
+					"        jpeg_path: path to jpeg file\r\n",
+					"    Returns:\r\n",
+					"        Dictionary of EXIF Header information\r\n",
+					"    \"\"\"\r\n",
+					"\r\n",
 					"    file = rasterio.open(jpeg_path)\r\n",
 					"    jpeg_EXIF = file.tags()\r\n",
 					"    file.close()\r\n",
@@ -438,6 +458,13 @@
 					"import rasterio\r\n",
 					"\r\n",
 					"def get_EXIF_lat(jpeg_path):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to get the Latitude of a JPEG image\r\n",
+					"    Arguments:\r\n",
+					"        jpeg_path: path to jpeg file\r\n",
+					"    Returns:\r\n",
+					"        string of latitude in format of (dd) (mm) (ss.sss) & GPS Reference in terms of (S or N)\r\n",
+					"    \"\"\"\r\n",
 					"    jpeg = rasterio.open(jpeg_path)\r\n",
 					"    filetags = jpeg.tags()\r\n",
 					"    GPSLatitude = filetags.get(\"EXIF_GPSLatitude\")\r\n",
@@ -446,6 +473,13 @@
 					"    return GPSLatitude, GPSLatitudeRef\r\n",
 					"\r\n",
 					"def get_EXIF_long(jpeg_path):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to get the Longitude of a JPEG image\r\n",
+					"    Arguments:\r\n",
+					"        jpeg_path: path to jpeg file\r\n",
+					"    Returns:\r\n",
+					"        string of longitude in format of (dd) (mm) (ss.sss) & GPS Reference in terms of (W or E)\r\n",
+					"    \"\"\"\r\n",
 					"    jpeg = rasterio.open(jpeg_path)\r\n",
 					"    filetags = jpeg.tags()\r\n",
 					"    GPSLongitude = filetags.get(\"EXIF_GPSLongitude\")\r\n",
@@ -471,6 +505,15 @@
 				},
 				"source": [
 					"def Exif_Cord_Convert(EXIF_Cord, direction):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to convert coordinate from get_EXIF_long + get_EXIF_lat functions (dd)(mm)(ss.sss) to decimal degrees.\r\n",
+					"    Arguments:\r\n",
+					"        EXIF_Cord: return from get_EXIF_long or get_EXIF_lat (first return)\r\n",
+					"        direction: return from get_EXIF_long or get_EXIF_lat (second return) - Either as \"N\",\"S\",\"E\", or \"W\"\r\n",
+					"    Returns:\r\n",
+					"        Decimal Degrees of coordinate.\r\n",
+					"    \"\"\"\r\n",
+					"\r\n",
 					"    new_str = EXIF_Cord.replace(\"(\",\"\")\r\n",
 					"    new_str = new_str.replace(\")\",\"\")\r\n",
 					"\r\n",
@@ -501,6 +544,15 @@
 					"from functools import partial\r\n",
 					"\r\n",
 					"def calculate_bb(lat, lon):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to calculate bounding box\r\n",
+					"    Arguments:\r\n",
+					"        EXIF_Cord: return from get_EXIF_long or get_EXIF_lat (first return)\r\n",
+					"        direction: return from get_EXIF_long or get_EXIF_lat (second return) - Either as \"N\",\"S\",\"E\", or \"W\"\r\n",
+					"    Returns:\r\n",
+					"        Decimal Degrees of coordinate.\r\n",
+					"    \"\"\"\r\n",
+					"\r\n",
 					"    proj_wgs84 = pyproj.Proj('+proj=longlat +datum=WGS84')\r\n",
 					"    \r\n",
 					"    # Azimuthal equidistant projection\r\n",
