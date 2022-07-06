@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5362a702-d7d3-4aa5-a63b-788de72ceeee"
+				"spark.autotune.trackingId": "6b730258-cb70-4f5b-8620-995392c5c185"
 			}
 		},
 		"metadata": {
@@ -705,12 +705,13 @@
 					"    filetags = jpeg.tags()\r\n",
 					"    jpeg.close()\r\n",
 					"    platform = filetags.get(\"EXIF_Make\")\r\n",
+					"    \r\n",
 					"    if platform == 'DJI':\r\n",
 					"        return True\r\n",
 					"    else:\r\n",
 					"        return False    "
 				],
-				"execution_count": 82
+				"execution_count": 100
 			},
 			{
 				"cell_type": "markdown",
@@ -746,24 +747,26 @@
 				},
 				"source": [
 					"import rasterio\r\n",
+					"import shutil\r\n",
+					"\r\n",
 					"def write_to_collection(jpeg_path, collection_path):\r\n",
-					"    BoundingBox = get_bb(jpeg_path)\r\n",
-					"    DateTime = get_jpeg_datetime(jpeg_path)\r\n",
-					"    jpeg_CRS = get_jpeg_crs(jpeg_path)\r\n",
-					"    Sensor = get_jpeg_sensor(jpeg_path)\r\n",
+					"    # BoundingBox = get_bb(jpeg_path)\r\n",
+					"    # DateTime = get_jpeg_datetime(jpeg_path)\r\n",
+					"    # jpeg_CRS = get_jpeg_crs(jpeg_path)\r\n",
+					"    # Sensor = get_jpeg_sensor(jpeg_path)\r\n",
 					"\r\n",
-					"    rasterio.shutil.copy(jpeg_path, collection_path)\r\n",
-					"    print(\"Copy created \" + collection_path)\r\n",
+					"    # shutil.copy(jpeg_path, collection_path)\r\n",
+					"    # print(\"Copy created \" + collection_path)\r\n",
 					"\r\n",
-					"    with rasterio.open(\r\n",
-					"            collection_path,\r\n",
-					"            'w',\r\n",
-					"            driver='JPEG') as dst:\r\n",
-					"            dst.update_tags(datetime = DateTime, start_datetime = None, end_datetime = None, bbox = BoundingBox, crs = jpeg_CRS, sensor = Sensor)\r\n",
+					"    # with rasterio.open(\r\n",
+					"    #         collection_path,\r\n",
+					"    #         'r+',\r\n",
+					"    #         driver='JPEG') as dst:\r\n",
+					"    #         dst.update_tags(datetime = DateTime, start_datetime = None, end_datetime = None, bbox = BoundingBox, crs = jpeg_CRS, sensor = Sensor)\r\n",
 					"\r\n",
 					"    return True"
 				],
-				"execution_count": 95
+				"execution_count": 118
 			},
 			{
 				"cell_type": "code",
@@ -783,22 +786,23 @@
 					"jobId = mssparkutils.env.getJobId()\r\n",
 					"img_path = f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/'\r\n",
 					"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
-					"print(outarray)\r\n",
+					"#print(outarray)\r\n",
 					"oblique_mobile_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting'\r\n",
 					"oblique_aerial_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting'\r\n",
 					"\r\n",
 					"for jpeg in outarray:\r\n",
-					"    print(jpeg)\r\n",
 					"    filename = os.path.basename(jpeg)\r\n",
-					"\r\n",
+					"    print(filename)\r\n",
+					"    \r\n",
 					"    if is_drone(jpeg):\r\n",
 					"        write_to_collection(jpeg, oblique_aerial_path+'/'+filename)\r\n",
 					"\r\n",
 					"    else:\r\n",
 					"        write_to_collection(jpeg, oblique_mobile_path+'/'+filename)\r\n",
+					"\r\n",
 					"    continue"
 				],
-				"execution_count": 96
+				"execution_count": 119
 			},
 			{
 				"cell_type": "code",
