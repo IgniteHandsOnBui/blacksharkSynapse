@@ -19,6 +19,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Stellar Data Storage Account v2'"
 		},
+		"innoaoaidata_STAC_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'innoaoaidata_STAC'"
+		},
 		"innosyn-pipeline-syn-ws-WorkspaceDefaultSqlServer_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'innosyn-pipeline-syn-ws-WorkspaceDefaultSqlServer'"
@@ -417,22 +421,28 @@
 				},
 				"parameters": {
 					"Prefix": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "innoblackshark"
 					},
 					"BatchName": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "blackshark-model"
 					},
 					"BatchLocation": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "southcentralus"
 					},
 					"JobName": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "blackshark-model"
 					},
 					"StorageAccountName": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "rawdatajbqezt"
 					},
 					"StorageAccountKey": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "AHOTVR7kOK3lLcJV177VGv8WaPpTd7GfYdds2XFWD7gLDD89bIzAbMj47eeLWCS+igKPwum0Ip1lCVpEUdtIrA=="
 					}
 				},
 				"variables": {
@@ -539,7 +549,7 @@
 								"--src_folder_name",
 								"@variables('CropSourceFolder')",
 								"--config_file_name",
-								"config-naip.json",
+								"config-aoi.json",
 								"--linked_service_name",
 								"Stellar Airbus v2"
 							],
@@ -870,21 +880,24 @@
 				},
 				"parameters": {
 					"Prefix": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "innoblackshark"
 					},
 					"StorageAccountName": {
 						"type": "string",
 						"defaultValue": "rawdatajbqezt"
 					},
 					"StorageAccountKey": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "AHOTVR7kOK3lLcJV177VGv8WaPpTd7GfYdds2XFWD7gLDD89bIzAbMj47eeLWCS+igKPwum0Ip1lCVpEUdtIrA=="
 					},
 					"BatchAccountName": {
 						"type": "string",
 						"defaultValue": "innosynorcbatchact"
 					},
 					"BatchJobName": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "blackshark-model"
 					},
 					"BatchLocation": {
 						"type": "string",
@@ -1081,7 +1094,7 @@
 							"referenceName": "Stellar Pipeline Key Vault",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "AirbusStorageAccountKey"
+						"secretName": "GeospatialStorageAccountKey"
 					},
 					"fileShare": "volume-a"
 				},
@@ -1129,7 +1142,7 @@
 							"referenceName": "Stellar Pipeline Key Vault",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "AirbusStorageAccountKey"
+						"secretName": "GeospatialStorageAccountKey"
 					}
 				},
 				"connectVia": {
@@ -1154,6 +1167,26 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/innoaoaidata_STAC')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "Blob storage for STAC guide",
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('innoaoaidata_STAC_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/innosyn-pipeline-syn-ws-WorkspaceDefaultSqlServer')]",
@@ -1260,11 +1293,11 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/cv_pumpjack_clip')]",
+			"name": "[concat(parameters('workspaceName'), '/STAC_PreProcessing_Guide')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
-				"description": "Working document for clipping pumpjacks - trying to replicate FME job",
+				"description": "Guide for documenting and sharing pre-processing steps required prior to the STAC ingestion process. This guide will use JPGs as an example",
 				"nbformat": 4,
 				"nbformat_minor": 2,
 				"bigDataPool": {
@@ -1272,16 +1305,16 @@
 					"type": "BigDataPoolReference"
 				},
 				"sessionProperties": {
-					"driverMemory": "28g",
-					"driverCores": 4,
-					"executorMemory": "28g",
-					"executorCores": 4,
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
 					"numExecutors": 2,
 					"conf": {
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "4ef67758-b95b-4c19-b6e5-39af09c6c7e6"
+						"spark.autotune.trackingId": "18c0e5db-3459-43d6-a9d9-11f4e65e9117"
 					}
 				},
 				"metadata": {
@@ -1313,18 +1346,136 @@
 				},
 				"cells": [
 					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# STAC Ingestion Synapse Notebook Guide\r\n",
+							"This guide will demonstrate the data processing steps of rich media data into STAC. \r\n",
+							"\r\n",
+							"For more information on Chevron's STAC implementation - **[Chevron Atlas](https://atlas-dev.azure.chevron.com/)**\r\n",
+							"\r\n",
+							"This guide follows recommendations provided in CDAS - **[Data Preparation](https://cdas.azure.chevron.com/Data-Insights/Geospatial-Technology-And-Analytics/Chevron-Atlas/Getting-Started/Data-Preparation.html)**\r\n",
+							"## Sections:\r\n",
+							"### 1. Mount blob storages\r\n",
+							"### 2. Get list of all images in source container\r\n",
+							"### 3. Setting up the collection\r\n",
+							"### 4. Extract file header information\r\n",
+							"### 5. Create new Metadata from file header\r\n",
+							"### 6. Determine if Mobile, or Aerial image (Platform)\r\n",
+							"### 7. Write to destination folder w/Metadata"
+						]
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 1. Mounting rich media source and destination storage accounts\r\n",
+							"Typically the source will be from the XXX and the destination will be YYYY"
+						]
+					},
+					{
 						"cell_type": "code",
-						"metadata": {},
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
 						"source": [
 							"from notebookutils import mssparkutils\r\n",
-							"mssparkutils.fs.mount(\r\n",
-							"    \"abfss://azureml-blobstore-91aa9420-fbec-40ef-91e9-982a277c80cf@dinnot101mlcvx.dfs.core.windows.net\",\r\n",
-							"    \"/test\",\r\n",
-							"    {\"linkedService\":\"LiamTest\"}\r\n",
-							")"
+							"\r\n",
+							"try:\r\n",
+							"    mssparkutils.fs.mount(\r\n",
+							"        \"wasbs://liamsource@innoaoaidata.blob.core.windows.net\",\r\n",
+							"        \"/STAC_Source\",\r\n",
+							"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
+							"    )\r\n",
+							"    print(\"Successful mount of source to /STAC_Source\")\r\n",
+							"except:\r\n",
+							"    print(\"FAILED TO MOUNT STAC SOURCE\")\r\n",
+							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")\r\n",
+							"\r\n",
+							"\r\n",
+							"try:\r\n",
+							"    mssparkutils.fs.mount(\r\n",
+							"        \"wasbs://liamdest@innoaoaidata.blob.core.windows.net\",\r\n",
+							"        \"/STAC_Dest\",\r\n",
+							"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
+							"    )\r\n",
+							"    print(\"Successful mount of source to /STAC_Dest\")\r\n",
+							"except:\r\n",
+							"    print(\"FAILED TO MOUNT STAC DESTINATION\")\r\n",
+							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
 						],
 						"outputs": [],
-						"execution_count": 1
+						"execution_count": 2
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## 2. Get list of all rich media data in source folder\r\n",
+							"This function is used to list out all the "
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Return array of all files in directory of type\r\n",
+							"import os\r\n",
+							"\r\n",
+							"def get_blob_file_list(directory, filetype):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to get a full list of files in a directory based on file type\r\n",
+							"    Arguments:\r\n",
+							"        directory: Directory path of folder you want to pull files from\r\n",
+							"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\"\r\n",
+							"    Returns:\r\n",
+							"        Array of filepaths/filename w/extension\r\n",
+							"    \"\"\"\r\n",
+							"    file_array = []\r\n",
+							"    for file in os.listdir(directory):\r\n",
+							"        file_ext = os.path.splitext(file)[1]\r\n",
+							"        if file_ext == filetype:\r\n",
+							"            file_array.append(directory+file)\r\n",
+							"    return file_array"
+						],
+						"outputs": [],
+						"execution_count": 19
 					},
 					{
 						"cell_type": "code",
@@ -1341,11 +1492,171 @@
 						},
 						"source": [
 							"jobId = mssparkutils.env.getJobId()\r\n",
-							"print(jobId)\r\n",
-							"mssparkutils.fs.ls(\"synfs:/\"+jobId+\"/test/UI/geotagged_subset_pumpjacks_clip/06-23-2022_015728_UTC/2022_SJVBU_KernRiverAFlight1_6-15-2022\")"
+							"img_path = f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/'\r\n",
+							"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
+							"outarray"
 						],
 						"outputs": [],
-						"execution_count": 40
+						"execution_count": 4
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## Lets take a look at what these photos look like:"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Dispay first 5 images in blob storage\r\n",
+							"import rasterio\r\n",
+							"from rasterio.plot import show\r\n",
+							"\r\n",
+							"def view_images(directory):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to view 5 images from a directory. Not used in the final workflow - just for show.\r\n",
+							"    Arguments:\r\n",
+							"        directory: Directory path of folder you want to display images of. Typically JPEG, GEOTIFF, etc ...\r\n",
+							"    Returns:\r\n",
+							"        Nothing\r\n",
+							"    \"\"\"\r\n",
+							"\r\n",
+							"    count = 0\r\n",
+							"    for image in get_blob_file_list(directory):\r\n",
+							"        if count >=5:\r\n",
+							"            src = rasterio.open(directory+image)\r\n",
+							"            show(src)\r\n",
+							"            src.close()\r\n",
+							"            count = count + 1"
+						],
+						"outputs": [],
+						"execution_count": 62
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## 3. Setting up the collection\r\n",
+							"\r\n",
+							"We have already setup 2 collections in the destination folder titled XXX and YYY"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"jobId = mssparkutils.env.getJobId()\r\n",
+							"oblique_mobile_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting'\r\n",
+							"oblique_aerial_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting'\r\n",
+							"\r\n",
+							"oblique_mobile_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting/rbu_mobile_oblique_imagery_for_ehsr_reporting_mtl.json'\r\n",
+							"oblique_aerial_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting/rbu_aerial_oblique_imagery_for_ehsr_reporting_mtl.json'"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Take a look at the collection MTL json files\r\n",
+							"import json\r\n",
+							"\r\n",
+							"def check_collection_mtl(jsonpath):\r\n",
+							"    \"\"\"\r\n",
+							"    Print and return collection_mtl. Not used in the final workflow - just for show.\r\n",
+							"    Arguments:\r\n",
+							"        jsonpath: Path to json_mtl file\r\n",
+							"    Returns:\r\n",
+							"        json json_mtl file\r\n",
+							"    \"\"\"\r\n",
+							"\r\n",
+							"    json_open = json.load(open(jsonpath))\r\n",
+							"    print(json_open)\r\n",
+							"    return json_open"
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"mobile_collection = check_collection_mtl(oblique_mobile_collection_json)\r\n",
+							"print(\"\")\r\n",
+							"aerial_collection = check_collection_mtl(oblique_aerial_collection_json)\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## 4. Extract EXIF Header Information\r\n",
+							"Depending on the rich media data type, this step will be different. Between LAS files, GEOTIFFs, JPEGs, etc ... this step will have to be re-written to extract metadata from those files. "
+						]
 					},
 					{
 						"cell_type": "code",
@@ -1362,13 +1673,22 @@
 						},
 						"source": [
 							"import rasterio\r\n",
-							"imagepath = r\"synfs:/36/test/UI/geotagged_subset_pumpjacks_clip/06-23-2022_015728_UTC/2022_SJVBU_KernRiverAFlight1_6-15-2022/2022_SJVBU_Kern_River_A_Flight_01_00459_2.jpg\"\r\n",
+							"def extract_EXIF(jpeg_path):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to list EXIF header information from the supplied JPEG. Not used in the final workflow - just for show.\r\n",
+							"    Arguments:\r\n",
+							"        jpeg_path: path to jpeg file\r\n",
+							"    Returns:\r\n",
+							"        Dictionary of EXIF Header information\r\n",
+							"    \"\"\"\r\n",
 							"\r\n",
-							"#image = mssparkutils.fs.head(\"synfs:/\"+jobId+\"/test/UI/geotagged_subset_pumpjacks_clip/06-23-2022_015728_UTC/2022_SJVBU_KernRiverAFlight1_6-15-2022/2022_SJVBU_Kern_River_A_Flight_01_00469_2.jpg\")\r\n",
-							"rasterio.open(imagepath)"
+							"    file = rasterio.open(jpeg_path)\r\n",
+							"    jpeg_EXIF = file.tags()\r\n",
+							"    file.close()\r\n",
+							"    return jpeg_EXIF"
 						],
 						"outputs": [],
-						"execution_count": 45
+						"execution_count": 8
 					},
 					{
 						"cell_type": "code",
@@ -1384,7 +1704,824 @@
 							}
 						},
 						"source": [
-							"mssparkutils.fs.unmount(\"/test\") "
+							"extract_EXIF(f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/202002280104265320_skilpatrick_S3_7-15-19_DJI_0256.JPG')"
+						],
+						"outputs": [],
+						"execution_count": 9
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## 5. Extract Metadata\r\n",
+							"### 5.1 Add Bounding Box\r\n",
+							"### 5.2 Add DateTime\r\n",
+							"### 5.3 Add CRS\r\n",
+							"### 5.4 Add Sensor Type"
+						]
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#### 5.1 Bounding Box\r\n",
+							"To calculate a bounding box from a JPEG you must first do 3 things:\r\n",
+							"- Extract lat/long from EXIF Header (including if coordinate direction is North/South or East/West)\r\n",
+							"- Convert lat/long from EXIF Header from Degree, Minutes, Seconds to Decimal Degrees\r\n",
+							"- Calculate new bounding box\r\n",
+							"- Return new bounding box\r\n",
+							"\r\n",
+							"Lastly, the data must be inserted into the \"headers\" of the JPEG. Since JPEG does not natively support adding to headers, a XML file is created via rasterio. This step will be done once we move the new images into the right folder."
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import rasterio\r\n",
+							"\r\n",
+							"def get_EXIF_lat(jpeg_path):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to get the Latitude of a JPEG image\r\n",
+							"    Arguments:\r\n",
+							"        jpeg_path: path to jpeg file\r\n",
+							"    Returns:\r\n",
+							"        string of latitude in format of (dd) (mm) (ss.sss) & GPS Reference in terms of (S or N)\r\n",
+							"    \"\"\"\r\n",
+							"    jpeg = rasterio.open(jpeg_path)\r\n",
+							"    filetags = jpeg.tags()\r\n",
+							"    GPSLatitude = filetags.get(\"EXIF_GPSLatitude\")\r\n",
+							"    GPSLatitudeRef = filetags.get(\"EXIF_GPSLatitudeRef\")\r\n",
+							"    jpeg.close()\r\n",
+							"    return GPSLatitude, GPSLatitudeRef\r\n",
+							"\r\n",
+							"def get_EXIF_long(jpeg_path):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to get the Longitude of a JPEG image\r\n",
+							"    Arguments:\r\n",
+							"        jpeg_path: path to jpeg file\r\n",
+							"    Returns:\r\n",
+							"        string of longitude in format of (dd) (mm) (ss.sss) & GPS Reference in terms of (W or E)\r\n",
+							"    \"\"\"\r\n",
+							"    jpeg = rasterio.open(jpeg_path)\r\n",
+							"    filetags = jpeg.tags()\r\n",
+							"    GPSLongitude = filetags.get(\"EXIF_GPSLongitude\")\r\n",
+							"    GPSLongitudeRef = filetags.get(\"EXIF_GPSLongitudeRef\")\r\n",
+							"\r\n",
+							"    jpeg.close()\r\n",
+							"    return GPSLongitude, GPSLongitudeRef"
+						],
+						"outputs": [],
+						"execution_count": 27
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"def Exif_Cord_Convert(EXIF_Cord, direction):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to convert coordinate from get_EXIF_long + get_EXIF_lat functions (dd)(mm)(ss.sss) to decimal degrees.\r\n",
+							"    Arguments:\r\n",
+							"        EXIF_Cord: return from get_EXIF_long or get_EXIF_lat (first return)\r\n",
+							"        direction: return from get_EXIF_long or get_EXIF_lat (second return) - Either as \"N\",\"S\",\"E\", or \"W\"\r\n",
+							"    Returns:\r\n",
+							"        Decimal Degrees of coordinate.\r\n",
+							"    \"\"\"\r\n",
+							"\r\n",
+							"    new_str = EXIF_Cord.replace(\"(\",\"\")\r\n",
+							"    new_str = new_str.replace(\")\",\"\")\r\n",
+							"\r\n",
+							"    split_str = new_str.split(\" \")\r\n",
+							"    \r\n",
+							"    decimaldegrees = (float(split_str[0]) + float(split_str[1])/60 + float(split_str[2])/(60*60)) * (-1 if direction in ['W', 'S'] else 1)\r\n",
+							"    return(decimaldegrees)"
+						],
+						"outputs": [],
+						"execution_count": 28
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import pyproj\r\n",
+							"from shapely.ops import transform\r\n",
+							"from shapely.geometry import Point\r\n",
+							"from functools import partial\r\n",
+							"\r\n",
+							"def calculate_bb(lat, lon):\r\n",
+							"\r\n",
+							"    proj_wgs84 = pyproj.Proj('+proj=longlat +datum=WGS84')\r\n",
+							"    \r\n",
+							"    # Azimuthal equidistant projection\r\n",
+							"    aeqd_proj = '+proj=aeqd +lat_0={lat} +lon_0={lon} +x_0=0 +y_0=0'\r\n",
+							"    project = partial(\r\n",
+							"        pyproj.transform,\r\n",
+							"        pyproj.Proj(aeqd_proj.format(lat=lat, lon=lon)),\r\n",
+							"        proj_wgs84)\r\n",
+							"    \r\n",
+							"    buf = Point(0, 0).buffer(1)  # buffers 1 meter\r\n",
+							"    return transform(project, buf).bounds"
+						],
+						"outputs": [],
+						"execution_count": 38
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"def get_bb(jpeg_path):\r\n",
+							"    EXIFlat, latRef = get_EXIF_lat(jpeg_path)\r\n",
+							"    EXIFlong, longRef = get_EXIF_long(jpeg_path)\r\n",
+							"\r\n",
+							"    lat = Exif_Cord_Convert(EXIFlat,latRef)\r\n",
+							"    long = Exif_Cord_Convert(EXIFlong,longRef)\r\n",
+							"\r\n",
+							"    return calculate_bb(lat,long)"
+						],
+						"outputs": [],
+						"execution_count": 78
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#### 5.2 Add Date Time\r\n",
+							"\r\n",
+							"The STAC spec calls for a datetime to be added to the headers of the files. For this use case, EXIF information includes this data, but we have to get it into the right format. To do this, we will extract the EXIF Datetime and convert it to the STAC-ready format.\r\n",
+							"\r\n",
+							"In some instances, rich media is captured over a range of time (videos, stiched together aerial GEOTIFFs, and point clouds). For any of those use cases, a new function would have to be created to return a start_datetime and an end_datetime to fit to the STAC standard.\r\n",
+							"\r\n",
+							"This step will be done once we move the new images into the right folder."
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from datetime import datetime\r\n",
+							"\r\n",
+							"#Output date time must be in \r\n",
+							"def get_jpeg_datetime(jpeg_path):\r\n",
+							"    jpeg = rasterio.open(jpeg_path)\r\n",
+							"    filetags = jpeg.tags()\r\n",
+							"    jpeg.close()\r\n",
+							"    EXIF_Datetime = filetags.get(\"EXIF_DateTime\")\r\n",
+							"    EXIF_datetime_obj = datetime.strptime(EXIF_Datetime, '%Y:%m:%d %H:%M:%S')\r\n",
+							"    STAC_datetime = EXIF_datetime_obj.strftime(\"%Y-%m-%dT%H:%M:%S%z\")\r\n",
+							"    return STAC_datetime"
+						],
+						"outputs": [],
+						"execution_count": 79
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#### 5.3 Add Coordinate Reference System\r\n",
+							"The Cordinate Reference System (CRS) of a JPEG is usually taken in WGS84 (since that is the datum GPS is based on). Sometimes there will be a GPSMapDatum in the EXIF header but usually this data is not captured (much to the chagrin of geospatial analysts everywhere). For example if the image was taken in Japan, this value will be \"TOKYO\" but for this data, none is given. \r\n",
+							"\r\n",
+							"We will assume the data is GPS-WGS84 which has a [European Petroleum Survey Group (EPSG)](https://support.esri.com/en/technical-article/000002814#:~:text=Answer,version%20of%20the%20EPSG%20model.) standard ID of \"4326\" or otherwise captured as [EPSG:4326](https://epsg.io/4326)"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"def get_jpeg_crs(jpeg_path):\r\n",
+							"    crs = \"EPSG:4326\"\r\n",
+							"    return crs"
+						],
+						"outputs": [],
+						"execution_count": 80
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#### 5.4 Add Sensor Type\r\n",
+							"Determining sensor type is important when you know your datasets will contain rich media from multiple sensors. Here we define sensor as the optical capturing device's binary return. For example, this RBU imagery was captured with an RGB (Red, Green, Blue) sensor, but there are other sensors we have recognized such as Near-Infrared (NIR), Radar, and Multispectral. \r\n",
+							"\r\n",
+							"[Check NASA's website](https://www.earthdata.nasa.gov/sensors) for an almost exhaustive list of remote sensing sensors. There is no standard yet set for how we want the sensor formated in STAC. More to come on this.\r\n",
+							"\r\n",
+							"For this dataset, we will return RGB because every imagery taken, we can assume, was taken by an RGB camera."
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"def get_jpeg_sensor(jpeg_path):\r\n",
+							"    sensor_type = \"RGB\"\r\n",
+							"    return sensor_type"
+						],
+						"outputs": [],
+						"execution_count": 81
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## 6. Mobile or Aerial image?\r\n",
+							"\r\n",
+							"Based of the proposed architecture, it is important to sort the imagery between \"Mobile\" and \"Drone\" since those are 2 different types of collections. How will we be able to do that on these images?\r\n",
+							"\r\n",
+							"Luckily, we know that in this use case, RBU is using \"DJI\" drones (commerical-company) which use DJI cameras. If you look in the EXIF header of the imagery you can see an attribute called \"EXIF_Make\" which contains the information about the camera maker. This item will contain:\r\n",
+							"1. DJI\r\n",
+							"2. Android\r\n",
+							"3. Apple\r\n",
+							"4. ... other mobile phones\r\n",
+							"5. Blank\r\n",
+							"\r\n",
+							"If we test between all RBU imagery if it is \"DJI imagery\" and \"everything else\" we can then sort between \"drone\" and \"mobile\" respectively"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Return true if image was taken from drone\r\n",
+							"def is_drone(jpeg_path):\r\n",
+							"    jpeg = rasterio.open(jpeg_path)\r\n",
+							"    filetags = jpeg.tags()\r\n",
+							"    jpeg.close()\r\n",
+							"    platform = filetags.get(\"EXIF_Make\")\r\n",
+							"    \r\n",
+							"    if platform == 'DJI':\r\n",
+							"        return True\r\n",
+							"    else:\r\n",
+							"        return False    "
+						],
+						"outputs": [],
+						"execution_count": 100
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## 7. Write to Collection - w/Added Metadata\r\n",
+							"Finally we get into the big task of reading from the STAC Source and writing to the STAC Destination. Here are the steps we have defined:\r\n",
+							"1. Get list of all JPEGs (using the function in step 2)\r\n",
+							"2. Determine which JPEG fits into which collection (using function in step 6)\r\n",
+							"3. Get list of all metadata components to be added (using function in step 5)\r\n",
+							"4. Write to collection folder w/metadata added\r\n",
+							"5. Celebrate 🙌"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import rasterio\r\n",
+							"import shutil\r\n",
+							"\r\n",
+							"def write_to_collection(jpeg_path, collection_path):\r\n",
+							"    # BoundingBox = get_bb(jpeg_path)\r\n",
+							"    # DateTime = get_jpeg_datetime(jpeg_path)\r\n",
+							"    # jpeg_CRS = get_jpeg_crs(jpeg_path)\r\n",
+							"    # Sensor = get_jpeg_sensor(jpeg_path)\r\n",
+							"\r\n",
+							"    # shutil.copy(jpeg_path, collection_path)\r\n",
+							"    # print(\"Copy created \" + collection_path)\r\n",
+							"\r\n",
+							"    # with rasterio.open(\r\n",
+							"    #         collection_path,\r\n",
+							"    #         'r+',\r\n",
+							"    #         driver='JPEG') as dst:\r\n",
+							"    #         dst.update_tags(datetime = DateTime, start_datetime = None, end_datetime = None, bbox = BoundingBox, crs = jpeg_CRS, sensor = Sensor)\r\n",
+							"\r\n",
+							"    return True"
+						],
+						"outputs": [],
+						"execution_count": 118
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import os\r\n",
+							"jobId = mssparkutils.env.getJobId()\r\n",
+							"img_path = f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/'\r\n",
+							"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
+							"#print(outarray)\r\n",
+							"oblique_mobile_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting'\r\n",
+							"oblique_aerial_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting'\r\n",
+							"\r\n",
+							"for jpeg in outarray:\r\n",
+							"    filename = os.path.basename(jpeg)\r\n",
+							"    print(filename)\r\n",
+							"    \r\n",
+							"    if is_drone(jpeg):\r\n",
+							"        write_to_collection(jpeg, oblique_aerial_path+'/'+filename)\r\n",
+							"\r\n",
+							"    else:\r\n",
+							"        write_to_collection(jpeg, oblique_mobile_path+'/'+filename)\r\n",
+							"\r\n",
+							"    continue"
+						],
+						"outputs": [],
+						"execution_count": 119
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/cv_pumpjack_clip')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "Working document for clipping pumpjacks - trying to replicate FME job",
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "Geospatialspark",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "9e25753f-5af8-417a-b8d5-e30402ca4c87"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+						"name": "Geospatialspark",
+						"type": "Spark",
+						"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"#Mounting the AML blob storage located in dinnot101mlcvx to this notebook so we can reference it as if it was a filepath\r\n",
+							"#The 'wasbs' is for blob storage. There is another prefix for file storage, etc ...\r\n",
+							"\r\n",
+							"from notebookutils import mssparkutils\r\n",
+							"try:\r\n",
+							"    mssparkutils.fs.mount(\r\n",
+							"        \"wasbs://azureml-blobstore-91aa9420-fbec-40ef-91e9-982a277c80cf@dinnot101mlcvx.blob.core.windows.net\",\r\n",
+							"        \"/testliam\",\r\n",
+							"        {\"linkedService\":\"LiamTest\"}\r\n",
+							"    )\r\n",
+							"except:\r\n",
+							"    print(\"FAILED TO MOUNT\")\r\n",
+							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
+						],
+						"outputs": [],
+						"execution_count": 185
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Plot jpeg image from blob storage container\r\n",
+							"\r\n",
+							"#This is a proof of concept of how rasterio/other python tools access files via blob storage/notebook mount.\r\n",
+							"\r\n",
+							"#Note 'jobId' which will change every notebook instance\r\n",
+							"jobId = mssparkutils.env.getJobId()\r\n",
+							"\r\n",
+							"import rasterio\r\n",
+							"from rasterio.plot import show\r\n",
+							"img_path = f'/synfs/'+jobId+'/testliam/UI/06-13-2022_075155_UTC/2022_SJVBU_Kern_River_A_Flight_01_00217.jpg'\r\n",
+							"src = rasterio.open(img_path)\r\n",
+							"show(src)"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#This function is not used during the cv_pumpjack_clip workflow, just wrote it for reference on which files were in a directory.\r\n",
+							"import os\r\n",
+							"\r\n",
+							"def get_blob_file_list(directory):\r\n",
+							"    for f in os.listdir(directory):\r\n",
+							"        f_img = img_dir+f\r\n",
+							"        print(f_img)"
+						],
+						"outputs": [],
+						"execution_count": 186
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import json\r\n",
+							"import numpy as np\r\n",
+							"\r\n",
+							"def parse_AML_json(json_path):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to parse the Azure Machine Learning (AML) JSONL output. \r\n",
+							"    Arguments:\r\n",
+							"        json_path: The filepath to the AML jsonl file. This file should contain name, topX, topY, bottomX, and bottomY\r\n",
+							"    Returns:\r\n",
+							"        A numpy array of all labels from AML jsonl file in this format - [filename, topX, topyY, bottomX, bottomY]\r\n",
+							"    \r\n",
+							"    \"\"\"\r\n",
+							"\r\n",
+							"    parsed_list = np.array(['name','topX','topY','bottomX','bottomY'])\r\n",
+							"\r\n",
+							"    with open(json_path, 'r') as json_file:\r\n",
+							"        json_list = list(json_file)\r\n",
+							"        for pumpjack in json_list:\r\n",
+							"            pumpjack_json = json.loads(pumpjack)\r\n",
+							"\r\n",
+							"            pumpjack_img = os.path.basename(pumpjack_json['image_url'])\r\n",
+							"            \r\n",
+							"            for pumpjack_label in pumpjack_json['label']:\r\n",
+							"                topX = pumpjack_label['topX']\r\n",
+							"                topY = pumpjack_label['topY']\r\n",
+							"                bottomX = pumpjack_label['bottomX']\r\n",
+							"                bottomY = pumpjack_label['bottomY']\r\n",
+							"                \r\n",
+							"                parsed_row = np.array([pumpjack_img,topX,topY,bottomX,bottomY])\r\n",
+							"                #print(parsed_row)\r\n",
+							"                parsed_list = np.vstack([parsed_list, parsed_row])\r\n",
+							"    return parsed_list"
+						],
+						"outputs": [],
+						"execution_count": 96
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#https://stackoverflow.com/questions/13852700/create-file-but-if-name-exists-add-number\r\n",
+							"def uniquify(path):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to return a unique path name if there is already a file that exists at path\r\n",
+							"    Arguments:\r\n",
+							"        path: a full directory and file name with extention\r\n",
+							"    Returns:\r\n",
+							"        path but with _x at the end with x being a unique number if there already exists a file with the suffix of _1, _2, _3 and so on.\r\n",
+							"    \"\"\"\r\n",
+							"    filename, extension = os.path.splitext(path)\r\n",
+							"    counter = 1\r\n",
+							"\r\n",
+							"    while os.path.exists(path):\r\n",
+							"        path = filename + \"_\" + str(counter) + extension\r\n",
+							"        counter += 1\r\n",
+							"\r\n",
+							"    return path"
+						],
+						"outputs": [],
+						"execution_count": 175
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from osgeo import gdal\r\n",
+							"from os.path import exists\r\n",
+							"\r\n",
+							"gdal.UseExceptions()\r\n",
+							"\r\n",
+							"def clip_pumpjacks(pumpjack_list, img_dir, img_dir_out):\r\n",
+							"    \"\"\"\r\n",
+							"    Function for clipping images 1500, 1500 from Azure Machine Learning provided bonding box. Currently the read/writes of images are done via GDAL\r\n",
+							"    Arguments:\r\n",
+							"        pumpjack_list: list of pumpjacks returned from parse_AML_json function\r\n",
+							"        img_dir: directory of where the pumpjack images to be clipped are located\r\n",
+							"        img_dir_out: directory of where the clipped images will go container_tokens\r\n",
+							"    Returns:\r\n",
+							"        True if the function was completed.\r\n",
+							"    \"\"\"\r\n",
+							"\r\n",
+							"    for pumpjack in pumpjack_list:\r\n",
+							"        if pumpjack[0] == 'name':\r\n",
+							"            continue     \r\n",
+							"\r\n",
+							"        img_file = img_dir + pumpjack[0]\r\n",
+							"\r\n",
+							"        topX = pumpjack[1]\r\n",
+							"        topY = pumpjack[2]\r\n",
+							"        bottomX = pumpjack[3]\r\n",
+							"        bottomY = pumpjack[4]\r\n",
+							"\r\n",
+							"        g = gdal.OpenEx(img_file)\r\n",
+							"        img_width = g.RasterXSize\r\n",
+							"        img_height = g.RasterYSize\r\n",
+							"\r\n",
+							"        g = None\r\n",
+							"\r\n",
+							"        topX_pixel = int(int(img_width)*float(topX))\r\n",
+							"        topY_pixel = int(int(img_height)*float(topY))\r\n",
+							"        bottomX_pixel = int(int(img_width)*float(bottomX))\r\n",
+							"        bottomY_pixel = int(int(img_height)*float(bottomY))\r\n",
+							"\r\n",
+							"        middleX_pixel = int(topX_pixel + .5*(bottomX_pixel-topX_pixel))\r\n",
+							"        middleY_pixel = int(topY_pixel + .5*(bottomY_pixel-topY_pixel))\r\n",
+							"\r\n",
+							"        new_topX_pixel = middleX_pixel - 750\r\n",
+							"        new_topY_pixel = middleY_pixel - 750\r\n",
+							"\r\n",
+							"        jpg_in = img_file\r\n",
+							"        jpg_out_nonunique = img_dir_out + pumpjack[0] +\".jpg\"\r\n",
+							"        jpg_out = uniquify(jpg_out_nonunique)\r\n",
+							"        print(jpg_out)\r\n",
+							"        srcWin_option = [new_topX_pixel, new_topY_pixel, 1500, 1500]\r\n",
+							"        options = gdal.TranslateOptions(format='JPEG', srcWin = srcWin_option)\r\n",
+							"        gdal.Translate(jpg_out, jpg_in, options=options)\r\n",
+							"\r\n",
+							"        # print(\"topX = \"+ str(topX_pixel))\r\n",
+							"        # print(\"topY = \"+ str(topY_pixel))\r\n",
+							"        # print(\"bottomX_pixel = \"+ str(bottomX_pixel))\r\n",
+							"        # print(\"bottomY_pixel = \"+ str(bottomY_pixel))\r\n",
+							"        # print(\" \")\r\n",
+							"        # print(\"middleX_pixel = \"+ str(middleX_pixel))\r\n",
+							"        # print(\"middleY_pixel = \"+ str(middleY_pixel))\r\n",
+							"        # print('')\r\n",
+							"        # print(str(bottomY_pixel-topY_pixel))\r\n",
+							"    return True"
+						],
+						"outputs": [],
+						"execution_count": 203
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"jobId = mssparkutils.env.getJobId()\r\n",
+							"\r\n",
+							"img_dir = f'/synfs/'+jobId+'/testliam/UI/06-15-2022_053557_UTC/geotagged_subset/'\r\n",
+							"aml_json_path = f'/synfs/'+jobId+'/testliam/Labeling/export/dataset/b2efe480-107f-e1c2-5e78-7af2427f8f00/b5779ff4-ec96-455f-82df-92de2386cafd/labeledDatapoints_1.jsonl'\r\n",
+							"img_dir_out = f'/synfs/'+jobId+'/testliam/UI/geotagged_subset_pumpjacks_clip/python_out/'\r\n",
+							"\r\n",
+							"#pumpjack_list = parse_AML_json(aml_json_path)\r\n",
+							"\r\n",
+							"#get_blob_file_list(img_dir)\r\n",
+							"\r\n",
+							"clip_pumpjacks(pumpjack_list, img_dir, img_dir_out)"
+						],
+						"outputs": [],
+						"execution_count": 201
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"mssparkutils.fs.unmount(\"/testliam\")"
 						],
 						"outputs": [],
 						"execution_count": null
@@ -1592,7 +2729,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "368b1763-9b52-4829-92cc-056ec99e90cb"
+						"spark.autotune.trackingId": "febd3d25-a839-4785-aaef-49cbff6b3df8"
 					}
 				},
 				"metadata": {
@@ -1617,8 +2754,7 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -2300,9 +3436,9 @@
 				"nodeSizeFamily": "MemoryOptimized",
 				"sparkVersion": "3.1",
 				"libraryRequirements": {
-					"content": "name: aoi-env\r\nchannels:\r\n  - defaults\r\ndependencies:\r\n  - azure-storage-file-datalake\r\n  - gdal=3.3.0\r\n  - libgdal\r\n  - pip>=20.1.1\r\n  - pyproj\r\n  - shapely\r\n  - pip:\r\n      - \"rasterio\"\r\n      - \"geopandas\"",
-					"filename": "environment.yml",
-					"time": "2022-06-06T15:15:28.7036181Z"
+					"content": "name: aoi-env\r\nchannels:\r\n  - defaults\r\ndependencies:\r\n  - azure-storage-file-datalake\r\n  - gdal=3.3.0\r\n  - libgdal\r\n  - pip>=20.1.1\r\n  - pyproj\r\n  - shapely\r\n  - pip:\r\n      - azure-storage-blob==0.37.1\r\n      - rasterio\r\n      - geopandas\r\n      - numpy\r\n      - opencv-python\r\n",
+					"filename": "environment (2).yml",
+					"time": "2022-06-27T14:26:52.5580015Z"
 				},
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": false,

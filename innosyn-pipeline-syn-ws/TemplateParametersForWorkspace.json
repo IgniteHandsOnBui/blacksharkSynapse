@@ -14,6 +14,9 @@
 		"Stellar Data Storage Account v2_connectionString": {
 			"value": ""
 		},
+		"innoaoaidata_STAC_connectionString": {
+			"value": ""
+		},
 		"innosyn-pipeline-syn-ws-WorkspaceDefaultSqlServer_connectionString": {
 			"value": ""
 		},
