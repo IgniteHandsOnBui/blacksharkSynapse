@@ -193,7 +193,13 @@
 						"--folders_to_create",
 						"@concat(pipeline().parameters.Prefix,'/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['resultsDirectory'])",
 						"--folders_to_create",
-						"@concat(pipeline().parameters.Prefix,'/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['logsDirectory'])"
+						"@concat(pipeline().parameters.Prefix,'/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['logsDirectory'])",
+						"--key_vault_name",
+						"innosyn-pipeline-kv",
+						"--linked_service_name",
+						"Stellar Pipeline Key Vault",
+						"--storage_account_key_secret_name",
+						"GeospatialStorageAccountKey"
 					],
 					"targetBigDataPool": {
 						"referenceName": "pooldl2xmc",
@@ -245,7 +251,13 @@
 						"--dst_fileshare",
 						"volume-a",
 						"--dst_folder",
-						"@concat(pipeline().parameters.Prefix,'/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['contextFileName'])"
+						"@concat(pipeline().parameters.Prefix,'/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['contextFileName'])",
+						"--key_vault_name",
+						"innosyn-pipeline-kv",
+						"--linked_service_name",
+						"Stellar Pipeline Key Vault",
+						"--storage_account_key_secret_name",
+						"GeospatialStorageAccountKey"
 					],
 					"targetBigDataPool": {
 						"referenceName": "pooldl2xmc",
@@ -369,7 +381,7 @@
 			},
 			"BatchName": {
 				"type": "string",
-				"defaultValue": "blackshark-model"
+				"defaultValue": "innosynorcbatchact"
 			},
 			"BatchLocation": {
 				"type": "string",
