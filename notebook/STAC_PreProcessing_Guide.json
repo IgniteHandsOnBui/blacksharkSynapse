@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "33d163b7-04bc-4cfc-bd23-f84964017332"
+				"spark.autotune.trackingId": "fa5ce1a0-da83-40fc-8862-3efdef49974c"
 			}
 		},
 		"metadata": {
@@ -86,7 +86,7 @@
 				},
 				"source": [
 					"### 1. Mounting rich media source and destination storage accounts\r\n",
-					"Typically the source will be XXXX and the destination will be YYYY"
+					"Typically the source will be from the XXX and the destination will be YYYY"
 				]
 			},
 			{
