@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "323e1f23-8932-45b8-8974-4f3f54db7054"
+				"spark.autotune.trackingId": "915ddef3-bb31-4e54-b828-d1126de64fb6"
 			}
 		},
 		"metadata": {
@@ -877,6 +877,19 @@
 					"    return True"
 				],
 				"execution_count": 174
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Below is where we run the whole script. I have not wrote it into a function as of yet."
+				]
 			},
 			{
 				"cell_type": "code",
