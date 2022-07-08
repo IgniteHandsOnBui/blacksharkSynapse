@@ -1910,7 +1910,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "acb24a7d-6c6e-4944-82d2-2cbb6968cba4"
+						"spark.autotune.trackingId": "28c79f4d-baa5-4960-a00e-e70b6816cb54"
 					}
 				},
 				"metadata": {
@@ -1935,7 +1935,8 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56
+						"memory": 56,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1976,7 +1977,7 @@
 							}
 						},
 						"source": [
-							"### 1. Mounting rich media source and destination storage accounts\r\n",
+							"## 1. Mounting rich media source and destination storage accounts\r\n",
 							"Typically the source of the rich media will be in one container, and the destination will be in another. In this example I have the source in a blob storage account under the container \"liamsource\" and the destination in a blob storage account under the \"liamdest\" container. In code, these folders will be \"STAC_Source\" and \"STAC_Dest\" respectively."
 						]
 					},
@@ -2020,7 +2021,7 @@
 							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
 						],
 						"outputs": [],
-						"execution_count": 2
+						"execution_count": 163
 					},
 					{
 						"cell_type": "markdown",
@@ -2070,7 +2071,7 @@
 							"    return file_array"
 						],
 						"outputs": [],
-						"execution_count": 19
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -2092,7 +2093,7 @@
 							"outarray"
 						],
 						"outputs": [],
-						"execution_count": 4
+						"execution_count": null
 					},
 					{
 						"cell_type": "markdown",
@@ -2143,7 +2144,7 @@
 							"            count = count + 1"
 						],
 						"outputs": [],
-						"execution_count": 62
+						"execution_count": null
 					},
 					{
 						"cell_type": "markdown",
@@ -2190,7 +2191,7 @@
 							"oblique_aerial_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting/rbu_aerial_oblique_imagery_for_ehsr_reporting_mtl.json'"
 						],
 						"outputs": [],
-						"execution_count": 5
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -2223,7 +2224,7 @@
 							"    return json_open"
 						],
 						"outputs": [],
-						"execution_count": 6
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -2245,7 +2246,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 7
+						"execution_count": null
 					},
 					{
 						"cell_type": "markdown",
@@ -2293,7 +2294,7 @@
 							"    return jpeg_EXIF"
 						],
 						"outputs": [],
-						"execution_count": 8
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -2312,7 +2313,7 @@
 							"extract_EXIF(f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/202002280104265320_skilpatrick_S3_7-15-19_DJI_0256.JPG')"
 						],
 						"outputs": [],
-						"execution_count": 9
+						"execution_count": null
 					},
 					{
 						"cell_type": "markdown",
@@ -2325,7 +2326,7 @@
 						},
 						"source": [
 							"## 5. Extract Metadata\r\n",
-							"Extracting the metadata of each JSON is a tedious task that calls for automation ...\r\n",
+							"Extracting the metadata of each JPEG is a tedious task that calls for automation. These next 4 funcitons extract/calculate metadata that STAC requires.\r\n",
 							"\r\n",
 							"### 5.1 Add Bounding Box\r\n",
 							"### 5.2 Add DateTime\r\n",
@@ -2344,6 +2345,8 @@
 						},
 						"source": [
 							"#### 5.1 Bounding Box\r\n",
+							"A bounding box is a concept that STAC requires, but not something that a JPEG has. To create a bounding box for a JPEG, we have to \"fake it\". In this scenario I am creating a fake 1 meter x 1 meter bounding box that STAC will recognize.\r\n",
+							"\r\n",
 							"To calculate a bounding box from a JPEG you must first do 3 things:\r\n",
 							"- Extract lat/long from EXIF Header (including if coordinate direction is North/South or East/West)\r\n",
 							"- Convert lat/long from EXIF Header from Degree, Minutes, Seconds to Decimal Degrees\r\n",
@@ -2401,7 +2404,7 @@
 							"    return GPSLongitude, GPSLongitudeRef"
 						],
 						"outputs": [],
-						"execution_count": 27
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -2426,17 +2429,16 @@
 							"    Returns:\r\n",
 							"        Decimal Degrees of coordinate.\r\n",
 							"    \"\"\"\r\n",
-							"\r\n",
 							"    new_str = EXIF_Cord.replace(\"(\",\"\")\r\n",
 							"    new_str = new_str.replace(\")\",\"\")\r\n",
 							"\r\n",
 							"    split_str = new_str.split(\" \")\r\n",
 							"    \r\n",
 							"    decimaldegrees = (float(split_str[0]) + float(split_str[1])/60 + float(split_str[2])/(60*60)) * (-1 if direction in ['W', 'S'] else 1)\r\n",
-							"    return(decimaldegrees)"
+							"    return decimaldegrees"
 						],
 						"outputs": [],
-						"execution_count": 28
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -2458,6 +2460,14 @@
 							"from functools import partial\r\n",
 							"\r\n",
 							"def calculate_bb(lat, lon):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to calculate a \"fake\" bounding box of 1m by 1m given a lat/long coordinate in Decimal Degrees. The lat/long is assumed to be in WGS84.\r\n",
+							"    Arguments:\r\n",
+							"        lat: latitude in decimal degrees\r\n",
+							"        long: longitude in decimal degrees\r\n",
+							"    Returns:\r\n",
+							"        array of bounding box to be used for metadata of JPEG.\r\n",
+							"    \"\"\"\r\n",
 							"\r\n",
 							"    proj_wgs84 = pyproj.Proj('+proj=longlat +datum=WGS84')\r\n",
 							"    \r\n",
@@ -2472,7 +2482,7 @@
 							"    return transform(project, buf).bounds"
 						],
 						"outputs": [],
-						"execution_count": 38
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -2489,6 +2499,14 @@
 						},
 						"source": [
 							"def get_bb(jpeg_path):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to return a faked bounding box using previous functions.\r\n",
+							"    Arguments:\r\n",
+							"        jpeg_path: path to JPEG which you want faked bounding box from. JPEG must have Latitude/Longitude in EXIF header.\r\n",
+							"    Returns:\r\n",
+							"        array of bounding box to be used for metadata of JPEG.\r\n",
+							"    \"\"\"\r\n",
+							"\r\n",
 							"    EXIFlat, latRef = get_EXIF_lat(jpeg_path)\r\n",
 							"    EXIFlong, longRef = get_EXIF_long(jpeg_path)\r\n",
 							"\r\n",
@@ -2498,7 +2516,7 @@
 							"    return calculate_bb(lat,long)"
 						],
 						"outputs": [],
-						"execution_count": 78
+						"execution_count": null
 					},
 					{
 						"cell_type": "markdown",
@@ -2537,6 +2555,14 @@
 							"\r\n",
 							"#Output date time must be in \r\n",
 							"def get_jpeg_datetime(jpeg_path):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to return a STAC-customized DateTime from JPEG image EXIF information.\r\n",
+							"    Arguments:\r\n",
+							"        jpeg_path: path to JPEG which you want STAC-DateTime for. JPEG must have DateTime in EXIF header.\r\n",
+							"    Returns:\r\n",
+							"        STAC-Specific DateTime as a string\r\n",
+							"    \"\"\"\r\n",
+							"\r\n",
 							"    jpeg = rasterio.open(jpeg_path)\r\n",
 							"    filetags = jpeg.tags()\r\n",
 							"    jpeg.close()\r\n",
@@ -2546,7 +2572,7 @@
 							"    return STAC_datetime"
 						],
 						"outputs": [],
-						"execution_count": 79
+						"execution_count": null
 					},
 					{
 						"cell_type": "markdown",
@@ -2579,11 +2605,19 @@
 						},
 						"source": [
 							"def get_jpeg_crs(jpeg_path):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to return \"EPSG:4326\"\r\n",
+							"    Arguments:\r\n",
+							"        jpeg_path: not used, but still good practice if we want to extend this function\r\n",
+							"    Returns:\r\n",
+							"        EPSG:4326 as a string which is the GPS-WGS84 Cordinate Reference System\r\n",
+							"    \"\"\"\r\n",
+							"\r\n",
 							"    crs = \"EPSG:4326\"\r\n",
 							"    return crs"
 						],
 						"outputs": [],
-						"execution_count": 80
+						"execution_count": null
 					},
 					{
 						"cell_type": "markdown",
@@ -2618,11 +2652,19 @@
 						},
 						"source": [
 							"def get_jpeg_sensor(jpeg_path):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to return \"RGB\"\r\n",
+							"    Arguments:\r\n",
+							"        jpeg_path: not used, but still good practice if we want to extend this function\r\n",
+							"    Returns:\r\n",
+							"        RGB as a string\r\n",
+							"    \"\"\"\r\n",
+							"\r\n",
 							"    sensor_type = \"RGB\"\r\n",
 							"    return sensor_type"
 						],
 						"outputs": [],
-						"execution_count": 81
+						"execution_count": null
 					},
 					{
 						"cell_type": "markdown",
@@ -2664,8 +2706,17 @@
 						"source": [
 							"#Return true if image was taken from drone\r\n",
 							"def is_drone(jpeg_path):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to determine if image was taken form a drone (Assuming drone is a DJI drone)\r\n",
+							"    Arguments:\r\n",
+							"        jpeg_path: path to JPEG you want to determine if taken from a drone or not.\r\n",
+							"    Returns:\r\n",
+							"        True if taken from a drone, otherwise returns False\r\n",
+							"    \"\"\"\r\n",
+							"\r\n",
 							"    jpeg = rasterio.open(jpeg_path)\r\n",
 							"    filetags = jpeg.tags()\r\n",
+							"    \r\n",
 							"    jpeg.close()\r\n",
 							"    platform = filetags.get(\"EXIF_Make\")\r\n",
 							"    \r\n",
@@ -2675,7 +2726,7 @@
 							"        return False    "
 						],
 						"outputs": [],
-						"execution_count": 100
+						"execution_count": null
 					},
 					{
 						"cell_type": "markdown",
@@ -2711,27 +2762,44 @@
 						},
 						"source": [
 							"import rasterio\r\n",
-							"import shutil\r\n",
+							"from notebookutils import mssparkutils\r\n",
+							"import os\r\n",
 							"\r\n",
 							"def write_to_collection(jpeg_path, collection_path):\r\n",
-							"    # BoundingBox = get_bb(jpeg_path)\r\n",
-							"    # DateTime = get_jpeg_datetime(jpeg_path)\r\n",
-							"    # jpeg_CRS = get_jpeg_crs(jpeg_path)\r\n",
-							"    # Sensor = get_jpeg_sensor(jpeg_path)\r\n",
+							"    \"\"\"\r\n",
+							"    Currently running into issues on copying the files. This step may be best done with a data pipeline outside of this script? For now, I have manually moved the files to the right folders.\r\n",
+							"    \"\"\"\r\n",
+							"    print(collection_path)\r\n",
+							"    BoundingBox = get_bb(jpeg_path)\r\n",
+							"    DateTime = get_jpeg_datetime(jpeg_path)\r\n",
+							"    jpeg_CRS = get_jpeg_crs(jpeg_path)\r\n",
+							"    Sensor = get_jpeg_sensor(jpeg_path)\r\n",
 							"\r\n",
-							"    # shutil.copy(jpeg_path, collection_path)\r\n",
-							"    # print(\"Copy created \" + collection_path)\r\n",
-							"\r\n",
-							"    # with rasterio.open(\r\n",
-							"    #         collection_path,\r\n",
-							"    #         'r+',\r\n",
-							"    #         driver='JPEG') as dst:\r\n",
-							"    #         dst.update_tags(datetime = DateTime, start_datetime = None, end_datetime = None, bbox = BoundingBox, crs = jpeg_CRS, sensor = Sensor)\r\n",
+							"    with rasterio.open(\r\n",
+							"            collection_path,\r\n",
+							"            'r+',\r\n",
+							"            driver='JPEG') as dst:\r\n",
+							"            dst.update_tags(datetime = DateTime, start_datetime = None, end_datetime = None, bbox = BoundingBox, crs = jpeg_CRS, sensor = Sensor)\r\n",
+							"            print(\"Added metadata to \"+ collection_path)\r\n",
+							"            dst = None\r\n",
 							"\r\n",
 							"    return True"
 						],
 						"outputs": [],
-						"execution_count": 118
+						"execution_count": 174
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"Below is where we run the whole script. I have not wrote it into a function as of yet."
+						]
 					},
 					{
 						"cell_type": "code",
@@ -2748,27 +2816,27 @@
 						},
 						"source": [
 							"import os\r\n",
+							"\r\n",
 							"jobId = mssparkutils.env.getJobId()\r\n",
 							"img_path = f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/'\r\n",
 							"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
 							"#print(outarray)\r\n",
-							"oblique_mobile_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting'\r\n",
-							"oblique_aerial_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting'\r\n",
+							"\r\n",
+							"oblique_mobile_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting/'\r\n",
+							"oblique_aerial_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting/'\r\n",
 							"\r\n",
 							"for jpeg in outarray:\r\n",
 							"    filename = os.path.basename(jpeg)\r\n",
 							"    print(filename)\r\n",
-							"    \r\n",
+							"\r\n",
 							"    if is_drone(jpeg):\r\n",
-							"        write_to_collection(jpeg, oblique_aerial_path+'/'+filename)\r\n",
+							"        write_to_collection(jpeg, oblique_aerial_path+filename)\r\n",
 							"\r\n",
 							"    else:\r\n",
-							"        write_to_collection(jpeg, oblique_mobile_path+'/'+filename)\r\n",
-							"\r\n",
-							"    continue"
+							"        write_to_collection(jpeg, oblique_mobile_path+filename)"
 						],
 						"outputs": [],
-						"execution_count": 119
+						"execution_count": 179
 					},
 					{
 						"cell_type": "code",
