@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e344894c-3391-4ef2-b744-e74dc620fbb8"
+				"spark.autotune.trackingId": "323e1f23-8932-45b8-8974-4f3f54db7054"
 			}
 		},
 		"metadata": {
@@ -857,24 +857,26 @@
 					"import os\r\n",
 					"\r\n",
 					"def write_to_collection(jpeg_path, collection_path):\r\n",
-					"    print(jpeg_path)\r\n",
-					"    mssparkutils.fs.ls(jpeg_path) \r\n",
-					"    # BoundingBox = get_bb(jpeg_path)\r\n",
-					"    # DateTime = get_jpeg_datetime(jpeg_path)\r\n",
-					"    # jpeg_CRS = get_jpeg_crs(jpeg_path)\r\n",
-					"    # Sensor = get_jpeg_sensor(jpeg_path)\r\n",
+					"    \"\"\"\r\n",
+					"    Currently running into issues on copying the files. This step may be best done with a data pipeline outside of this script? For now, I have manually moved the files to the right folders.\r\n",
+					"    \"\"\"\r\n",
+					"    print(collection_path)\r\n",
+					"    BoundingBox = get_bb(jpeg_path)\r\n",
+					"    DateTime = get_jpeg_datetime(jpeg_path)\r\n",
+					"    jpeg_CRS = get_jpeg_crs(jpeg_path)\r\n",
+					"    Sensor = get_jpeg_sensor(jpeg_path)\r\n",
 					"\r\n",
-					"    # with rasterio.open(\r\n",
-					"    #         collection_path,\r\n",
-					"    #         'r+',\r\n",
-					"    #         driver='JPEG') as dst:\r\n",
-					"    #         dst.update_tags(datetime = DateTime, start_datetime = None, end_datetime = None, bbox = BoundingBox, crs = jpeg_CRS, sensor = Sensor)\r\n",
-					"    #         print(\"Added metadata to \"+ collection_path)\r\n",
-					"    #         dst.close()\r\n",
+					"    with rasterio.open(\r\n",
+					"            collection_path,\r\n",
+					"            'r+',\r\n",
+					"            driver='JPEG') as dst:\r\n",
+					"            dst.update_tags(datetime = DateTime, start_datetime = None, end_datetime = None, bbox = BoundingBox, crs = jpeg_CRS, sensor = Sensor)\r\n",
+					"            print(\"Added metadata to \"+ collection_path)\r\n",
+					"            dst = None\r\n",
 					"\r\n",
 					"    return True"
 				],
-				"execution_count": 160
+				"execution_count": 174
 			},
 			{
 				"cell_type": "code",
@@ -905,14 +907,12 @@
 					"    print(filename)\r\n",
 					"\r\n",
 					"    if is_drone(jpeg):\r\n",
-					"        write_to_collection(jpeg, oblique_aerial_path)\r\n",
+					"        write_to_collection(jpeg, oblique_aerial_path+filename)\r\n",
 					"\r\n",
 					"    else:\r\n",
-					"        write_to_collection(jpeg, oblique_mobile_path)\r\n",
-					"\r\n",
-					"    break"
+					"        write_to_collection(jpeg, oblique_mobile_path+filename)"
 				],
-				"execution_count": 162
+				"execution_count": 179
 			},
 			{
 				"cell_type": "code",
