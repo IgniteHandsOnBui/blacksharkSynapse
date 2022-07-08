@@ -313,7 +313,32 @@
 						}
 					},
 					"enableStaging": false
-				}
+				},
+				"inputs": [
+					{
+						"referenceName": "run_container",
+						"type": "DatasetReference",
+						"parameters": {
+							"container_name": {
+								"value": "@pipeline().parameters.Prefix",
+								"type": "Expression"
+							},
+							"folder_path": "config"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "run_fileshare",
+						"type": "DatasetReference",
+						"parameters": {
+							"folder_path": {
+								"value": "@concat(pipeline().parameters.Prefix, '/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['resultsDirectory'])",
+								"type": "Expression"
+							}
+						}
+					}
+				]
 			},
 			{
 				"name": "Create Logs Directory with placeholder_copy1",
@@ -359,7 +384,32 @@
 						}
 					},
 					"enableStaging": false
-				}
+				},
+				"inputs": [
+					{
+						"referenceName": "run_container",
+						"type": "DatasetReference",
+						"parameters": {
+							"container_name": {
+								"value": "@pipeline().parameters.Prefix",
+								"type": "Expression"
+							},
+							"folder_path": "config"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "run_fileshare",
+						"type": "DatasetReference",
+						"parameters": {
+							"folder_path": {
+								"value": "@concat(pipeline().parameters.Prefix, '/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['logsDirectory'])",
+								"type": "Expression"
+							}
+						}
+					}
+				]
 			},
 			{
 				"name": "Create Geotiff",
@@ -402,7 +452,32 @@
 						}
 					},
 					"enableStaging": false
-				}
+				},
+				"inputs": [
+					{
+						"referenceName": "run_container",
+						"type": "DatasetReference",
+						"parameters": {
+							"container_name": {
+								"value": "@pipeline().parameters.Prefix",
+								"type": "Expression"
+							},
+							"folder_path": "warp"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "run_fileshare",
+						"type": "DatasetReference",
+						"parameters": {
+							"folder_path": {
+								"value": "@concat(pipeline().parameters.Prefix, '/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['submissionDirectory'])",
+								"type": "Expression"
+							}
+						}
+					}
+				]
 			},
 			{
 				"name": "Create Config",
@@ -448,7 +523,32 @@
 						}
 					},
 					"enableStaging": false
-				}
+				},
+				"inputs": [
+					{
+						"referenceName": "run_container",
+						"type": "DatasetReference",
+						"parameters": {
+							"container_name": {
+								"value": "@pipeline().parameters.Prefix",
+								"type": "Expression"
+							},
+							"folder_path": "config"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "run_fileshare",
+						"type": "DatasetReference",
+						"parameters": {
+							"folder_path": {
+								"value": "@concat(pipeline().parameters.Prefix)",
+								"type": "Expression"
+							}
+						}
+					}
+				]
 			},
 			{
 				"name": "Delete Results Directory placeholder",
@@ -470,6 +570,16 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"dataset": {
+						"referenceName": "run_fileshare",
+						"type": "DatasetReference",
+						"parameters": {
+							"folder_path": {
+								"value": "@concat(pipeline().parameters.Prefix, '/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['resultsDirectory'])",
+								"type": "Expression"
+							}
+						}
+					},
 					"logStorageSettings": {
 						"linkedServiceName": {
 							"referenceName": "Stellar Airbus v2",
@@ -505,6 +615,16 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"dataset": {
+						"referenceName": "run_fileshare",
+						"type": "DatasetReference",
+						"parameters": {
+							"folder_path": {
+								"value": "@concat(pipeline().parameters.Prefix, '/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['logsDirectory'])",
+								"type": "Expression"
+							}
+						}
+					},
 					"logStorageSettings": {
 						"linkedServiceName": {
 							"referenceName": "Stellar Airbus v2",
