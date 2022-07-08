@@ -19,6 +19,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Stellar Data Storage Account v2'"
 		},
+		"innoaoaidata_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'innoaoaidata'"
+		},
 		"innoaoaidata_STAC_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'innoaoaidata_STAC'"
@@ -162,7 +166,25 @@
 						"type": "WebActivity",
 						"dependsOn": [
 							{
-								"activity": "Copy Config file",
+								"activity": "Create Config",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Create Geotiff",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Delete Results Directory placeholder",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Delete Logs Directory placeholder",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -197,116 +219,6 @@
 								"type": "MSI",
 								"resource": "https://batch.core.windows.net/"
 							}
-						}
-					},
-					{
-						"name": "Copy GeoTiff",
-						"type": "SparkJob",
-						"dependsOn": [
-							{
-								"activity": "Read Spec Document",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"sparkJob": {
-								"referenceName": "Copy noop",
-								"type": "SparkJobDefinitionReference"
-							},
-							"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/copy_noop/src/main.py",
-							"args": [
-								"--storage_account_name",
-								"@pipeline().parameters.StorageAccountName",
-								"--src_container",
-								"@pipeline().parameters.Prefix",
-								"--src_folder",
-								"warp",
-								"--storage_account_key",
-								"@pipeline().parameters.StorageAccountKey",
-								"--dst_fileshare",
-								"volume-a",
-								"--dst_folder",
-								"@concat(pipeline().parameters.Prefix,'/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['submissionDirectory'])",
-								"--folders_to_create",
-								"@concat(pipeline().parameters.Prefix,'/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['mountedDirectory'])",
-								"--folders_to_create",
-								"@concat(pipeline().parameters.Prefix,'/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['resultsDirectory'])",
-								"--folders_to_create",
-								"@concat(pipeline().parameters.Prefix,'/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['logsDirectory'])"
-							],
-							"targetBigDataPool": {
-								"referenceName": "pooldl2xmc",
-								"type": "BigDataPoolReference"
-							},
-							"executorSize": "Medium",
-							"conf": {
-								"spark.dynamicAllocation.minExecutors": 2,
-								"spark.dynamicAllocation.maxExecutors": 3
-							},
-							"driverSize": "Medium",
-							"numExecutors": 2
-						}
-					},
-					{
-						"name": "Copy Config file",
-						"type": "SparkJob",
-						"dependsOn": [
-							{
-								"activity": "Copy GeoTiff",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"sparkJob": {
-								"referenceName": "Copy noop",
-								"type": "SparkJobDefinitionReference"
-							},
-							"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/copy_noop/src/main.py",
-							"args": [
-								"--storage_account_name",
-								"@pipeline().parameters.StorageAccountName",
-								"--src_container",
-								"@pipeline().parameters.Prefix",
-								"--src_folder",
-								"@concat('config/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['contextFileName'])",
-								"--storage_account_key",
-								"@pipeline().parameters.StorageAccountKey",
-								"--dst_fileshare",
-								"volume-a",
-								"--dst_folder",
-								"@concat(pipeline().parameters.Prefix,'/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['contextFileName'])"
-							],
-							"targetBigDataPool": {
-								"referenceName": "pooldl2xmc",
-								"type": "BigDataPoolReference"
-							},
-							"executorSize": "Medium",
-							"conf": {
-								"spark.dynamicAllocation.minExecutors": 2,
-								"spark.dynamicAllocation.maxExecutors": 3
-							},
-							"driverSize": "Medium",
-							"numExecutors": 2
 						}
 					},
 					{
@@ -413,6 +325,377 @@
 								"firstRowOnly": true
 							}
 						}
+					},
+					{
+						"name": "Create Results Directory with placeholder",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Read Spec Document",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"maxConcurrentConnections": 15,
+									"recursive": true,
+									"wildcardFolderPath": "config",
+									"wildcardFileName": {
+										"value": "@activity('Read Spec Document').output['runStatus'].output.sink.value[0]['contextFileName']",
+										"type": "Expression"
+									},
+									"deleteFilesAfterCompletion": false
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureFileStorageWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "run_container",
+								"type": "DatasetReference",
+								"parameters": {
+									"container_name": {
+										"value": "@pipeline().parameters.Prefix",
+										"type": "Expression"
+									},
+									"folder_path": "config"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "run_fileshare",
+								"type": "DatasetReference",
+								"parameters": {
+									"folder_path": {
+										"value": "@concat(pipeline().parameters.Prefix, '/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['resultsDirectory'])",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					},
+					{
+						"name": "Create Logs Directory with placeholder_copy1",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Read Spec Document",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"maxConcurrentConnections": 15,
+									"recursive": true,
+									"wildcardFolderPath": "config",
+									"wildcardFileName": {
+										"value": "@activity('Read Spec Document').output['runStatus'].output.sink.value[0]['contextFileName']",
+										"type": "Expression"
+									},
+									"deleteFilesAfterCompletion": false
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureFileStorageWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "run_container",
+								"type": "DatasetReference",
+								"parameters": {
+									"container_name": {
+										"value": "@pipeline().parameters.Prefix",
+										"type": "Expression"
+									},
+									"folder_path": "config"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "run_fileshare",
+								"type": "DatasetReference",
+								"parameters": {
+									"folder_path": {
+										"value": "@concat(pipeline().parameters.Prefix, '/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['logsDirectory'])",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					},
+					{
+						"name": "Create Geotiff",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Read Spec Document",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"maxConcurrentConnections": 15,
+									"recursive": true,
+									"wildcardFolderPath": "warp",
+									"wildcardFileName": "*.tif",
+									"deleteFilesAfterCompletion": false
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureFileStorageWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "run_container",
+								"type": "DatasetReference",
+								"parameters": {
+									"container_name": {
+										"value": "@pipeline().parameters.Prefix",
+										"type": "Expression"
+									},
+									"folder_path": "warp"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "run_fileshare",
+								"type": "DatasetReference",
+								"parameters": {
+									"folder_path": {
+										"value": "@concat(pipeline().parameters.Prefix, '/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['submissionDirectory'])",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					},
+					{
+						"name": "Create Config",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Read Spec Document",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"maxConcurrentConnections": 15,
+									"recursive": true,
+									"wildcardFolderPath": "config",
+									"wildcardFileName": {
+										"value": "@activity('Read Spec Document').output['runStatus'].output.sink.value[0]['contextFileName']",
+										"type": "Expression"
+									},
+									"deleteFilesAfterCompletion": false
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureFileStorageWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "run_container",
+								"type": "DatasetReference",
+								"parameters": {
+									"container_name": {
+										"value": "@pipeline().parameters.Prefix",
+										"type": "Expression"
+									},
+									"folder_path": "config"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "run_fileshare",
+								"type": "DatasetReference",
+								"parameters": {
+									"folder_path": {
+										"value": "@concat(pipeline().parameters.Prefix)",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					},
+					{
+						"name": "Delete Results Directory placeholder",
+						"type": "Delete",
+						"dependsOn": [
+							{
+								"activity": "Create Results Directory with placeholder",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "run_fileshare",
+								"type": "DatasetReference",
+								"parameters": {
+									"folder_path": {
+										"value": "@concat(pipeline().parameters.Prefix, '/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['resultsDirectory'])",
+										"type": "Expression"
+									}
+								}
+							},
+							"logStorageSettings": {
+								"linkedServiceName": {
+									"referenceName": "Stellar Airbus v2",
+									"type": "LinkedServiceReference"
+								}
+							},
+							"enableLogging": true,
+							"storeSettings": {
+								"type": "AzureFileStorageReadSettings",
+								"recursive": true,
+								"wildcardFileName": "*.*",
+								"enablePartitionDiscovery": false
+							}
+						}
+					},
+					{
+						"name": "Delete Logs Directory placeholder",
+						"type": "Delete",
+						"dependsOn": [
+							{
+								"activity": "Create Logs Directory with placeholder_copy1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "run_fileshare",
+								"type": "DatasetReference",
+								"parameters": {
+									"folder_path": {
+										"value": "@concat(pipeline().parameters.Prefix, '/', activity('Read Spec Document').output['runStatus'].output.sink.value[0]['logsDirectory'])",
+										"type": "Expression"
+									}
+								}
+							},
+							"logStorageSettings": {
+								"linkedServiceName": {
+									"referenceName": "Stellar Airbus v2",
+									"type": "LinkedServiceReference"
+								}
+							},
+							"enableLogging": true,
+							"storeSettings": {
+								"type": "AzureFileStorageReadSettings",
+								"recursive": true,
+								"wildcardFileName": "*.*",
+								"enablePartitionDiscovery": false
+							}
+						}
 					}
 				],
 				"policy": {
@@ -426,7 +709,7 @@
 					},
 					"BatchName": {
 						"type": "string",
-						"defaultValue": "blackshark-model"
+						"defaultValue": "innosynorcbatchact"
 					},
 					"BatchLocation": {
 						"type": "string",
@@ -458,11 +741,12 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
-				"[concat(variables('workspaceId'), '/sparkJobDefinitions/Copy noop')]",
-				"[concat(variables('workspaceId'), '/bigDataPools/pooldl2xmc')]",
 				"[concat(variables('workspaceId'), '/datasets/gls')]",
 				"[concat(variables('workspaceId'), '/datasets/gld')]",
-				"[concat(variables('workspaceId'), '/dataflows/ReadSpecDocumentFlow')]"
+				"[concat(variables('workspaceId'), '/dataflows/ReadSpecDocumentFlow')]",
+				"[concat(variables('workspaceId'), '/datasets/run_container')]",
+				"[concat(variables('workspaceId'), '/datasets/run_fileshare')]",
+				"[concat(variables('workspaceId'), '/linkedServices/Stellar Airbus v2')]"
 			]
 		},
 		{
@@ -1016,6 +1300,73 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/run_container')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Stellar Airbus v2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"container_name": {
+						"type": "string"
+					},
+					"folder_path": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().folder_path",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().container_name",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Stellar Airbus v2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/run_fileshare')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Stellar Airbus v2 FS",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folder_path": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureFileStorageLocation",
+						"folderPath": {
+							"value": "@dataset().folder_path",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/Stellar Airbus v2 FS')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/spec_doc_specification')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -1169,6 +1520,25 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/innoaoaidata')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('innoaoaidata_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/innoaoaidata_STAC')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -1293,11 +1663,10 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/STAC_PreProcessing_Guide')]",
+			"name": "[concat(parameters('workspaceName'), '/Notebook 1')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
-				"description": "Guide for documenting and sharing pre-processing steps required prior to the STAC ingestion process. This guide will use JPGs as an example",
 				"nbformat": 4,
 				"nbformat_minor": 2,
 				"bigDataPool": {
@@ -1314,7 +1683,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "18c0e5db-3459-43d6-a9d9-11f4e65e9117"
+						"spark.autotune.trackingId": "78a8a068-0045-4120-b099-4f55dbfe8f6b"
 					}
 				},
 				"metadata": {
@@ -1339,8 +1708,234 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from osgeo import gdal\r\n",
+							"from os.path import exists"
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from notebookutils import mssparkutils\r\n",
+							"# hhttps://innoaoaidata.blob.core.windows.net/innosource\r\n",
+							"try:\r\n",
+							"    mssparkutils.fs.mount(\r\n",
+							"        \"wasbs://innosource@innoaoaidata.blob.core.windows.net\",\r\n",
+							"        \"/aoai_source\",\r\n",
+							"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
+							"    )\r\n",
+							"    print(\"Successful mount\")\r\n",
+							"except:\r\n",
+							"    print(\"FAILED TO MOUNT\")\r\n",
+							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")\r\n",
+							"\r\n",
+							"\r\n",
+							"try:\r\n",
+							"    mssparkutils.fs.mount(\r\n",
+							"        \"wasbs://hilario@innoaoaidata.blob.core.windows.net\",\r\n",
+							"        \"/aoai_dest\",\r\n",
+							"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
+							"    )\r\n",
+							"    print(\"Successful mount\")\r\n",
+							"except:\r\n",
+							"    print(\"FAILED TO MOUNT)\r\n",
+							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
+						],
+						"outputs": [],
+						"execution_count": 15
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import os\r\n",
+							"\r\n",
+							"def get_blob_file_list(directory, filetype):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to get a full list of files in a directory based on file type\r\n",
+							"    Arguments:\r\n",
+							"        directory: Directory path of folder you want to pull files from\r\n",
+							"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\"\r\n",
+							"    Returns:\r\n",
+							"        Array of filepaths/filename w/extension\r\n",
+							"    \"\"\"\r\n",
+							"    file_array = []\r\n",
+							"    for file in os.listdir(directory):\r\n",
+							"        file_ext = os.path.splitext(file)[1]\r\n",
+							"        if file_ext == filetype:\r\n",
+							"            file_array.append(directory+file)\r\n",
+							"    return file_array"
+						],
+						"outputs": [],
+						"execution_count": 11
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"jobId = mssparkutils.env.getJobId()\r\n",
+							"img_path = f'/synfs/'+jobId+'/aoai_source'\r\n",
+							"outarray = get_blob_file_list(img_path, \".tif\")\r\n",
+							"outarray"
+						],
+						"outputs": [],
+						"execution_count": 16
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#gdal.Translate(epsg:4326)\r\n",
+							"\r\n",
+							"input_tif = '/synfs/68/aoai_sourcec2022CPPAOI_CopyRaster63_cog.tif'\r\n",
+							"output_tif = '/synfs/68/hello.tif'\r\n",
+							"\r\n",
+							"warp = gdal.Warp(input_tif, output_tif ,dstSRS='EPSG:4326')\r\n",
+							"warp = None # Closes the files"
+						],
+						"outputs": [],
+						"execution_count": 24
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"jobId"
+						],
+						"outputs": [],
+						"execution_count": 19
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/STAC_PreProcessing_Guide')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "Guide for documenting and sharing pre-processing steps required prior to the STAC ingestion process. This guide will use JPGs as an example",
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "Geospatialspark",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "acb24a7d-6c6e-4944-82d2-2cbb6968cba4"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+						"name": "Geospatialspark",
+						"type": "Spark",
+						"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1356,7 +1951,7 @@
 						},
 						"source": [
 							"# STAC Ingestion Synapse Notebook Guide\r\n",
-							"This guide will demonstrate the data processing steps of rich media data into STAC. \r\n",
+							"This guide will demonstrate the data processing steps of the oblique imagery data type into a STAC-ready format.\r\n",
 							"\r\n",
 							"For more information on Chevron's STAC implementation - **[Chevron Atlas](https://atlas-dev.azure.chevron.com/)**\r\n",
 							"\r\n",
@@ -1382,7 +1977,7 @@
 						},
 						"source": [
 							"### 1. Mounting rich media source and destination storage accounts\r\n",
-							"Typically the source will be from the XXX and the destination will be YYYY"
+							"Typically the source of the rich media will be in one container, and the destination will be in another. In this example I have the source in a blob storage account under the container \"liamsource\" and the destination in a blob storage account under the \"liamdest\" container. In code, these folders will be \"STAC_Source\" and \"STAC_Dest\" respectively."
 						]
 					},
 					{
@@ -1438,7 +2033,7 @@
 						},
 						"source": [
 							"## 2. Get list of all rich media data in source folder\r\n",
-							"This function is used to list out all the "
+							"This function is used to list out all the files of a type in a folder. This will be used during the later steps of the script."
 						]
 					},
 					{
@@ -1463,7 +2058,7 @@
 							"    Function to get a full list of files in a directory based on file type\r\n",
 							"    Arguments:\r\n",
 							"        directory: Directory path of folder you want to pull files from\r\n",
-							"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\"\r\n",
+							"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\" or \".JSON\"\r\n",
 							"    Returns:\r\n",
 							"        Array of filepaths/filename w/extension\r\n",
 							"    \"\"\"\r\n",
@@ -1509,7 +2104,7 @@
 							}
 						},
 						"source": [
-							"## Lets take a look at what these photos look like:"
+							"#### Lets take a look at what these photos look like:"
 						]
 					},
 					{
@@ -1562,7 +2157,15 @@
 						"source": [
 							"## 3. Setting up the collection\r\n",
 							"\r\n",
-							"We have already setup 2 collections in the destination folder titled XXX and YYY"
+							"We have already setup 2 collections in the destination folder titled \"rbu_mobile_oblique_imagery_for_ehsr_reporting\" and \"rbu_aerial_oblique_imagery_for_ehsr_reporting\"\r\n",
+							"\r\n",
+							"Note the difference of these two collection names and their folder path. In this scenario we are seperating JPEGs that were taken from drones (Aerial) and JPEGs that were taken from phones.\r\n",
+							"\r\n",
+							"We are organizing by \"oblique\" because we can assume that a majority (if not all) imagery we are consuming is of the type \"oblique\" to understand the definition of an oblique image, take a look at this image:\r\n",
+							"\r\n",
+							"![Oblique Image](http://3.bp.blogspot.com/-_dwZHYm-fTI/VdOTnSDGGUI/AAAAAAAAOiY/1SbT8RKhlYo/s1600/nadir_vs_oblique.png)\r\n",
+							"\r\n",
+							"Inside each collection is a json_mtl file which describes information about itself, and all the images in the collection folder. Lets take a look at that collection_mtl file to understand some more information about our collections."
 						]
 					},
 					{
@@ -1581,7 +2184,7 @@
 						"source": [
 							"jobId = mssparkutils.env.getJobId()\r\n",
 							"oblique_mobile_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting'\r\n",
-							"oblique_aerial_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting'\r\n",
+							"oblique_aerial_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting'\r\n",
 							"\r\n",
 							"oblique_mobile_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting/rbu_mobile_oblique_imagery_for_ehsr_reporting_mtl.json'\r\n",
 							"oblique_aerial_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting/rbu_aerial_oblique_imagery_for_ehsr_reporting_mtl.json'"
@@ -1655,7 +2258,9 @@
 						},
 						"source": [
 							"## 4. Extract EXIF Header Information\r\n",
-							"Depending on the rich media data type, this step will be different. Between LAS files, GEOTIFFs, JPEGs, etc ... this step will have to be re-written to extract metadata from those files. "
+							"Depending on the rich media data type, this step will be different. Between LAS files, GEOTIFFs, JPEGs, etc ... this step will have to be re-written to extract metadata from those files. \r\n",
+							"\r\n",
+							"This function is just used for returning/printing the metadata of the JPEG and is not currently used later on in this workflow."
 						]
 					},
 					{
@@ -1720,6 +2325,8 @@
 						},
 						"source": [
 							"## 5. Extract Metadata\r\n",
+							"Extracting the metadata of each JSON is a tedious task that calls for automation ...\r\n",
+							"\r\n",
 							"### 5.1 Add Bounding Box\r\n",
 							"### 5.2 Add DateTime\r\n",
 							"### 5.3 Add CRS\r\n",

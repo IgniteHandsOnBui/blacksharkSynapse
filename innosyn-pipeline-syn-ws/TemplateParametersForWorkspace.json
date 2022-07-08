@@ -14,6 +14,9 @@
 		"Stellar Data Storage Account v2_connectionString": {
 			"value": ""
 		},
+		"innoaoaidata_connectionString": {
+			"value": ""
+		},
 		"innoaoaidata_STAC_connectionString": {
 			"value": ""
 		},
