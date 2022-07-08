@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "614a1b46-630a-4a27-9408-8733178f649b"
+				"spark.autotune.trackingId": "acb24a7d-6c6e-4944-82d2-2cbb6968cba4"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,7 @@
 				},
 				"source": [
 					"# STAC Ingestion Synapse Notebook Guide\r\n",
-					"This guide will demonstrate the data processing steps of rich media data into STAC. \r\n",
+					"This guide will demonstrate the data processing steps of the oblique imagery data type into a STAC-ready format.\r\n",
 					"\r\n",
 					"For more information on Chevron's STAC implementation - **[Chevron Atlas](https://atlas-dev.azure.chevron.com/)**\r\n",
 					"\r\n",
@@ -86,7 +86,7 @@
 				},
 				"source": [
 					"### 1. Mounting rich media source and destination storage accounts\r\n",
-					"Typically the source will be from the XXX and the destination will be YYYY"
+					"Typically the source of the rich media will be in one container, and the destination will be in another. In this example I have the source in a blob storage account under the container \"liamsource\" and the destination in a blob storage account under the \"liamdest\" container. In code, these folders will be \"STAC_Source\" and \"STAC_Dest\" respectively."
 				]
 			},
 			{
@@ -141,7 +141,7 @@
 				},
 				"source": [
 					"## 2. Get list of all rich media data in source folder\r\n",
-					"This function is used to list out all the "
+					"This function is used to list out all the files of a type in a folder. This will be used during the later steps of the script."
 				]
 			},
 			{
@@ -166,7 +166,7 @@
 					"    Function to get a full list of files in a directory based on file type\r\n",
 					"    Arguments:\r\n",
 					"        directory: Directory path of folder you want to pull files from\r\n",
-					"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\"\r\n",
+					"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\" or \".JSON\"\r\n",
 					"    Returns:\r\n",
 					"        Array of filepaths/filename w/extension\r\n",
 					"    \"\"\"\r\n",
@@ -210,7 +210,7 @@
 					}
 				},
 				"source": [
-					"## Lets take a look at what these photos look like:"
+					"#### Lets take a look at what these photos look like:"
 				]
 			},
 			{
@@ -262,7 +262,15 @@
 				"source": [
 					"## 3. Setting up the collection\r\n",
 					"\r\n",
-					"We have already setup 2 collections in the destination folder titled XXX and YYY"
+					"We have already setup 2 collections in the destination folder titled \"rbu_mobile_oblique_imagery_for_ehsr_reporting\" and \"rbu_aerial_oblique_imagery_for_ehsr_reporting\"\r\n",
+					"\r\n",
+					"Note the difference of these two collection names and their folder path. In this scenario we are seperating JPEGs that were taken from drones (Aerial) and JPEGs that were taken from phones.\r\n",
+					"\r\n",
+					"We are organizing by \"oblique\" because we can assume that a majority (if not all) imagery we are consuming is of the type \"oblique\" to understand the definition of an oblique image, take a look at this image:\r\n",
+					"\r\n",
+					"![Oblique Image](http://3.bp.blogspot.com/-_dwZHYm-fTI/VdOTnSDGGUI/AAAAAAAAOiY/1SbT8RKhlYo/s1600/nadir_vs_oblique.png)\r\n",
+					"\r\n",
+					"Inside each collection is a json_mtl file which describes information about itself, and all the images in the collection folder. Lets take a look at that collection_mtl file to understand some more information about our collections."
 				]
 			},
 			{
@@ -281,7 +289,7 @@
 				"source": [
 					"jobId = mssparkutils.env.getJobId()\r\n",
 					"oblique_mobile_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting'\r\n",
-					"oblique_aerial_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting'\r\n",
+					"oblique_aerial_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting'\r\n",
 					"\r\n",
 					"oblique_mobile_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting/rbu_mobile_oblique_imagery_for_ehsr_reporting_mtl.json'\r\n",
 					"oblique_aerial_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting/rbu_aerial_oblique_imagery_for_ehsr_reporting_mtl.json'"
@@ -352,7 +360,9 @@
 				},
 				"source": [
 					"## 4. Extract EXIF Header Information\r\n",
-					"Depending on the rich media data type, this step will be different. Between LAS files, GEOTIFFs, JPEGs, etc ... this step will have to be re-written to extract metadata from those files. "
+					"Depending on the rich media data type, this step will be different. Between LAS files, GEOTIFFs, JPEGs, etc ... this step will have to be re-written to extract metadata from those files. \r\n",
+					"\r\n",
+					"This function is just used for returning/printing the metadata of the JPEG and is not currently used later on in this workflow."
 				]
 			},
 			{
@@ -415,6 +425,8 @@
 				},
 				"source": [
 					"## 5. Extract Metadata\r\n",
+					"Extracting the metadata of each JSON is a tedious task that calls for automation ...\r\n",
+					"\r\n",
 					"### 5.1 Add Bounding Box\r\n",
 					"### 5.2 Add DateTime\r\n",
 					"### 5.3 Add CRS\r\n",
