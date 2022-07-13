@@ -1,5 +1,5 @@
 {
-	"name": "Notebook 1",
+	"name": "reproject-image-chips-nb",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "78a8a068-0045-4120-b099-4f55dbfe8f6b"
+				"spark.autotune.trackingId": "8b0494b4-c3fa-4d0e-a19a-85e1efd1ae00"
 			}
 		},
 		"metadata": {
