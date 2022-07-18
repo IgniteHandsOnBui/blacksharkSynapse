@@ -19,6 +19,18 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Stellar Data Storage Account v2'"
 		},
+		"dinnosa_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'dinnosa'"
+		},
+		"flexible_postgrse_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'flexible_postgrse'"
+		},
+		"flexible_potgrse_aoai_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'flexible_potgrse_aoai'"
+		},
 		"innoaoaidata_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'innoaoaidata'"
@@ -31,6 +43,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'innosyn-pipeline-syn-ws-WorkspaceDefaultSqlServer'"
 		},
+		"chevrondatalake_servicePrincipalCredential": {
+			"type": "secureString",
+			"metadata": "Secure string for 'servicePrincipalCredential' of 'chevrondatalake'"
+		},
 		"Stellar Airbus v2_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://rawdatajbqezt.dfs.core.windows.net"
@@ -42,6 +58,18 @@
 		"innosyn-pipeline-syn-ws-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://synhnsdl2xmc.dfs.core.windows.net/"
+		},
+		"chevrondatalake_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://chevrondatalakedev.dfs.core.windows.net"
+		},
+		"chevrondatalake_properties_typeProperties_tenant": {
+			"type": "string",
+			"defaultValue": "fd799da1-bfc1-4234-a91c-72b3a1cb9e26"
+		},
+		"chevrondatalake_properties_typeProperties_servicePrincipalId": {
+			"type": "string",
+			"defaultValue": "951ed11c-702e-4a70-a2b7-db45570030ad"
 		}
 	},
 	"variables": {
@@ -1520,6 +1548,63 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/dinnosa')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('dinnosa_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/flexible_postgrse')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzurePostgreSql",
+				"typeProperties": {
+					"connectionString": "[parameters('flexible_postgrse_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/flexible_potgrse_aoai')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzurePostgreSql",
+				"typeProperties": {
+					"connectionString": "[parameters('flexible_potgrse_aoai_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/innoaoaidata')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -1663,232 +1748,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Notebook 1')]",
-			"type": "Microsoft.Synapse/workspaces/notebooks",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"nbformat": 4,
-				"nbformat_minor": 2,
-				"bigDataPool": {
-					"referenceName": "Geospatialspark",
-					"type": "BigDataPoolReference"
-				},
-				"sessionProperties": {
-					"driverMemory": "56g",
-					"driverCores": 8,
-					"executorMemory": "56g",
-					"executorCores": 8,
-					"numExecutors": 2,
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "2",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "78a8a068-0045-4120-b099-4f55dbfe8f6b"
-					}
-				},
-				"metadata": {
-					"saveOutput": true,
-					"enableDebugMode": false,
-					"kernelspec": {
-						"name": "synapse_pyspark",
-						"display_name": "Synapse PySpark"
-					},
-					"language_info": {
-						"name": "python"
-					},
-					"a365ComputeOptions": {
-						"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
-						"name": "Geospatialspark",
-						"type": "Spark",
-						"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
-						"auth": {
-							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net"
-						},
-						"sparkVersion": "3.1",
-						"nodeCount": 10,
-						"cores": 8,
-						"memory": 56
-					},
-					"sessionKeepAliveTimeout": 30
-				},
-				"cells": [
-					{
-						"cell_type": "code",
-						"source": [
-							"from osgeo import gdal\r\n",
-							"from os.path import exists"
-						],
-						"outputs": [],
-						"execution_count": 4
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"from notebookutils import mssparkutils\r\n",
-							"# hhttps://innoaoaidata.blob.core.windows.net/innosource\r\n",
-							"try:\r\n",
-							"    mssparkutils.fs.mount(\r\n",
-							"        \"wasbs://innosource@innoaoaidata.blob.core.windows.net\",\r\n",
-							"        \"/aoai_source\",\r\n",
-							"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
-							"    )\r\n",
-							"    print(\"Successful mount\")\r\n",
-							"except:\r\n",
-							"    print(\"FAILED TO MOUNT\")\r\n",
-							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")\r\n",
-							"\r\n",
-							"\r\n",
-							"try:\r\n",
-							"    mssparkutils.fs.mount(\r\n",
-							"        \"wasbs://hilario@innoaoaidata.blob.core.windows.net\",\r\n",
-							"        \"/aoai_dest\",\r\n",
-							"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
-							"    )\r\n",
-							"    print(\"Successful mount\")\r\n",
-							"except:\r\n",
-							"    print(\"FAILED TO MOUNT)\r\n",
-							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
-						],
-						"outputs": [],
-						"execution_count": 15
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"import os\r\n",
-							"\r\n",
-							"def get_blob_file_list(directory, filetype):\r\n",
-							"    \"\"\"\r\n",
-							"    Function to get a full list of files in a directory based on file type\r\n",
-							"    Arguments:\r\n",
-							"        directory: Directory path of folder you want to pull files from\r\n",
-							"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\"\r\n",
-							"    Returns:\r\n",
-							"        Array of filepaths/filename w/extension\r\n",
-							"    \"\"\"\r\n",
-							"    file_array = []\r\n",
-							"    for file in os.listdir(directory):\r\n",
-							"        file_ext = os.path.splitext(file)[1]\r\n",
-							"        if file_ext == filetype:\r\n",
-							"            file_array.append(directory+file)\r\n",
-							"    return file_array"
-						],
-						"outputs": [],
-						"execution_count": 11
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"jobId = mssparkutils.env.getJobId()\r\n",
-							"img_path = f'/synfs/'+jobId+'/aoai_source'\r\n",
-							"outarray = get_blob_file_list(img_path, \".tif\")\r\n",
-							"outarray"
-						],
-						"outputs": [],
-						"execution_count": 16
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"#gdal.Translate(epsg:4326)\r\n",
-							"\r\n",
-							"input_tif = '/synfs/68/aoai_sourcec2022CPPAOI_CopyRaster63_cog.tif'\r\n",
-							"output_tif = '/synfs/68/hello.tif'\r\n",
-							"\r\n",
-							"warp = gdal.Warp(input_tif, output_tif ,dstSRS='EPSG:4326')\r\n",
-							"warp = None # Closes the files"
-						],
-						"outputs": [],
-						"execution_count": 24
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"jobId"
-						],
-						"outputs": [],
-						"execution_count": 19
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							""
-						],
-						"outputs": [],
-						"execution_count": null
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/STAC_PreProcessing_Guide')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -1910,7 +1769,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "28c79f4d-baa5-4960-a00e-e70b6816cb54"
+						"spark.autotune.trackingId": "a4f37aca-c780-4819-b000-712dd7433b80"
 					}
 				},
 				"metadata": {
@@ -2021,7 +1880,37 @@
 							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
 						],
 						"outputs": [],
-						"execution_count": 163
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Mounting the STAC_Innovation_Ingest folder the Data & Insights Innovation team has on the Chevon Datalake.\r\n",
+							"\r\n",
+							"try:\r\n",
+							"    mssparkutils.fs.mount(\r\n",
+							"        'wasbs://raw@chevrondatalakedev.blob.core.windows.net',\r\n",
+							"        '/STAC_InnoDL',\r\n",
+							"        {'linkedService':'chevrondatalake'}\r\n",
+							"    )\r\n",
+							"    print(\"Successful mount of source to /STAC_InnoDL\")\r\n",
+							"except:\r\n",
+							"    print(\"FAILED TO MOUNT STAC INNOVATION DATALAKE FOLDER\")\r\n",
+							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
+						],
+						"outputs": [],
+						"execution_count": 6
 					},
 					{
 						"cell_type": "markdown",
@@ -2856,6 +2745,20 @@
 						],
 						"outputs": [],
 						"execution_count": null
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## RBU Data Lake Example\r\n",
+							"There is a dataset in the Chevron datalek that contains thousands of images that could be ingested for STAC. We will list them out here as a proof of concept. To run our whole script on this would take days on our current spark pool."
+						]
 					}
 				]
 			},
@@ -2883,7 +2786,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "9e25753f-5af8-417a-b8d5-e30402ca4c87"
+						"spark.autotune.trackingId": "c083af34-2b83-4064-97c8-76b4835d0ff3"
 					}
 				},
 				"metadata": {
@@ -2908,13 +2811,15 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56
+						"memory": 56,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"#Mounting the AML blob storage located in dinnot101mlcvx to this notebook so we can reference it as if it was a filepath\r\n",
 							"#The 'wasbs' is for blob storage. There is another prefix for file storage, etc ...\r\n",
@@ -3197,6 +3102,335 @@
 						},
 						"source": [
 							"mssparkutils.fs.unmount(\"/testliam\")"
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/geospatial-iou-nb')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "Geospatialspark",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "2d5856a9-cc83-495b-acb7-6f96bf2edb2d"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+						"name": "Geospatialspark",
+						"type": "Spark",
+						"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"import shapely\r\n",
+							"from shapely.geometry import Point, Polygon, LineString, GeometryCollection\r\n",
+							"import numpy as np\r\n",
+							"import geopandas as gpd\r\n",
+							"import cv2\r\n",
+							"import matplotlib.pyplot as plt\r\n",
+							"import rasterio.warp\r\n",
+							"from shapely.geometry import shape\r\n",
+							"import fiona"
+						],
+						"outputs": [],
+						"execution_count": 29
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from notebookutils import mssparkutils\r\n",
+							"# hhttps://innoaoaidata.blob.core.windows.net/innosource\r\n",
+							"try:\r\n",
+							"    mssparkutils.fs.mount(\r\n",
+							"        \"wasbs://coco-lily-ee-output@dinnosa.blob.core.windows.net\",\r\n",
+							"        \"/dinnosa\",\r\n",
+							"        {\"linkedService\":\"dinnosa\"}\r\n",
+							"    )\r\n",
+							"    print(\"Successful mount\")\r\n",
+							"except:\r\n",
+							"    print(\"FAILED TO MOUNT\")\r\n",
+							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# iterate through file to make sure that our files are present\r\n",
+							"\r\n",
+							"import os\r\n",
+							"\r\n",
+							"def get_blob_file_list(directory, filetype):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to get a full list of files in a directory based on file type\r\n",
+							"    Arguments:\r\n",
+							"        directory: Directory path of folder you want to pull files from\r\n",
+							"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\"\r\n",
+							"    Returns:\r\n",
+							"        Array of filepaths/filename w/extension\r\n",
+							"    \"\"\"\r\n",
+							"    file_array = []\r\n",
+							"    for file in os.listdir(directory):\r\n",
+							"        file_ext = os.path.splitext(file)[1]\r\n",
+							"        if file_ext == filetype:\r\n",
+							"            file_array.append(directory+file)\r\n",
+							"    return file_array"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# create directory for NB\r\n",
+							"\r\n",
+							"jobId = mssparkutils.env.getJobId()\r\n",
+							"img_path = f'/synfs/'+jobId+'/dinnosa/geospatial_transformation/'\r\n",
+							"outarray = get_blob_file_list(img_path, \".shp\")\r\n",
+							"outarray"
+						],
+						"outputs": [],
+						"execution_count": 14
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"gdf_cali = gpd.read_file('/synfs/70/dinnosa/geospatial_transformation/EXAMPLE_AOI.geojson')\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 23
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							" # align on projection\r\n",
+							"\r\n",
+							"california_aoi_path = (img_path + 'Cali_sub.shp')\r\n",
+							"gpkg_aoi_path = (img_path + 'gpkg_00.shp')\r\n",
+							"\r\n",
+							"# https://gis.stackexchange.com/questions/266098/how-to-convert-a-geoseries-to-a-geodataframe-with-geopandas\r\n",
+							"\r\n",
+							"polys_cali = []\r\n",
+							"for pol in fiona.open(california_aoi_path):\r\n",
+							"    poly = shape(pol['geometry'])\r\n",
+							"    if isinstance(poly, MultiPolygon):\r\n",
+							"        polys_cali += poly\r\n",
+							"    else:\r\n",
+							"        polys_cali.append(poly)\r\n",
+							"mp_cali = MultiPolygon(polys_cali)\r\n",
+							"\r\n",
+							"polys_gpkg = []\r\n",
+							"for pol in fiona.open(gpkg_aoi_path):\r\n",
+							"    poly = shape(pol['geometry'])\r\n",
+							"    if isinstance(poly, MultiPolygon):\r\n",
+							"        polys_gpkg += poly\r\n",
+							"    else:\r\n",
+							"        polys_gpkg.append(poly)\r\n",
+							"mp_gpkg = MultiPolygon(polys_gpkg)\r\n",
+							"\r\n",
+							"mp_gpkg\r\n",
+							"\r\n",
+							"# gdf_cali = gpd.read_file(mp_cali)\r\n",
+							"# gdf_gpkg = gpd.read_file(mp_gpkg)\r\n",
+							"\r\n",
+							"\r\n",
+							"# gdf_cali = gdf_cali.to_crs(4326)\r\n",
+							"# gdf_gpkg = gdf_gpkg.to_crs(4326)\r\n",
+							"\r\n",
+							"# gdf_cali.crs\r\n",
+							"# gdf_gpkg.crs"
+						],
+						"outputs": [],
+						"execution_count": 33
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"mp_gpkg[0][]"
+						],
+						"outputs": [],
+						"execution_count": 34
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from shapely.geometry import MultiPolygon\r\n",
+							"\r\n",
+							"\r\n",
+							"shapefile = ('/synfs/70/dinnosa/geospatial_transformation/Cali_sub.shp')\r\n",
+							"\r\n",
+							"\r\n",
+							"polys = []\r\n",
+							"for pol in fiona.open(shapefile):\r\n",
+							"    poly = shape(pol['geometry'])\r\n",
+							"    if isinstance(poly, MultiPolygon):\r\n",
+							"        polys += poly\r\n",
+							"    else:\r\n",
+							"        polys.append(poly)\r\n",
+							"mp = MultiPolygon(polys)"
+						],
+						"outputs": [],
+						"execution_count": 27
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"f, ax = plt.subplots(1)\r\n",
+							"gdf_cali.plot(ax=ax)\r\n",
+							"#gdf_gpkg.plot(ax=ax,cmap=None,)\r\n",
+							"plt.show()"
+						],
+						"outputs": [],
+						"execution_count": 37
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
 						],
 						"outputs": [],
 						"execution_count": null
@@ -3636,6 +3870,232 @@
 						],
 						"outputs": [],
 						"execution_count": 20
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/reproject-image-chips-nb')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "Geospatialspark",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "8b0494b4-c3fa-4d0e-a19a-85e1efd1ae00"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+						"name": "Geospatialspark",
+						"type": "Spark",
+						"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from osgeo import gdal\r\n",
+							"from os.path import exists"
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from notebookutils import mssparkutils\r\n",
+							"# hhttps://innoaoaidata.blob.core.windows.net/innosource\r\n",
+							"try:\r\n",
+							"    mssparkutils.fs.mount(\r\n",
+							"        \"wasbs://innosource@innoaoaidata.blob.core.windows.net\",\r\n",
+							"        \"/aoai_source\",\r\n",
+							"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
+							"    )\r\n",
+							"    print(\"Successful mount\")\r\n",
+							"except:\r\n",
+							"    print(\"FAILED TO MOUNT\")\r\n",
+							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")\r\n",
+							"\r\n",
+							"\r\n",
+							"try:\r\n",
+							"    mssparkutils.fs.mount(\r\n",
+							"        \"wasbs://hilario@innoaoaidata.blob.core.windows.net\",\r\n",
+							"        \"/aoai_dest\",\r\n",
+							"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
+							"    )\r\n",
+							"    print(\"Successful mount\")\r\n",
+							"except:\r\n",
+							"    print(\"FAILED TO MOUNT)\r\n",
+							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
+						],
+						"outputs": [],
+						"execution_count": 15
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import os\r\n",
+							"\r\n",
+							"def get_blob_file_list(directory, filetype):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to get a full list of files in a directory based on file type\r\n",
+							"    Arguments:\r\n",
+							"        directory: Directory path of folder you want to pull files from\r\n",
+							"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\"\r\n",
+							"    Returns:\r\n",
+							"        Array of filepaths/filename w/extension\r\n",
+							"    \"\"\"\r\n",
+							"    file_array = []\r\n",
+							"    for file in os.listdir(directory):\r\n",
+							"        file_ext = os.path.splitext(file)[1]\r\n",
+							"        if file_ext == filetype:\r\n",
+							"            file_array.append(directory+file)\r\n",
+							"    return file_array"
+						],
+						"outputs": [],
+						"execution_count": 11
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"jobId = mssparkutils.env.getJobId()\r\n",
+							"img_path = f'/synfs/'+jobId+'/aoai_source'\r\n",
+							"outarray = get_blob_file_list(img_path, \".tif\")\r\n",
+							"outarray"
+						],
+						"outputs": [],
+						"execution_count": 16
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#gdal.Translate(epsg:4326)\r\n",
+							"\r\n",
+							"input_tif = '/synfs/68/aoai_sourcec2022CPPAOI_CopyRaster63_cog.tif'\r\n",
+							"output_tif = '/synfs/68/hello.tif'\r\n",
+							"\r\n",
+							"warp = gdal.Warp(input_tif, output_tif ,dstSRS='EPSG:4326')\r\n",
+							"warp = None # Closes the files"
+						],
+						"outputs": [],
+						"execution_count": 24
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"jobId"
+						],
+						"outputs": [],
+						"execution_count": 19
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
 					}
 				]
 			},
@@ -4181,6 +4641,32 @@
 			},
 			"dependsOn": [],
 			"location": "southcentralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/chevrondatalake')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('chevrondatalake_properties_typeProperties_url')]",
+					"tenant": "[parameters('chevrondatalake_properties_typeProperties_tenant')]",
+					"servicePrincipalId": "[parameters('chevrondatalake_properties_typeProperties_servicePrincipalId')]",
+					"servicePrincipalCredentialType": "ServicePrincipalKey",
+					"servicePrincipalCredential": {
+						"type": "SecureString",
+						"value": "[parameters('chevrondatalake_servicePrincipalCredential')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
 		}
 	]
 }
