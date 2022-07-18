@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "915ddef3-bb31-4e54-b828-d1126de64fb6"
+				"spark.autotune.trackingId": "a844597f-96f7-48f6-ad33-a7a5a7dcf5ea"
 			}
 		},
 		"metadata": {
@@ -128,7 +128,36 @@
 					"    print(\"FAILED TO MOUNT STAC DESTINATION\")\r\n",
 					"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
 				],
-				"execution_count": 163
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Mounting the STAC_Innovation_Ingest folder the Data & Insights Innovation team has on the Chevon Datalake.\r\n",
+					"\r\n",
+					"try:\r\n",
+					"    mssparkutils.fs.mount(\r\n",
+					"        'wasbs://raw@chevrondatalakedev.blob.core.windows.net',\r\n",
+					"        '/STAC_InnoDL',\r\n",
+					"        {'linkedService':'chevrondatalake'}\r\n",
+					"    )\r\n",
+					"    print(\"Successful mount of source to /STAC_InnoDL\")\r\n",
+					"except:\r\n",
+					"    print(\"FAILED TO MOUNT STAC INNOVATION DATALAKE FOLDER\")\r\n",
+					"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
+				],
+				"execution_count": 6
 			},
 			{
 				"cell_type": "markdown",
@@ -944,6 +973,20 @@
 					""
 				],
 				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## RBU Data Lake Example\r\n",
+					"There is a dataset in the Chevron datalek that contains thousands of images that could be ingested for STAC. We will list them out here as a proof of concept. To run our whole script on this would take days on our current spark pool."
+				]
 			}
 		]
 	}
