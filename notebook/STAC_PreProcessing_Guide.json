@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b27259eb-03ee-4379-ac9d-8b0dad5ce745"
+				"spark.autotune.trackingId": "d8ac6c24-7a3d-4c46-82eb-b90b3c18db6e"
 			}
 		},
 		"metadata": {
@@ -1038,6 +1038,8 @@
 					}
 				},
 				"source": [
+					"from osgeo import gdal\r\n",
+					"\r\n",
 					"def get_geotiff_datetime(geotiff_path):\r\n",
 					"    \"\"\"\r\n",
 					"    Function to return a STAC-customized DateTime from GEOTIFF GDAL_Metadata\r\n",
@@ -1046,13 +1048,8 @@
 					"    Returns:\r\n",
 					"        STAC-Specific DateTime as a string\r\n",
 					"    \"\"\"\r\n",
-					"\r\n",
-					"    geotiff = rasterio.open(geotiff_path)\r\n",
-					"    filetags = geotiff.tags()\r\n",
-					"    geotiff.close()\r\n",
-					"    print(filetags)\r\n",
-					"\r\n",
-					"    return filetags"
+					"    gtiff = gdal.OpenEx(geotiff_path)\r\n",
+					"    print(gtiff)"
 				],
 				"execution_count": null
 			},
