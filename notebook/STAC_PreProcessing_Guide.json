@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "339dc37f-1d3a-4dd8-b64d-8d2927b30c5b"
+				"spark.autotune.trackingId": "b27259eb-03ee-4379-ac9d-8b0dad5ce745"
 			}
 		},
 		"metadata": {
@@ -987,7 +987,7 @@
 					"## Georeferenced TIFF STAC\r\n",
 					"Up till now we have created functions for finding and creating metadata for oblique images, but what about _Georeferenced Imagery_? A georeferenced image is an image where all four corners fit into a real world space. When you pull this type of imagery into certain geospatial softwares like ArcGIS Pro, GlobalMapper, ENVI, AzureMaps ... the software will project the image into real world space. Originally this type of data was what the STAC spec was built off of and there are many resources built around it. Lets investigate Georeferenced Imagery (in the form of a GEOTIFF).\r\n",
 					"\r\n",
-					"Unlike oblique imagery GeoTiffs innately have bounding boxes, so, we will not need to create one within the headers. Also CRS is something that most images come with innately in their headers. We will not need to create a function to create this. We will still need Date Time, and Sensor Type however. Lets create some functions!"
+					"The STACify process is able to read the metadata of GEOTIFFs very well so we will not have to reformat many metadata components. Unlike oblique imagery GeoTiffs innately have bounding boxes, so, we will not need to create one within the headers. Also CRS is something that most images come with innately in their headers. We will not need to create a function to create this. We will still need Date Time, and Sensor Type however. Lets create some functions!"
 				]
 			},
 			{
@@ -1002,8 +1002,7 @@
 				"source": [
 					"### GeoTIFF Metadata\r\n",
 					"1. Date Time\r\n",
-					"2. CRS\r\n",
-					"3. Sensor Type"
+					"2. Sensor Type"
 				]
 			},
 			{
@@ -1039,7 +1038,21 @@
 					}
 				},
 				"source": [
-					""
+					"def get_geotiff_datetime(geotiff_path):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to return a STAC-customized DateTime from GEOTIFF GDAL_Metadata\r\n",
+					"    Arguments:\r\n",
+					"        geotiff_path: path to GeoTIFF which you want STAC-DateTime for. GeoTIFF that was used in this situation has an acquisitionEndDate and acquisitionStartDate in GDAL Metadata header.\r\n",
+					"    Returns:\r\n",
+					"        STAC-Specific DateTime as a string\r\n",
+					"    \"\"\"\r\n",
+					"\r\n",
+					"    geotiff = rasterio.open(geotiff_path)\r\n",
+					"    filetags = geotiff.tags()\r\n",
+					"    geotiff.close()\r\n",
+					"    print(filetags)\r\n",
+					"\r\n",
+					"    return filetags"
 				],
 				"execution_count": null
 			},
