@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a844597f-96f7-48f6-ad33-a7a5a7dcf5ea"
+				"spark.autotune.trackingId": "579a3be8-da91-49ce-9c0c-9555523729a4"
 			}
 		},
 		"metadata": {
@@ -955,6 +955,54 @@
 					"        write_to_collection(jpeg, oblique_mobile_path+filename)"
 				],
 				"execution_count": 179
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Georeferenced TIFF STAC\r\n",
+					""
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### GeoTIFF Metadata\r\n",
+					"1. Date Time\r\n",
+					"2. CRS\r\n",
+					"3. Sensor Type"
+				]
 			},
 			{
 				"cell_type": "code",
