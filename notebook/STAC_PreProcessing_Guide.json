@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "07b8cdc6-6ced-4b74-82d9-c708516f9bf8"
+				"spark.autotune.trackingId": "339dc37f-1d3a-4dd8-b64d-8d2927b30c5b"
 			}
 		},
 		"metadata": {
@@ -985,7 +985,9 @@
 				},
 				"source": [
 					"## Georeferenced TIFF STAC\r\n",
-					""
+					"Up till now we have created functions for finding and creating metadata for oblique images, but what about _Georeferenced Imagery_? A georeferenced image is an image where all four corners fit into a real world space. When you pull this type of imagery into certain geospatial softwares like ArcGIS Pro, GlobalMapper, ENVI, AzureMaps ... the software will project the image into real world space. Originally this type of data was what the STAC spec was built off of and there are many resources built around it. Lets investigate Georeferenced Imagery (in the form of a GEOTIFF).\r\n",
+					"\r\n",
+					"Unlike oblique imagery GeoTiffs innately have bounding boxes, so, we will not need to create one within the headers. Also CRS is something that most images come with innately in their headers. We will not need to create a function to create this. We will still need Date Time, and Sensor Type however. Lets create some functions!"
 				]
 			},
 			{
