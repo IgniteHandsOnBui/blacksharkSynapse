@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "78703a59-cf1c-4909-84f4-547ba59f7322"
+				"spark.autotune.trackingId": "2ccd0ae9-015e-4652-8f90-ec6fbbe86abe"
 			}
 		},
 		"metadata": {
@@ -957,24 +957,6 @@
 				"execution_count": 179
 			},
 			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					""
-				],
-				"execution_count": null
-			},
-			{
 				"cell_type": "markdown",
 				"metadata": {
 					"nteract": {
@@ -1039,6 +1021,7 @@
 					}
 				},
 				"source": [
+					"# Currently not implemented\r\n",
 					"from osgeo import gdal\r\n",
 					"\r\n",
 					"def get_geotiff_datetime(geotiff_path):\r\n",
@@ -1049,25 +1032,11 @@
 					"    Returns:\r\n",
 					"        STAC-Specific DateTime as a string\r\n",
 					"    \"\"\"\r\n",
-					"    gtiff = gdal.Info(geotiff_path)\r\n",
 					"\r\n",
+					"    gtiff = gdal.Info(geotiff_path)\r\n",
 					"    print(gtiff)"
 				],
 				"execution_count": 10
-			},
-			{
-				"cell_type": "markdown",
-				"metadata": {
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"## RBU Data Lake Example\r\n",
-					"There is a dataset in the Chevron datalek that contains thousands of images that could be ingested for STAC. We will list them out here as a proof of concept. To run our whole script on this would take days on our current spark pool."
-				]
 			}
 		]
 	}
