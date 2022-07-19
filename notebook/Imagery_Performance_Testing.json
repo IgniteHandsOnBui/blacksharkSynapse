@@ -1,0 +1,268 @@
+{
+	"name": "Imagery_Performance_Testing",
+	"properties": {
+		"description": "Notebook to test cloud optimized imagery",
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "Geospatialspark",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "56g",
+			"driverCores": 8,
+			"executorMemory": "56g",
+			"executorCores": 8,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "02e369b9-270e-440e-ab37-767e43733697"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+				"name": "Geospatialspark",
+				"type": "Spark",
+				"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 8,
+				"memory": 56,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from notebookutils import mssparkutils\r\n",
+					"\r\n",
+					"try:\r\n",
+					"    mssparkutils.fs.mount(\r\n",
+					"        \"wasbs://liamsource@innoaoaidata.blob.core.windows.net\",\r\n",
+					"        \"/Imagery_Source\",\r\n",
+					"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
+					"    )\r\n",
+					"    print(\"Successful mount of source to /Imagery_Source\")\r\n",
+					"except:\r\n",
+					"    print(\"FAILED TO MOUNT STAC SOURCE\")\r\n",
+					"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")\r\n",
+					""
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import rasterio\r\n",
+					"from rasterio.plot import show"
+				],
+				"execution_count": 14
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Unmodified GeoTIFF"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"jobId = mssparkutils.env.getJobId()\r\n",
+					"geotiff_path = f'/synfs/'+jobId+'/Imagery_Source/CloudOptomized_Imagery/NormalGeoTIFF.tif'\r\n",
+					"\r\n",
+					"with rasterio.open(geotiff_path) as src:\r\n",
+					"    show(src)\r\n",
+					"    src.close()"
+				],
+				"execution_count": 15
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Cloud Optomized GeoTIFF (COG)"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"jobId = mssparkutils.env.getJobId()\r\n",
+					"COG_path = f'/synfs/'+jobId+'/Imagery_Source/CloudOptomized_Imagery/CloudOptomizedGeoTIFF.tif'\r\n",
+					"\r\n",
+					"with rasterio.open(COG_path) as src:\r\n",
+					"    show(src)\r\n",
+					"    src.close()"
+				],
+				"execution_count": 16
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Meta Raster Format (MRF)"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"jobId = mssparkutils.env.getJobId()\r\n",
+					"MRF_path = f'/synfs/'+jobId+'/Imagery_Source/CloudOptomized_Imagery/MRF_Image2/MRF_image.mrf'\r\n",
+					"\r\n",
+					"with rasterio.open(MRF_path) as src:\r\n",
+					"    show(src)\r\n",
+					"    src.close()"
+				],
+				"execution_count": 17
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Cloud Raster Format (CRF)"
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Looks like rasterio and GDAL do not recognize CRF.\r\n",
+					"jobId = mssparkutils.env.getJobId()\r\n",
+					"CRF_path = f'/synfs/'+jobId+'/Imagery_Source/CloudOptomized_Imagery/CRF/CRF_Image.crf'\r\n",
+					"\r\n",
+					"with rasterio.open(CRF_path) as src:\r\n",
+					"    show(src)\r\n",
+					"    src.close()"
+				],
+				"execution_count": 18
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
