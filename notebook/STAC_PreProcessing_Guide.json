@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cf640385-99d8-4a50-b9cb-1957430a069b"
+				"spark.autotune.trackingId": "84322c01-1ab9-45e9-a490-274d7c359d67"
 			}
 		},
 		"metadata": {
@@ -128,7 +128,7 @@
 					"    print(\"FAILED TO MOUNT STAC DESTINATION\")\r\n",
 					"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
 				],
-				"execution_count": 2
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -206,7 +206,7 @@
 					"            file_array.append(directory+file)\r\n",
 					"    return file_array"
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -1023,7 +1023,7 @@
 					"img_path = f'/synfs/'+jobId+'/STAC_Source/GEOTIFF_STAC_SOURCE/slr_tk_dd_rgb_T25109_20210812_151800.tif'\r\n",
 					"get_geotiff_datetime(img_path)"
 				],
-				"execution_count": 14
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -1049,11 +1049,11 @@
 					"    Returns:\r\n",
 					"        STAC-Specific DateTime as a string\r\n",
 					"    \"\"\"\r\n",
-					"    gtiff = gdal.OpenEx(geotiff_path)\r\n",
+					"    gtiff = gdal.Info(geotiff_path)\r\n",
 					"\r\n",
-					"    print(gtiff.RasterXSize)"
+					"    print(gtiff)"
 				],
-				"execution_count": 13
+				"execution_count": 10
 			},
 			{
 				"cell_type": "markdown",
