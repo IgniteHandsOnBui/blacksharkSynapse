@@ -1257,8 +1257,7 @@
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
-									"wildcardFolderPath": "RBU_STAC_SOURCE",
-									"wildcardFileName": "*.jpg",
+									"wildcardFileName": "*.JPG",
 									"deleteFilesAfterCompletion": false
 								},
 								"formatSettings": {
@@ -1336,6 +1335,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
+						"folderPath": "RBU_STAC_SOURCE",
 						"container": "liamsource"
 					}
 				}
