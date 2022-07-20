@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "dac3b448-dae4-482e-a5af-802c2e0a20c0"
+				"spark.autotune.trackingId": "9ac2fe75-4da1-4e22-9588-cc5fce7a7b74"
 			}
 		},
 		"metadata": {
@@ -78,7 +78,7 @@
 				"source": [
 					"JSON_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/RBU_STAC_DEST/\""
 				],
-				"execution_count": 80
+				"execution_count": 85
 			},
 			{
 				"cell_type": "code",
@@ -112,7 +112,7 @@
 					"    print(\"Either due to the drive already been mounted, or because the path is incorrect.\")\r\n",
 					""
 				],
-				"execution_count": 82
+				"execution_count": 86
 			},
 			{
 				"cell_type": "code",
@@ -461,9 +461,7 @@
 					"    container = '/'.join(parsed_url.path.split('/')[2:])+\"/\"\r\n",
 					"\r\n",
 					"print(container)\r\n",
-					"\r\n",
 					"img_path = f'/synfs/'+jobId+'/STAC_Dest/'+container\r\n",
-					"print(img_path)\r\n",
 					"\r\n",
 					"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
 					"print(outarray)\r\n",
@@ -472,9 +470,9 @@
 					"    filename = os.path.basename(jpeg)\r\n",
 					"    print(filename)\r\n",
 					"\r\n",
-					"    write_to_collection(jpeg, outarray)"
+					"    write_to_collection(jpeg)"
 				],
-				"execution_count": 84
+				"execution_count": 88
 			},
 			{
 				"cell_type": "code",
