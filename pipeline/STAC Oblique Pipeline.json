@@ -6,14 +6,7 @@
 			{
 				"name": "JPG Source to Dest",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "STACify_JPG",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -60,7 +53,14 @@
 			{
 				"name": "STACify_JPG",
 				"type": "SynapseNotebook",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "JPG Source to Dest",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
