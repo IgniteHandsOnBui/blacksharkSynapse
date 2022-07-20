@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fbab9c64-97c5-4be3-92a2-2809794c5308"
+				"spark.autotune.trackingId": "dac3b448-dae4-482e-a5af-802c2e0a20c0"
 			}
 		},
 		"metadata": {
@@ -78,7 +78,7 @@
 				"source": [
 					"JSON_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/RBU_STAC_DEST/\""
 				],
-				"execution_count": 14
+				"execution_count": 80
 			},
 			{
 				"cell_type": "code",
@@ -103,16 +103,16 @@
 					"try:\r\n",
 					"    mssparkutils.fs.mount(\r\n",
 					"        f\"wasbs://{container}@{accountName}\",\r\n",
-					"        \"/STAC_Source\",\r\n",
+					"        \"/STAC_Dest\",\r\n",
 					"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
 					"    )\r\n",
-					"    print(\"Successful mount of source to /STAC_Source\")\r\n",
+					"    print(\"Successful mount of source to /STAC_Dest\")\r\n",
 					"except:\r\n",
-					"    print(\"FAILED TO MOUNT STAC SOURCE\")\r\n",
+					"    print(\"FAILED TO MOUNT STAC DEST\")\r\n",
 					"    print(\"Either due to the drive already been mounted, or because the path is incorrect.\")\r\n",
 					""
 				],
-				"execution_count": 33
+				"execution_count": 82
 			},
 			{
 				"cell_type": "code",
@@ -147,7 +147,7 @@
 					"            file_array.append(directory+file)\r\n",
 					"    return file_array"
 				],
-				"execution_count": 23
+				"execution_count": 40
 			},
 			{
 				"cell_type": "code",
@@ -196,7 +196,7 @@
 					"    jpeg.close()\r\n",
 					"    return GPSLongitude, GPSLongitudeRef"
 				],
-				"execution_count": 24
+				"execution_count": 41
 			},
 			{
 				"cell_type": "code",
@@ -229,7 +229,7 @@
 					"    decimaldegrees = (float(split_str[0]) + float(split_str[1])/60 + float(split_str[2])/(60*60)) * (-1 if direction in ['W', 'S'] else 1)\r\n",
 					"    return decimaldegrees"
 				],
-				"execution_count": 25
+				"execution_count": 42
 			},
 			{
 				"cell_type": "code",
@@ -272,7 +272,7 @@
 					"    buf = Point(0, 0).buffer(1)  # buffers 1 meter\r\n",
 					"    return transform(project, buf).bounds"
 				],
-				"execution_count": 26
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
@@ -305,7 +305,7 @@
 					"\r\n",
 					"    return calculate_bb(lat,long)"
 				],
-				"execution_count": 27
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",
@@ -341,7 +341,7 @@
 					"    STAC_datetime = EXIF_datetime_obj.strftime(\"%Y-%m-%dT%H:%M:%S%z\")\r\n",
 					"    return STAC_datetime"
 				],
-				"execution_count": 28
+				"execution_count": 45
 			},
 			{
 				"cell_type": "code",
@@ -369,7 +369,7 @@
 					"    crs = \"EPSG:4326\"\r\n",
 					"    return crs"
 				],
-				"execution_count": 29
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
@@ -397,7 +397,7 @@
 					"    sensor_type = \"RGB\"\r\n",
 					"    return sensor_type"
 				],
-				"execution_count": 30
+				"execution_count": 47
 			},
 			{
 				"cell_type": "code",
@@ -434,7 +434,7 @@
 					"\r\n",
 					"    return True"
 				],
-				"execution_count": 31
+				"execution_count": 48
 			},
 			{
 				"cell_type": "code",
@@ -455,27 +455,26 @@
 					"jobId = mssparkutils.env.getJobId()\r\n",
 					"\r\n",
 					"parsed_url = urlparse(JSON_Dest)\r\n",
-					"container = parsed_url.path.split(\"/\")[2:]\r\n",
+					"if parsed_url.path.endswith('/'):\r\n",
+					"    container = '/'.join(parsed_url.path.split('/')[2:])\r\n",
+					"else:\r\n",
+					"    container = '/'.join(parsed_url.path.split('/')[2:])+\"/\"\r\n",
+					"\r\n",
 					"print(container)\r\n",
 					"\r\n",
-					"# img_path = f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/'\r\n",
-					"# outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
-					"# #print(outarray)\r\n",
+					"img_path = f'/synfs/'+jobId+'/STAC_Dest/'+container\r\n",
+					"print(img_path)\r\n",
 					"\r\n",
-					"# oblique_mobile_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting/'\r\n",
-					"# oblique_aerial_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting/'\r\n",
+					"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
+					"print(outarray)\r\n",
 					"\r\n",
-					"# for jpeg in outarray:\r\n",
-					"#     filename = os.path.basename(jpeg)\r\n",
-					"#     print(filename)\r\n",
+					"for jpeg in outarray:\r\n",
+					"    filename = os.path.basename(jpeg)\r\n",
+					"    print(filename)\r\n",
 					"\r\n",
-					"#     if is_drone(jpeg):\r\n",
-					"#         write_to_collection(jpeg, oblique_aerial_path+filename)\r\n",
-					"\r\n",
-					"#     else:\r\n",
-					"#         write_to_collection(jpeg, oblique_mobile_path+filename)"
+					"    write_to_collection(jpeg, outarray)"
 				],
-				"execution_count": 35
+				"execution_count": 84
 			},
 			{
 				"cell_type": "code",
