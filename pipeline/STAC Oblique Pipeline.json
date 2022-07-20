@@ -6,7 +6,14 @@
 			{
 				"name": "JPG Source to Dest",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "STACify_JPG",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -49,8 +56,43 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "STACify_JPG",
+				"type": "SynapseNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "STACify_JPG",
+						"type": "NotebookReference"
+					},
+					"parameters": {
+						"JPG_Dest": {
+							"value": {
+								"value": "@pipeline().parameters.JPG_Destination_Dir",
+								"type": "Expression"
+							},
+							"type": "string"
+						}
+					},
+					"snapshot": true
+				}
 			}
 		],
+		"parameters": {
+			"JPG_Destination_Dir": {
+				"type": "string",
+				"defaultValue": "https://innoaoaidata.blob.core.windows.net/liamdest/RBU_STAC_DEST/"
+			}
+		},
 		"annotations": []
 	}
 }
