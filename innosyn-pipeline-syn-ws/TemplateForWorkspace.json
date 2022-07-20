@@ -1242,7 +1242,14 @@
 					{
 						"name": "JPG Source to Dest",
 						"type": "Copy",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Set variable1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "7.00:00:00",
 							"retry": 0,
@@ -1287,17 +1294,83 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "STACify_JPG",
+						"type": "SynapseNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "STACify_JPG",
+								"type": "NotebookReference"
+							},
+							"parameters": {
+								"JPG_Dest": {
+									"value": {
+										"value": "@pipeline().parameters.JPG_Destination_Dir",
+										"type": "Expression"
+									},
+									"type": "string"
+								}
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "Geospatialspark",
+								"type": "BigDataPoolReference"
+							}
+						}
+					},
+					{
+						"name": "Set variable1",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "STACify_JPG",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "TestOut",
+							"value": {
+								"value": "@activity('STACify_JPG').output.status.Output.result.exitValue",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
 				},
+				"parameters": {
+					"JPG_Destination_Dir": {
+						"type": "string",
+						"defaultValue": "https://innoaoaidata.blob.core.windows.net/liamdest/RBU_STAC_DEST/"
+					}
+				},
+				"variables": {
+					"TestOut": {
+						"type": "String"
+					}
+				},
 				"annotations": []
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/datasets/STAC_Source')]",
-				"[concat(variables('workspaceId'), '/datasets/STAC_Dest')]"
+				"[concat(variables('workspaceId'), '/datasets/STAC_Dest')]",
+				"[concat(variables('workspaceId'), '/notebooks/STACify_JPG')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/Geospatialspark')]"
 			]
 		},
 		{
@@ -2316,7 +2389,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "c72e0d8b-ebb9-4245-8590-65ce295aca6f"
+						"spark.autotune.trackingId": "2bff6d84-6bcd-4e00-ba45-b3d03815cc83"
 					}
 				},
 				"metadata": {
@@ -3298,7 +3371,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "7940008e-868c-4162-8b5d-1275c6937c2d"
+						"spark.autotune.trackingId": "ddf9d759-da51-4e34-a8f6-2723622eda59"
 					}
 				},
 				"metadata": {
@@ -3306,7 +3379,7 @@
 					"enableDebugMode": false,
 					"kernelspec": {
 						"name": "synapse_pyspark",
-						"display_name": "python"
+						"display_name": "Synapse PySpark"
 					},
 					"language_info": {
 						"name": "python"
@@ -3343,21 +3416,46 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"tags": [
+								"parameters"
+							]
+						},
 						"source": [
-							"from notebookutils import mssparkutils\r\n",
-							"try:\r\n",
-							"    mssparkutils.fs.mount(\r\n",
-							"        \"wasbs://liamdest@innoaoaidata.blob.core.windows.net\",\r\n",
-							"        \"/STAC_Dest\",\r\n",
-							"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
-							"    )\r\n",
-							"    print(\"Successful mount of source to /STAC_Dest\")\r\n",
-							"except:\r\n",
-							"    print(\"FAILED TO MOUNT STAC DESTINATION\")\r\n",
-							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
+							"JSON_Dest = \"\""
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from notebookutils import mssparkutils\r\n",
+							"Test_Out = JSON_Dest\r\n",
+							"mssparkutils.notebook.exit(Test_Out)"
+						],
+						"outputs": [],
+						"execution_count": 6
 					}
 				]
 			},
