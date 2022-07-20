@@ -1240,7 +1240,7 @@
 				"description": "Copying data from a source, to a destination, of JPG oblique images while adding STAC components.",
 				"activities": [
 					{
-						"name": "Copy data1",
+						"name": "JPG Source to Dest",
 						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
