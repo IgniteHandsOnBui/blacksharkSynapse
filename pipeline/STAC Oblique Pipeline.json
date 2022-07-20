@@ -6,14 +6,7 @@
 			{
 				"name": "JPG Source to Dest",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "STACify_JPG",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -85,12 +78,37 @@
 					},
 					"snapshot": true
 				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "STACify_JPG",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "TestOut",
+					"value": {
+						"value": "@activity(STACify_JPG).output.status.Output.result.exitValue",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
 			"JPG_Destination_Dir": {
 				"type": "string",
 				"defaultValue": "https://innoaoaidata.blob.core.windows.net/liamdest/RBU_STAC_DEST/"
+			}
+		},
+		"variables": {
+			"TestOut": {
+				"type": "String"
 			}
 		},
 		"annotations": []
