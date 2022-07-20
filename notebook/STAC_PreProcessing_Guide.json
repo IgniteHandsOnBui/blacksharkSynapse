@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2ccd0ae9-015e-4652-8f90-ec6fbbe86abe"
+				"spark.autotune.trackingId": "c72e0d8b-ebb9-4245-8590-65ce295aca6f"
 			}
 		},
 		"metadata": {
@@ -88,6 +88,29 @@
 					"## 1. Mounting rich media source and destination storage accounts\r\n",
 					"Typically the source of the rich media will be in one container, and the destination will be in another. In this example I have the source in a blob storage account under the container \"liamsource\" and the destination in a blob storage account under the \"liamdest\" container. In code, these folders will be \"STAC_Source\" and \"STAC_Dest\" respectively."
 				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"tags": [
+						"parameters"
+					]
+				},
+				"source": [
+					"jobId = mssparkutils.env.getJobId()\r\n",
+					"JPG_Source_Dir = f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/'\r\n",
+					"JPG_Dest_Dir = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/'"
+				],
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -209,27 +232,6 @@
 				"execution_count": 2
 			},
 			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"jobId = mssparkutils.env.getJobId()\r\n",
-					"img_path = f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/'\r\n",
-					"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
-					"outarray"
-				],
-				"execution_count": null
-			},
-			{
 				"cell_type": "markdown",
 				"metadata": {
 					"nteract": {
@@ -316,29 +318,6 @@
 					}
 				},
 				"source": [
-					"jobId = mssparkutils.env.getJobId()\r\n",
-					"oblique_mobile_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting'\r\n",
-					"oblique_aerial_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting'\r\n",
-					"\r\n",
-					"oblique_mobile_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting/rbu_mobile_oblique_imagery_for_ehsr_reporting_mtl.json'\r\n",
-					"oblique_aerial_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting/rbu_aerial_oblique_imagery_for_ehsr_reporting_mtl.json'"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
 					"#Take a look at the collection MTL json files\r\n",
 					"import json\r\n",
 					"\r\n",
@@ -354,27 +333,6 @@
 					"    json_open = json.load(open(jsonpath))\r\n",
 					"    print(json_open)\r\n",
 					"    return json_open"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"mobile_collection = check_collection_mtl(oblique_mobile_collection_json)\r\n",
-					"print(\"\")\r\n",
-					"aerial_collection = check_collection_mtl(oblique_aerial_collection_json)\r\n",
-					""
 				],
 				"execution_count": null
 			},
@@ -422,24 +380,6 @@
 					"    jpeg_EXIF = file.tags()\r\n",
 					"    file.close()\r\n",
 					"    return jpeg_EXIF"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"extract_EXIF(f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/202002280104265320_skilpatrick_S3_7-15-19_DJI_0256.JPG')"
 				],
 				"execution_count": null
 			},
@@ -986,26 +926,6 @@
 					"1. Date Time\r\n",
 					"2. Sensor Type"
 				]
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"jobId = mssparkutils.env.getJobId()\r\n",
-					"img_path = f'/synfs/'+jobId+'/STAC_Source/GEOTIFF_STAC_SOURCE/slr_tk_dd_rgb_T25109_20210812_151800.tif'\r\n",
-					"get_geotiff_datetime(img_path)"
-				],
-				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
