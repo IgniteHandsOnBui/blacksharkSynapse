@@ -14,6 +14,9 @@
 		"Stellar Data Storage Account v2_connectionString": {
 			"value": ""
 		},
+		"chevrondatalake_servicePrincipalCredential": {
+			"value": ""
+		},
 		"dinnosa_connectionString": {
 			"value": ""
 		},
@@ -32,17 +35,11 @@
 		"innosyn-pipeline-syn-ws-WorkspaceDefaultSqlServer_connectionString": {
 			"value": ""
 		},
-		"chevrondatalake_servicePrincipalCredential": {
-			"value": ""
-		},
 		"Stellar Airbus v2_properties_typeProperties_url": {
 			"value": "https://rawdatajbqezt.dfs.core.windows.net"
 		},
 		"Stellar Pipeline Key Vault_properties_typeProperties_baseUrl": {
 			"value": "https://innosyn-pipeline-kv.vault.azure.net/"
-		},
-		"innosyn-pipeline-syn-ws-WorkspaceDefaultStorage_properties_typeProperties_url": {
-			"value": "https://synhnsdl2xmc.dfs.core.windows.net/"
 		},
 		"chevrondatalake_properties_typeProperties_url": {
 			"value": "https://chevrondatalakedev.dfs.core.windows.net"
@@ -52,6 +49,9 @@
 		},
 		"chevrondatalake_properties_typeProperties_servicePrincipalId": {
 			"value": "951ed11c-702e-4a70-a2b7-db45570030ad"
+		},
+		"innosyn-pipeline-syn-ws-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://synhnsdl2xmc.dfs.core.windows.net/"
 		}
 	}
 }

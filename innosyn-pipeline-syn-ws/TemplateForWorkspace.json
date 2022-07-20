@@ -19,6 +19,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Stellar Data Storage Account v2'"
 		},
+		"chevrondatalake_servicePrincipalCredential": {
+			"type": "secureString",
+			"metadata": "Secure string for 'servicePrincipalCredential' of 'chevrondatalake'"
+		},
 		"dinnosa_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'dinnosa'"
@@ -43,10 +47,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'innosyn-pipeline-syn-ws-WorkspaceDefaultSqlServer'"
 		},
-		"chevrondatalake_servicePrincipalCredential": {
-			"type": "secureString",
-			"metadata": "Secure string for 'servicePrincipalCredential' of 'chevrondatalake'"
-		},
 		"Stellar Airbus v2_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://rawdatajbqezt.dfs.core.windows.net"
@@ -54,10 +54,6 @@
 		"Stellar Pipeline Key Vault_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://innosyn-pipeline-kv.vault.azure.net/"
-		},
-		"innosyn-pipeline-syn-ws-WorkspaceDefaultStorage_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://synhnsdl2xmc.dfs.core.windows.net/"
 		},
 		"chevrondatalake_properties_typeProperties_url": {
 			"type": "string",
@@ -70,6 +66,10 @@
 		"chevrondatalake_properties_typeProperties_servicePrincipalId": {
 			"type": "string",
 			"defaultValue": "951ed11c-702e-4a70-a2b7-db45570030ad"
+		},
+		"innosyn-pipeline-syn-ws-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://synhnsdl2xmc.dfs.core.windows.net/"
 		}
 	},
 	"variables": {
@@ -1233,6 +1233,118 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/STAC Oblique Pipeline')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "Copying data from a source, to a destination, of JPG oblique images while adding STAC components.",
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "RBU_STAC_SOURCE",
+									"wildcardFileName": "*.jpg",
+									"deleteFilesAfterCompletion": false
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "STAC_Source",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "STAC_Dest",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/STAC_Source')]",
+				"[concat(variables('workspaceId'), '/datasets/STAC_Dest')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/STAC_Dest')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "innoaoaidata_STAC",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "liamdest"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/innoaoaidata_STAC')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/STAC_Source')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "innoaoaidata_STAC",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "liamsource"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/innoaoaidata_STAC')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/gld')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -1548,6 +1660,32 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/chevrondatalake')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('chevrondatalake_properties_typeProperties_url')]",
+					"tenant": "[parameters('chevrondatalake_properties_typeProperties_tenant')]",
+					"servicePrincipalId": "[parameters('chevrondatalake_properties_typeProperties_servicePrincipalId')]",
+					"servicePrincipalCredentialType": "ServicePrincipalKey",
+					"servicePrincipalCredential": {
+						"type": "SecureString",
+						"value": "[parameters('chevrondatalake_servicePrincipalCredential')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/dinnosa')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -1748,11 +1886,141 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/STAC_PreProcessing_Guide')]",
+			"name": "[concat(parameters('workspaceName'), '/Copy noop')]",
+			"type": "Microsoft.Synapse/workspaces/sparkJobDefinitions",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"targetBigDataPool": {
+					"referenceName": "pooldl2xmc",
+					"type": "BigDataPoolReference"
+				},
+				"requiredSparkVersion": "3.1",
+				"language": "python",
+				"jobProperties": {
+					"name": "Copy noop",
+					"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/copy_noop/src/mosaic.py",
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "1",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "01767b3a-cede-4abf-8b79-52cb6d0ff80d"
+					},
+					"args": [],
+					"jars": [],
+					"files": [],
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Crop')]",
+			"type": "Microsoft.Synapse/workspaces/sparkJobDefinitions",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"targetBigDataPool": {
+					"referenceName": "pooldl2xmc",
+					"type": "BigDataPoolReference"
+				},
+				"requiredSparkVersion": "3.1",
+				"language": "python",
+				"jobProperties": {
+					"name": "Crop",
+					"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/raster_crop/src/crop.py",
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "1",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "f4cbbafe-9d98-476f-9bd4-e5bfc7bad06c"
+					},
+					"args": [],
+					"jars": [],
+					"files": [
+						"abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/raster_crop/src/utils.py"
+					],
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Mosaic')]",
+			"type": "Microsoft.Synapse/workspaces/sparkJobDefinitions",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"targetBigDataPool": {
+					"referenceName": "pooldl2xmc",
+					"type": "BigDataPoolReference"
+				},
+				"requiredSparkVersion": "3.1",
+				"language": "python",
+				"jobProperties": {
+					"name": "Mosaic",
+					"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/raster_mosaic/src/mosaic.py",
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "3",
+						"spark.dynamicAllocation.maxExecutors": "3",
+						"spark.autotune.trackingId": "811de002-982f-4b4b-9732-147d3565c502"
+					},
+					"args": [],
+					"jars": [],
+					"files": [],
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 3
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Warp')]",
+			"type": "Microsoft.Synapse/workspaces/sparkJobDefinitions",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"targetBigDataPool": {
+					"referenceName": "pooldl2xmc",
+					"type": "BigDataPoolReference"
+				},
+				"requiredSparkVersion": "3.1",
+				"language": "python",
+				"jobProperties": {
+					"name": "Warp",
+					"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/raster_warp/src/warp.py",
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "3",
+						"spark.dynamicAllocation.maxExecutors": "3",
+						"spark.autotune.trackingId": "335dd1ad-fc75-4734-ad92-03a79e9ad399"
+					},
+					"args": [],
+					"jars": [],
+					"files": [],
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 3
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Imagery_Performance_Testing')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
-				"description": "Guide for documenting and sharing pre-processing steps required prior to the STAC ingestion process. This guide will use JPGs as an example",
+				"description": "Notebook to test cloud optimized imagery",
 				"nbformat": 4,
 				"nbformat_minor": 2,
 				"bigDataPool": {
@@ -1769,7 +2037,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "a4f37aca-c780-4819-b000-712dd7433b80"
+						"spark.autotune.trackingId": "02e369b9-270e-440e-ab37-767e43733697"
 					}
 				},
 				"metadata": {
@@ -1794,8 +2062,284 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from notebookutils import mssparkutils\r\n",
+							"\r\n",
+							"try:\r\n",
+							"    mssparkutils.fs.mount(\r\n",
+							"        \"wasbs://liamsource@innoaoaidata.blob.core.windows.net\",\r\n",
+							"        \"/Imagery_Source\",\r\n",
+							"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
+							"    )\r\n",
+							"    print(\"Successful mount of source to /Imagery_Source\")\r\n",
+							"except:\r\n",
+							"    print(\"FAILED TO MOUNT STAC SOURCE\")\r\n",
+							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import rasterio\r\n",
+							"from rasterio.plot import show"
+						],
+						"outputs": [],
+						"execution_count": 14
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## Unmodified GeoTIFF"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"jobId = mssparkutils.env.getJobId()\r\n",
+							"geotiff_path = f'/synfs/'+jobId+'/Imagery_Source/CloudOptomized_Imagery/NormalGeoTIFF.tif'\r\n",
+							"\r\n",
+							"with rasterio.open(geotiff_path) as src:\r\n",
+							"    show(src)\r\n",
+							"    src.close()"
+						],
+						"outputs": [],
+						"execution_count": 15
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## Cloud Optomized GeoTIFF (COG)"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"jobId = mssparkutils.env.getJobId()\r\n",
+							"COG_path = f'/synfs/'+jobId+'/Imagery_Source/CloudOptomized_Imagery/CloudOptomizedGeoTIFF.tif'\r\n",
+							"\r\n",
+							"with rasterio.open(COG_path) as src:\r\n",
+							"    show(src)\r\n",
+							"    src.close()"
+						],
+						"outputs": [],
+						"execution_count": 16
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## Meta Raster Format (MRF)"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"jobId = mssparkutils.env.getJobId()\r\n",
+							"MRF_path = f'/synfs/'+jobId+'/Imagery_Source/CloudOptomized_Imagery/MRF_Image2/MRF_image.mrf'\r\n",
+							"\r\n",
+							"with rasterio.open(MRF_path) as src:\r\n",
+							"    show(src)\r\n",
+							"    src.close()"
+						],
+						"outputs": [],
+						"execution_count": 17
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## Cloud Raster Format (CRF)"
+						]
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Looks like rasterio and GDAL do not recognize CRF.\r\n",
+							"jobId = mssparkutils.env.getJobId()\r\n",
+							"CRF_path = f'/synfs/'+jobId+'/Imagery_Source/CloudOptomized_Imagery/CRF/CRF_Image.crf'\r\n",
+							"\r\n",
+							"with rasterio.open(CRF_path) as src:\r\n",
+							"    show(src)\r\n",
+							"    src.close()"
+						],
+						"outputs": [],
+						"execution_count": 18
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/STAC_PreProcessing_Guide')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "Guide for documenting and sharing pre-processing steps required prior to the STAC ingestion process. This guide will use JPGs as an example",
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "Geospatialspark",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "c72e0d8b-ebb9-4245-8590-65ce295aca6f"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+						"name": "Geospatialspark",
+						"type": "Spark",
+						"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1839,6 +2383,30 @@
 							"## 1. Mounting rich media source and destination storage accounts\r\n",
 							"Typically the source of the rich media will be in one container, and the destination will be in another. In this example I have the source in a blob storage account under the container \"liamsource\" and the destination in a blob storage account under the \"liamdest\" container. In code, these folders will be \"STAC_Source\" and \"STAC_Dest\" respectively."
 						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"tags": [
+								"parameters"
+							]
+						},
+						"source": [
+							"jobId = mssparkutils.env.getJobId()\r\n",
+							"JPG_Source_Dir = f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/'\r\n",
+							"JPG_Dest_Dir = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/'"
+						],
+						"outputs": [],
+						"execution_count": 2
 					},
 					{
 						"cell_type": "code",
@@ -1960,29 +2528,7 @@
 							"    return file_array"
 						],
 						"outputs": [],
-						"execution_count": null
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"jobId = mssparkutils.env.getJobId()\r\n",
-							"img_path = f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/'\r\n",
-							"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
-							"outarray"
-						],
-						"outputs": [],
-						"execution_count": null
+						"execution_count": 2
 					},
 					{
 						"cell_type": "markdown",
@@ -2072,30 +2618,6 @@
 							}
 						},
 						"source": [
-							"jobId = mssparkutils.env.getJobId()\r\n",
-							"oblique_mobile_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting'\r\n",
-							"oblique_aerial_path = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting'\r\n",
-							"\r\n",
-							"oblique_mobile_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Mobile/Oblique/rbu_mobile_oblique_imagery_for_ehsr_reporting/rbu_mobile_oblique_imagery_for_ehsr_reporting_mtl.json'\r\n",
-							"oblique_aerial_collection_json = f'/synfs/'+jobId+'/STAC_Dest/RBU_STAC_DEST/Aerial/Oblique/rbu_aerial_oblique_imagery_for_ehsr_reporting/rbu_aerial_oblique_imagery_for_ehsr_reporting_mtl.json'"
-						],
-						"outputs": [],
-						"execution_count": null
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
 							"#Take a look at the collection MTL json files\r\n",
 							"import json\r\n",
 							"\r\n",
@@ -2111,28 +2633,6 @@
 							"    json_open = json.load(open(jsonpath))\r\n",
 							"    print(json_open)\r\n",
 							"    return json_open"
-						],
-						"outputs": [],
-						"execution_count": null
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"mobile_collection = check_collection_mtl(oblique_mobile_collection_json)\r\n",
-							"print(\"\")\r\n",
-							"aerial_collection = check_collection_mtl(oblique_aerial_collection_json)\r\n",
-							""
 						],
 						"outputs": [],
 						"execution_count": null
@@ -2181,25 +2681,6 @@
 							"    jpeg_EXIF = file.tags()\r\n",
 							"    file.close()\r\n",
 							"    return jpeg_EXIF"
-						],
-						"outputs": [],
-						"execution_count": null
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"extract_EXIF(f'/synfs/'+jobId+'/STAC_Source/RBU_STAC_SOURCE/202002280104265320_skilpatrick_S3_7-15-19_DJI_0256.JPG')"
 						],
 						"outputs": [],
 						"execution_count": null
@@ -2728,6 +3209,37 @@
 						"execution_count": 179
 					},
 					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## Georeferenced TIFF STAC\r\n",
+							"Up till now we have created functions for finding and creating metadata for oblique images, but what about _Georeferenced Imagery_? A georeferenced image is an image where all four corners fit into a real world space. When you pull this type of imagery into certain geospatial softwares like ArcGIS Pro, GlobalMapper, ENVI, AzureMaps ... the software will project the image into real world space. Originally this type of data was what the STAC spec was built off of and there are many resources built around it. Lets investigate Georeferenced Imagery (in the form of a GEOTIFF).\r\n",
+							"\r\n",
+							"The STACify process is able to read the metadata of GEOTIFFs very well so we will not have to reformat many metadata components. Unlike oblique imagery GeoTiffs innately have bounding boxes, so, we will not need to create one within the headers. Also CRS is something that most images come with innately in their headers. We will not need to create a function to create this. We will still need Date Time, and Sensor Type however. Lets create some functions!"
+						]
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### GeoTIFF Metadata\r\n",
+							"1. Date Time\r\n",
+							"2. Sensor Type"
+						]
+					},
+					{
 						"cell_type": "code",
 						"metadata": {
 							"jupyter": {
@@ -2741,11 +3253,79 @@
 							}
 						},
 						"source": [
-							""
+							"# Currently not implemented\r\n",
+							"from osgeo import gdal\r\n",
+							"\r\n",
+							"def get_geotiff_datetime(geotiff_path):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to return a STAC-customized DateTime from GEOTIFF GDAL_Metadata\r\n",
+							"    Arguments:\r\n",
+							"        geotiff_path: path to GeoTIFF which you want STAC-DateTime for. GeoTIFF that was used in this situation has an acquisitionEndDate and acquisitionStartDate in GDAL Metadata header.\r\n",
+							"    Returns:\r\n",
+							"        STAC-Specific DateTime as a string\r\n",
+							"    \"\"\"\r\n",
+							"\r\n",
+							"    gtiff = gdal.Info(geotiff_path)\r\n",
+							"    print(gtiff)"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 10
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/STACify_JPG')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "Geospatialspark",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "7940008e-868c-4162-8b5d-1275c6937c2d"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
 					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+						"name": "Geospatialspark",
+						"type": "Spark",
+						"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
 					{
 						"cell_type": "markdown",
 						"metadata": {
@@ -2756,9 +3336,26 @@
 							}
 						},
 						"source": [
-							"## RBU Data Lake Example\r\n",
-							"There is a dataset in the Chevron datalek that contains thousands of images that could be ingested for STAC. We will list them out here as a proof of concept. To run our whole script on this would take days on our current spark pool."
+							"The goal of this notebook is to test a productionized version of the STAC_PreProcessing_Guide"
 						]
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"from notebookutils import mssparkutils\r\n",
+							"try:\r\n",
+							"    mssparkutils.fs.mount(\r\n",
+							"        \"wasbs://liamdest@innoaoaidata.blob.core.windows.net\",\r\n",
+							"        \"/STAC_Dest\",\r\n",
+							"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
+							"    )\r\n",
+							"    print(\"Successful mount of source to /STAC_Dest\")\r\n",
+							"except:\r\n",
+							"    print(\"FAILED TO MOUNT STAC DESTINATION\")\r\n",
+							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
+						],
+						"outputs": [],
+						"execution_count": null
 					}
 				]
 			},
@@ -2786,7 +3383,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "c083af34-2b83-4064-97c8-76b4835d0ff3"
+						"spark.autotune.trackingId": "9e25753f-5af8-417a-b8d5-e30402ca4c87"
 					}
 				},
 				"metadata": {
@@ -2811,15 +3408,13 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#Mounting the AML blob storage located in dinnot101mlcvx to this notebook so we can reference it as if it was a filepath\r\n",
 							"#The 'wasbs' is for blob storage. There is another prefix for file storage, etc ...\r\n",
@@ -4393,136 +4988,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Copy noop')]",
-			"type": "Microsoft.Synapse/workspaces/sparkJobDefinitions",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"targetBigDataPool": {
-					"referenceName": "pooldl2xmc",
-					"type": "BigDataPoolReference"
-				},
-				"requiredSparkVersion": "3.1",
-				"language": "python",
-				"jobProperties": {
-					"name": "Copy noop",
-					"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/copy_noop/src/mosaic.py",
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "1",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "01767b3a-cede-4abf-8b79-52cb6d0ff80d"
-					},
-					"args": [],
-					"jars": [],
-					"files": [],
-					"driverMemory": "56g",
-					"driverCores": 8,
-					"executorMemory": "56g",
-					"executorCores": 8,
-					"numExecutors": 2
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/Crop')]",
-			"type": "Microsoft.Synapse/workspaces/sparkJobDefinitions",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"targetBigDataPool": {
-					"referenceName": "pooldl2xmc",
-					"type": "BigDataPoolReference"
-				},
-				"requiredSparkVersion": "3.1",
-				"language": "python",
-				"jobProperties": {
-					"name": "Crop",
-					"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/raster_crop/src/crop.py",
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "1",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f4cbbafe-9d98-476f-9bd4-e5bfc7bad06c"
-					},
-					"args": [],
-					"jars": [],
-					"files": [
-						"abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/raster_crop/src/utils.py"
-					],
-					"driverMemory": "56g",
-					"driverCores": 8,
-					"executorMemory": "56g",
-					"executorCores": 8,
-					"numExecutors": 2
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/Mosaic')]",
-			"type": "Microsoft.Synapse/workspaces/sparkJobDefinitions",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"targetBigDataPool": {
-					"referenceName": "pooldl2xmc",
-					"type": "BigDataPoolReference"
-				},
-				"requiredSparkVersion": "3.1",
-				"language": "python",
-				"jobProperties": {
-					"name": "Mosaic",
-					"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/raster_mosaic/src/mosaic.py",
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "3",
-						"spark.dynamicAllocation.maxExecutors": "3",
-						"spark.autotune.trackingId": "811de002-982f-4b4b-9732-147d3565c502"
-					},
-					"args": [],
-					"jars": [],
-					"files": [],
-					"driverMemory": "56g",
-					"driverCores": 8,
-					"executorMemory": "56g",
-					"executorCores": 8,
-					"numExecutors": 3
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/Warp')]",
-			"type": "Microsoft.Synapse/workspaces/sparkJobDefinitions",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"targetBigDataPool": {
-					"referenceName": "pooldl2xmc",
-					"type": "BigDataPoolReference"
-				},
-				"requiredSparkVersion": "3.1",
-				"language": "python",
-				"jobProperties": {
-					"name": "Warp",
-					"file": "abfss://spark-jobs@synhnsdl2xmc.dfs.core.windows.net/raster_warp/src/warp.py",
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "3",
-						"spark.dynamicAllocation.maxExecutors": "3",
-						"spark.autotune.trackingId": "335dd1ad-fc75-4734-ad92-03a79e9ad399"
-					},
-					"args": [],
-					"jars": [],
-					"files": [],
-					"driverMemory": "56g",
-					"driverCores": 8,
-					"executorMemory": "56g",
-					"executorCores": 8,
-					"numExecutors": 3
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/pooldl2xmc')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -4641,32 +5106,6 @@
 			},
 			"dependsOn": [],
 			"location": "southcentralus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/chevrondatalake')]",
-			"type": "Microsoft.Synapse/workspaces/linkedServices",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('chevrondatalake_properties_typeProperties_url')]",
-					"tenant": "[parameters('chevrondatalake_properties_typeProperties_tenant')]",
-					"servicePrincipalId": "[parameters('chevrondatalake_properties_typeProperties_servicePrincipalId')]",
-					"servicePrincipalCredentialType": "ServicePrincipalKey",
-					"servicePrincipalCredential": {
-						"type": "SecureString",
-						"value": "[parameters('chevrondatalake_servicePrincipalCredential')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
 		}
 	]
 }
