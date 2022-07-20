@@ -6,7 +6,14 @@
 			{
 				"name": "JPG Source to Dest",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -76,7 +83,11 @@
 							"type": "string"
 						}
 					},
-					"snapshot": true
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "Geospatialspark",
+						"type": "BigDataPoolReference"
+					}
 				}
 			},
 			{
@@ -94,7 +105,7 @@
 				"typeProperties": {
 					"variableName": "TestOut",
 					"value": {
-						"value": "@activity(STACify_JPG).output.status.Output.result.exitValue",
+						"value": "@activity('STACify_JPG').output.status.Output.result.exitValue",
 						"type": "Expression"
 					}
 				}
