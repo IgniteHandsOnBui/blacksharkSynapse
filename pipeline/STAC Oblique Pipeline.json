@@ -22,7 +22,7 @@
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
 							"wildcardFolderPath": "RBU_STAC_SOURCE",
-							"wildcardFileName": "*.jpg",
+							"wildcardFileName": "*.JPG",
 							"deleteFilesAfterCompletion": false
 						},
 						"formatSettings": {
