@@ -8,7 +8,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "Set variable1",
+						"activity": "STACify_JPG",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -87,26 +87,6 @@
 					"sparkPool": {
 						"referenceName": "Geospatialspark",
 						"type": "BigDataPoolReference"
-					}
-				}
-			},
-			{
-				"name": "Set variable1",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "STACify_JPG",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "TestOut",
-					"value": {
-						"value": "@activity('STACify_JPG').output.status.Output.result.exitValue",
-						"type": "Expression"
 					}
 				}
 			}
