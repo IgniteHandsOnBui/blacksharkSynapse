@@ -1244,7 +1244,7 @@
 						"type": "Copy",
 						"dependsOn": [
 							{
-								"activity": "Set variable1",
+								"activity": "STACify_JPG",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -1325,26 +1325,6 @@
 							"sparkPool": {
 								"referenceName": "Geospatialspark",
 								"type": "BigDataPoolReference"
-							}
-						}
-					},
-					{
-						"name": "Set variable1",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "STACify_JPG",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "TestOut",
-							"value": {
-								"value": "@activity('STACify_JPG').output.status.Output.result.exitValue",
-								"type": "Expression"
 							}
 						}
 					}
@@ -2389,7 +2369,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "2bff6d84-6bcd-4e00-ba45-b3d03815cc83"
+						"spark.autotune.trackingId": "c2261fad-b30d-4f46-8295-c3d9a83ad215"
 					}
 				},
 				"metadata": {
@@ -3371,7 +3351,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "ddf9d759-da51-4e34-a8f6-2723622eda59"
+						"spark.autotune.trackingId": "0c277fd1-ddc4-4e7f-ab0c-7b4551ff94f5"
 					}
 				},
 				"metadata": {
@@ -3426,12 +3406,10 @@
 									"deleting": false
 								}
 							},
-							"tags": [
-								"parameters"
-							]
+							"tags": []
 						},
 						"source": [
-							"JSON_Dest = \"\""
+							"JSON_Dest = \"Hello World\""
 						],
 						"outputs": [],
 						"execution_count": 4
