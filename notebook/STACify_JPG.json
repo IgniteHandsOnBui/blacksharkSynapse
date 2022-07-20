@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5cb81aa0-2699-4be0-bfab-f7219aa8b0a4"
+				"spark.autotune.trackingId": "ddf9d759-da51-4e34-a8f6-2723622eda59"
 			}
 		},
 		"metadata": {
@@ -78,26 +78,29 @@
 					]
 				},
 				"source": [
-					"print(JPG_Dest)"
+					"JSON_Dest = \"\""
 				],
-				"execution_count": 3
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
 				"source": [
-					"# from notebookutils import mssparkutils\r\n",
-					"# try:\r\n",
-					"#     mssparkutils.fs.mount(\r\n",
-					"#         \"wasbs://liamdest@innoaoaidata.blob.core.windows.net\",\r\n",
-					"#         \"/STAC_Dest\",\r\n",
-					"#         {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
-					"#     )\r\n",
-					"#     print(\"Successful mount of source to /STAC_Dest\")\r\n",
-					"# except:\r\n",
-					"#     print(\"FAILED TO MOUNT STAC DESTINATION\")\r\n",
-					"#     print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
+					"from notebookutils import mssparkutils\r\n",
+					"Test_Out = JSON_Dest\r\n",
+					"mssparkutils.notebook.exit(Test_Out)"
 				],
-				"execution_count": null
+				"execution_count": 6
 			}
 		]
 	}
