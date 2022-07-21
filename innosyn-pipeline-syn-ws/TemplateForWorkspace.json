@@ -1267,8 +1267,7 @@
 							"sink": {
 								"type": "BinarySink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings",
-									"copyBehavior": "PreserveHierarchy"
+									"type": "AzureBlobStorageWriteSettings"
 								}
 							},
 							"enableStaging": false
@@ -5622,8 +5621,7 @@
 							"sink": {
 								"type": "BinarySink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings",
-									"copyBehavior": "PreserveHierarchy"
+									"type": "AzureBlobStorageWriteSettings"
 								}
 							},
 							"enableStaging": false
@@ -5647,6 +5645,12 @@
 				"policy": {
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
+				},
+				"parameters": {
+					"GEOTiff_Destination_Dir": {
+						"type": "string",
+						"defaultValue": "https://innoaoaidata.blob.core.windows.net/liamdest/GEOTIFF_STAC_DEST/"
+					}
 				},
 				"annotations": []
 			},
