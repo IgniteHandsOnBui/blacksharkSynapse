@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7f402eaf-b411-4f8e-9a03-f36924374ce4"
+				"spark.autotune.trackingId": "d0b151f1-8c0d-4340-b4d6-f698782c4436"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 				"source": [
 					"GEOTIFF_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/GEOTIFF_STAC_DEST/\""
 				],
-				"execution_count": 86
+				"execution_count": 99
 			},
 			{
 				"cell_type": "code",
@@ -100,7 +100,7 @@
 					"    print(\"Either due to the drive already been mounted, or because the path is incorrect.\")\r\n",
 					""
 				],
-				"execution_count": 73
+				"execution_count": 100
 			},
 			{
 				"cell_type": "code",
@@ -135,7 +135,7 @@
 					"            file_array.append(directory+file)\r\n",
 					"    return file_array"
 				],
-				"execution_count": 74
+				"execution_count": 101
 			},
 			{
 				"cell_type": "code",
@@ -174,7 +174,7 @@
 					"\r\n",
 					"    return GDAL_dd_acquisitionStartDate, GDAL_dd_acquisitionEndDate"
 				],
-				"execution_count": 85
+				"execution_count": 102
 			},
 			{
 				"cell_type": "code",
@@ -201,7 +201,7 @@
 					"    sensor_type = \"RGB\"\r\n",
 					"    return sensor_type"
 				],
-				"execution_count": 81
+				"execution_count": 103
 			},
 			{
 				"cell_type": "code",
@@ -221,7 +221,7 @@
 					"import os\r\n",
 					"\r\n",
 					"def tiff_to_cog(tiff_path):\r\n",
-					"    options = gdal.TranslateOptions(format='COG',creationOptions = ['TFW=YES', 'COMPRESS=JPEG'])\r\n",
+					"    options = gdal.TranslateOptions(format='COG',creationOptions = ['COMPRESS=JPEG'])\r\n",
 					"    newname = os.path.splitext(tiff_path)[0]+\"_COG.tif\"\r\n",
 					"\r\n",
 					"    #Getting Datetime\r\n",
@@ -241,7 +241,7 @@
 					"\r\n",
 					"    print(\"Converted\")"
 				],
-				"execution_count": 93
+				"execution_count": 109
 			},
 			{
 				"cell_type": "code",
@@ -277,9 +277,9 @@
 					"    print(filename + \" is currently being converted to COG\")\r\n",
 					"    print(\"\")\r\n",
 					"\r\n",
-					"    #tiff_to_cog(tiff)"
+					"    tiff_to_cog(tiff)"
 				],
-				"execution_count": 98
+				"execution_count": 108
 			},
 			{
 				"cell_type": "code",
