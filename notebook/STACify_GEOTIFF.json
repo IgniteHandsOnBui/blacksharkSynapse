@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6a5b0805-c8b1-4922-801e-389dba562a82"
+				"spark.autotune.trackingId": "1d5cee39-36d7-4620-8718-a8bf9caf1d20"
 			}
 		},
 		"metadata": {
@@ -53,7 +53,7 @@
 				"source": [
 					"GEOTIFF_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/GEOTIFF_STAC_DEST/\""
 				],
-				"execution_count": 29
+				"execution_count": 72
 			},
 			{
 				"cell_type": "code",
@@ -87,7 +87,7 @@
 					"    print(\"Either due to the drive already been mounted, or because the path is incorrect.\")\r\n",
 					""
 				],
-				"execution_count": 16
+				"execution_count": 73
 			},
 			{
 				"cell_type": "code",
@@ -122,7 +122,7 @@
 					"            file_array.append(directory+file)\r\n",
 					"    return file_array"
 				],
-				"execution_count": 30
+				"execution_count": 74
 			},
 			{
 				"cell_type": "code",
@@ -162,7 +162,7 @@
 					"\r\n",
 					"    return GDAL_dd_acquisitionStartDate, GDAL_dd_acquisitionEndDate"
 				],
-				"execution_count": 38
+				"execution_count": 76
 			},
 			{
 				"cell_type": "code",
@@ -180,7 +180,7 @@
 				"source": [
 					"get_tiff_datetime('/synfs/92/STAC_Dest/GEOTIFF_STAC_DEST/TemplinHwymap_Orthomosaic_export_SatJan15091105977530.tif')"
 				],
-				"execution_count": 39
+				"execution_count": 78
 			},
 			{
 				"cell_type": "code",
@@ -202,10 +202,14 @@
 					"def tiff_to_cog(tiff_path):\r\n",
 					"    options = gdal.TranslateOptions(format='COG',creationOptions = ['TFW=YES', 'COMPRESS=JPEG'])\r\n",
 					"    newname = os.path.splitext(tiff_path)[0]+\"_COG.tif\"\r\n",
-					"    gdal.Translate(newname, tiff_path, options=options)\r\n",
+					"    start_dt, end_dt = get_tiff_datetime(tiff_path)\r\n",
+					"\r\n",
+					"    dst = gdal.Translate(newname, tiff_path, options=options)\r\n",
+					"    dst.SetMetadata( {'datetime': 'NULL', 'start_datetime': start_dt, 'end_datetime': end_dt})\r\n",
+					"    dst = None\r\n",
 					"    print(\"Converted\")"
 				],
-				"execution_count": 66
+				"execution_count": 79
 			},
 			{
 				"cell_type": "code",
@@ -243,7 +247,7 @@
 					"\r\n",
 					"    tiff_to_cog(tiff)"
 				],
-				"execution_count": 67
+				"execution_count": 80
 			},
 			{
 				"cell_type": "code",
