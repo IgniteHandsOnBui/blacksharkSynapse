@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "73359fba-c812-491b-b89b-6ea0e03ce2a6"
+				"spark.autotune.trackingId": "df86a4f3-e259-4e2b-8311-9569e72617c2"
 			}
 		},
 		"metadata": {
@@ -454,7 +454,7 @@
 					"\r\n",
 					"jobId = mssparkutils.env.getJobId()\r\n",
 					"\r\n",
-					"parsed_url = urlparse(JSON_Dest)\r\n",
+					"parsed_url = urlparse(JPG_Dest)\r\n",
 					"if parsed_url.path.endswith('/'):\r\n",
 					"    container = '/'.join(parsed_url.path.split('/')[2:])\r\n",
 					"else:\r\n",
