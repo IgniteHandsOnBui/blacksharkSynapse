@@ -1256,6 +1256,8 @@
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
+									"wildcardFolderPath": "*",
+									"wildcardFileName": "*.tif",
 									"deleteFilesAfterCompletion": false
 								},
 								"formatSettings": {
@@ -1501,7 +1503,6 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"fileName": "pr_tk_dd_rgb_Tank330_20210629_200100.tif",
 						"folderPath": "GEOTIFF_STAC_SOURCE",
 						"container": "liamsource"
 					}
