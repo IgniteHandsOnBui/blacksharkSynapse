@@ -20,7 +20,7 @@
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
-							"wildcardFolderPath": "GEOTIFF_*",
+							"wildcardFolderPath": "GEOTIFF_STAC_DEST",
 							"wildcardFileName": "*.tif",
 							"deleteFilesAfterCompletion": false
 						},
@@ -31,8 +31,7 @@
 					"sink": {
 						"type": "BinarySink",
 						"storeSettings": {
-							"type": "AzureBlobStorageWriteSettings",
-							"copyBehavior": "PreserveHierarchy"
+							"type": "AzureBlobStorageWriteSettings"
 						}
 					},
 					"enableStaging": false
