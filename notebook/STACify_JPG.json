@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "df86a4f3-e259-4e2b-8311-9569e72617c2"
+				"spark.autotune.trackingId": "8a0b79d4-e4d9-4d38-bfea-5760e824a091"
 			}
 		},
 		"metadata": {
@@ -73,7 +73,9 @@
 							"deleting": false
 						}
 					},
-					"tags": []
+					"tags": [
+						"parameters"
+					]
 				},
 				"source": [
 					"JPG_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/RBU_STAC_DEST/\""
