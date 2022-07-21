@@ -1233,6 +1233,79 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/STAC GEOTiff Pipeline')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "GEOTiff Source to Dest",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "GEOTIFF_STAC_DEST",
+									"wildcardFileName": "*.tif",
+									"deleteFilesAfterCompletion": false
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "STAC_Source_GEOTiff",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "STAC_Dest_GEOTiff",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"GEOTiff_Destination_Dir": {
+						"type": "string",
+						"defaultValue": "https://innoaoaidata.blob.core.windows.net/liamdest/GEOTIFF_STAC_DEST/"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/STAC_Source_GEOTiff')]",
+				"[concat(variables('workspaceId'), '/datasets/STAC_Dest_GEOTiff')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/STAC Oblique Pipeline')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -1376,6 +1449,29 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/STAC_Dest_GEOTiff')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "innoaoaidata_STAC",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "GEOTIFF_STAC_DEST",
+						"container": "liamdest"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/innoaoaidata_STAC')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/STAC_Source')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -1390,6 +1486,29 @@
 					"location": {
 						"type": "AzureBlobStorageLocation",
 						"folderPath": "RBU_STAC_SOURCE",
+						"container": "liamsource"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/innoaoaidata_STAC')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/STAC_Source_GEOTiff')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "innoaoaidata_STAC",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "GEOTIFF_STAC_DEST",
 						"container": "liamsource"
 					}
 				}
@@ -5586,124 +5705,6 @@
 			},
 			"dependsOn": [],
 			"location": "southcentralus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/STAC GEOTiff Pipeline')]",
-			"type": "Microsoft.Synapse/workspaces/pipelines",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"activities": [
-					{
-						"name": "GEOTiff Source to Dest",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "BinarySource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFileName": "*.tif",
-									"deleteFilesAfterCompletion": false
-								},
-								"formatSettings": {
-									"type": "BinaryReadSettings"
-								}
-							},
-							"sink": {
-								"type": "BinarySink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "STAC_Source_GEOTiff",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "STAC_Dest_GEOTiff",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"parameters": {
-					"GEOTiff_Destination_Dir": {
-						"type": "string",
-						"defaultValue": "https://innoaoaidata.blob.core.windows.net/liamdest/GEOTIFF_STAC_DEST/"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/datasets/STAC_Source_GEOTiff')]",
-				"[concat(variables('workspaceId'), '/datasets/STAC_Dest_GEOTiff')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/STAC_Dest_GEOTiff')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "innoaoaidata_STAC",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"folderPath": "GEOTIFF_STAC_DEST",
-						"container": "liamdest"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/innoaoaidata_STAC')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/STAC_Source_GEOTiff')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "innoaoaidata_STAC",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"folderPath": "GEOTIFF_STAC_DEST",
-						"container": "liamsource"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/innoaoaidata_STAC')]"
-			]
 		}
 	]
 }
