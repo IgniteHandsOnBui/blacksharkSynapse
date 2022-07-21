@@ -1286,6 +1286,46 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "STACify_GEOTIFF",
+						"type": "SynapseNotebook",
+						"dependsOn": [
+							{
+								"activity": "GEOTiff Source to Dest",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "STACify_GEOTIFF",
+								"type": "NotebookReference"
+							},
+							"parameters": {
+								"GEOTIFF_Dest": {
+									"value": {
+										"value": "@pipeline().parameters.GEOTiff_Destination_Dir",
+										"type": "Expression"
+									},
+									"type": "string"
+								}
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "Geospatialspark",
+								"type": "BigDataPoolReference"
+							}
+						}
 					}
 				],
 				"policy": {
@@ -1302,7 +1342,9 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/datasets/STAC_Source_GEOTiff')]",
-				"[concat(variables('workspaceId'), '/datasets/STAC_Dest_GEOTiff')]"
+				"[concat(variables('workspaceId'), '/datasets/STAC_Dest_GEOTiff')]",
+				"[concat(variables('workspaceId'), '/notebooks/STACify_GEOTIFF')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/Geospatialspark')]"
 			]
 		},
 		{
@@ -3464,7 +3506,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "517fe173-e0a0-4ef1-9cb6-0e1e432a936c"
+						"spark.autotune.trackingId": "7f402eaf-b411-4f8e-9a03-f36924374ce4"
 					}
 				},
 				"metadata": {
@@ -3489,20 +3531,31 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### This script was built of imagery being ingested from DroneDeploy"
+						]
+					},
+					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"GEOTIFF_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/GEOTIFF_STAC_DEST/\""
 						],
 						"outputs": [],
-						"execution_count": 29
+						"execution_count": 86
 					},
 					{
 						"cell_type": "code",
@@ -3537,7 +3590,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 16
+						"execution_count": 73
 					},
 					{
 						"cell_type": "code",
@@ -3573,7 +3626,7 @@
 							"    return file_array"
 						],
 						"outputs": [],
-						"execution_count": 30
+						"execution_count": 74
 					},
 					{
 						"cell_type": "code",
@@ -3605,7 +3658,6 @@
 							"\r\n",
 							"    tiff = rasterio.open(tiff_path)\r\n",
 							"    filetags = tiff.tags()\r\n",
-							"    print(filetags)\r\n",
 							"    tiff.close()\r\n",
 							"\r\n",
 							"    GDAL_dd_acquisitionStartDate = filetags.get(\"acquisitionEndDate\")\r\n",
@@ -3614,7 +3666,7 @@
 							"    return GDAL_dd_acquisitionStartDate, GDAL_dd_acquisitionEndDate"
 						],
 						"outputs": [],
-						"execution_count": 38
+						"execution_count": 85
 					},
 					{
 						"cell_type": "code",
@@ -3630,10 +3682,19 @@
 							}
 						},
 						"source": [
-							"get_tiff_datetime('/synfs/92/STAC_Dest/GEOTIFF_STAC_DEST/TemplinHwymap_Orthomosaic_export_SatJan15091105977530.tif')"
+							"def get_tiff_sensor(tiff_path):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to return \"RGB\"\r\n",
+							"    Arguments:\r\n",
+							"        jpeg_path: not used, but still good practice if we want to extend this function\r\n",
+							"    Returns:\r\n",
+							"        RGB as a string\r\n",
+							"    \"\"\"\r\n",
+							"    sensor_type = \"RGB\"\r\n",
+							"    return sensor_type"
 						],
 						"outputs": [],
-						"execution_count": 39
+						"execution_count": 81
 					},
 					{
 						"cell_type": "code",
@@ -3655,11 +3716,26 @@
 							"def tiff_to_cog(tiff_path):\r\n",
 							"    options = gdal.TranslateOptions(format='COG',creationOptions = ['TFW=YES', 'COMPRESS=JPEG'])\r\n",
 							"    newname = os.path.splitext(tiff_path)[0]+\"_COG.tif\"\r\n",
-							"    gdal.Translate(newname, tiff_path, options=options)\r\n",
+							"\r\n",
+							"    #Getting Datetime\r\n",
+							"    start_dt, end_dt = get_tiff_datetime(tiff_path)\r\n",
+							"\r\n",
+							"    #Getting Sensor\r\n",
+							"    sensor = get_tiff_sensor(tiff_path)\r\n",
+							"\r\n",
+							"    dst = gdal.Translate(newname, tiff_path, options=options)\r\n",
+							"    dst.SetMetadata( {'datetime': 'NULL', 'start_datetime': start_dt, 'end_datetime': end_dt, 'sensor': sensor})\r\n",
+							"    dst = None\r\n",
+							"    \r\n",
+							"    #Remove old file\r\n",
+							"    os.remove(tiff_path)\r\n",
+							"    #Rename COG to old file name\r\n",
+							"    os.rename(newname, tiff_path)\r\n",
+							"\r\n",
 							"    print(\"Converted\")"
 						],
 						"outputs": [],
-						"execution_count": 66
+						"execution_count": 93
 					},
 					{
 						"cell_type": "code",
@@ -3695,10 +3771,10 @@
 							"    print(filename + \" is currently being converted to COG\")\r\n",
 							"    print(\"\")\r\n",
 							"\r\n",
-							"    tiff_to_cog(tiff)"
+							"    #tiff_to_cog(tiff)"
 						],
 						"outputs": [],
-						"execution_count": 67
+						"execution_count": 98
 					},
 					{
 						"cell_type": "code",
@@ -3744,7 +3820,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "8a0b79d4-e4d9-4d38-bfea-5760e824a091"
+						"spark.autotune.trackingId": "5a5ef098-a786-46c0-8ffc-9f983fe23d0f"
 					}
 				},
 				"metadata": {
@@ -3784,7 +3860,7 @@
 							}
 						},
 						"source": [
-							"The goal of this notebook is to test a productionized version of the STAC_PreProcessing_Guide"
+							"### This script was built for the use case of imagery being ingested from RBU Drone Program for EHSR"
 						]
 					},
 					{
