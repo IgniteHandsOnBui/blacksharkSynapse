@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1d5cee39-36d7-4620-8718-a8bf9caf1d20"
+				"spark.autotune.trackingId": "7f402eaf-b411-4f8e-9a03-f36924374ce4"
 			}
 		},
 		"metadata": {
@@ -49,11 +49,24 @@
 		},
 		"cells": [
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### This script was built of imagery being ingested from DroneDeploy"
+				]
+			},
+			{
 				"cell_type": "code",
 				"source": [
 					"GEOTIFF_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/GEOTIFF_STAC_DEST/\""
 				],
-				"execution_count": 72
+				"execution_count": 86
 			},
 			{
 				"cell_type": "code",
@@ -154,7 +167,6 @@
 					"\r\n",
 					"    tiff = rasterio.open(tiff_path)\r\n",
 					"    filetags = tiff.tags()\r\n",
-					"    print(filetags)\r\n",
 					"    tiff.close()\r\n",
 					"\r\n",
 					"    GDAL_dd_acquisitionStartDate = filetags.get(\"acquisitionEndDate\")\r\n",
@@ -162,7 +174,7 @@
 					"\r\n",
 					"    return GDAL_dd_acquisitionStartDate, GDAL_dd_acquisitionEndDate"
 				],
-				"execution_count": 76
+				"execution_count": 85
 			},
 			{
 				"cell_type": "code",
@@ -178,9 +190,18 @@
 					}
 				},
 				"source": [
-					"get_tiff_datetime('/synfs/92/STAC_Dest/GEOTIFF_STAC_DEST/TemplinHwymap_Orthomosaic_export_SatJan15091105977530.tif')"
+					"def get_tiff_sensor(tiff_path):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to return \"RGB\"\r\n",
+					"    Arguments:\r\n",
+					"        jpeg_path: not used, but still good practice if we want to extend this function\r\n",
+					"    Returns:\r\n",
+					"        RGB as a string\r\n",
+					"    \"\"\"\r\n",
+					"    sensor_type = \"RGB\"\r\n",
+					"    return sensor_type"
 				],
-				"execution_count": 78
+				"execution_count": 81
 			},
 			{
 				"cell_type": "code",
@@ -202,14 +223,25 @@
 					"def tiff_to_cog(tiff_path):\r\n",
 					"    options = gdal.TranslateOptions(format='COG',creationOptions = ['TFW=YES', 'COMPRESS=JPEG'])\r\n",
 					"    newname = os.path.splitext(tiff_path)[0]+\"_COG.tif\"\r\n",
+					"\r\n",
+					"    #Getting Datetime\r\n",
 					"    start_dt, end_dt = get_tiff_datetime(tiff_path)\r\n",
 					"\r\n",
+					"    #Getting Sensor\r\n",
+					"    sensor = get_tiff_sensor(tiff_path)\r\n",
+					"\r\n",
 					"    dst = gdal.Translate(newname, tiff_path, options=options)\r\n",
-					"    dst.SetMetadata( {'datetime': 'NULL', 'start_datetime': start_dt, 'end_datetime': end_dt})\r\n",
+					"    dst.SetMetadata( {'datetime': 'NULL', 'start_datetime': start_dt, 'end_datetime': end_dt, 'sensor': sensor})\r\n",
 					"    dst = None\r\n",
+					"    \r\n",
+					"    #Remove old file\r\n",
+					"    os.remove(tiff_path)\r\n",
+					"    #Rename COG to old file name\r\n",
+					"    os.rename(newname, tiff_path)\r\n",
+					"\r\n",
 					"    print(\"Converted\")"
 				],
-				"execution_count": 79
+				"execution_count": 93
 			},
 			{
 				"cell_type": "code",
@@ -245,9 +277,9 @@
 					"    print(filename + \" is currently being converted to COG\")\r\n",
 					"    print(\"\")\r\n",
 					"\r\n",
-					"    tiff_to_cog(tiff)"
+					"    #tiff_to_cog(tiff)"
 				],
-				"execution_count": 80
+				"execution_count": 98
 			},
 			{
 				"cell_type": "code",

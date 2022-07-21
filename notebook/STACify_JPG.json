@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8a0b79d4-e4d9-4d38-bfea-5760e824a091"
+				"spark.autotune.trackingId": "5a5ef098-a786-46c0-8ffc-9f983fe23d0f"
 			}
 		},
 		"metadata": {
@@ -58,7 +58,7 @@
 					}
 				},
 				"source": [
-					"The goal of this notebook is to test a productionized version of the STAC_PreProcessing_Guide"
+					"### This script was built for the use case of imagery being ingested from RBU Drone Program for EHSR"
 				]
 			},
 			{
