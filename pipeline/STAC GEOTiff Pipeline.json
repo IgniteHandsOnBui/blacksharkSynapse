@@ -48,6 +48,46 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "STACify_GEOTIFF",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "GEOTiff Source to Dest",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "STACify_GEOTIFF",
+						"type": "NotebookReference"
+					},
+					"parameters": {
+						"GEOTIFF_Dest": {
+							"value": {
+								"value": "@pipeline().parameters.GEOTiff_Destination_Dir",
+								"type": "Expression"
+							},
+							"type": "string"
+						}
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "Geospatialspark",
+						"type": "BigDataPoolReference"
+					}
+				}
 			}
 		],
 		"parameters": {
