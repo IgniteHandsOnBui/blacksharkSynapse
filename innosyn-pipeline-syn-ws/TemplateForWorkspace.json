@@ -3506,7 +3506,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "7f402eaf-b411-4f8e-9a03-f36924374ce4"
+						"spark.autotune.trackingId": "2b8de1e2-7e6d-42f3-9bab-2e44b539f917"
 					}
 				},
 				"metadata": {
@@ -3531,7 +3531,8 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56
+						"memory": 56,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -3551,11 +3552,12 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"GEOTIFF_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/GEOTIFF_STAC_DEST/\""
 						],
 						"outputs": [],
-						"execution_count": 86
+						"execution_count": 99
 					},
 					{
 						"cell_type": "code",
@@ -3590,7 +3592,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 73
+						"execution_count": 100
 					},
 					{
 						"cell_type": "code",
@@ -3626,7 +3628,7 @@
 							"    return file_array"
 						],
 						"outputs": [],
-						"execution_count": 74
+						"execution_count": 101
 					},
 					{
 						"cell_type": "code",
@@ -3666,7 +3668,7 @@
 							"    return GDAL_dd_acquisitionStartDate, GDAL_dd_acquisitionEndDate"
 						],
 						"outputs": [],
-						"execution_count": 85
+						"execution_count": 102
 					},
 					{
 						"cell_type": "code",
@@ -3694,7 +3696,7 @@
 							"    return sensor_type"
 						],
 						"outputs": [],
-						"execution_count": 81
+						"execution_count": 103
 					},
 					{
 						"cell_type": "code",
@@ -3714,7 +3716,7 @@
 							"import os\r\n",
 							"\r\n",
 							"def tiff_to_cog(tiff_path):\r\n",
-							"    options = gdal.TranslateOptions(format='COG',creationOptions = ['TFW=YES', 'COMPRESS=JPEG'])\r\n",
+							"    options = gdal.TranslateOptions(format='COG',creationOptions = ['COMPRESS=JPEG'])\r\n",
 							"    newname = os.path.splitext(tiff_path)[0]+\"_COG.tif\"\r\n",
 							"\r\n",
 							"    #Getting Datetime\r\n",
@@ -3735,7 +3737,7 @@
 							"    print(\"Converted\")"
 						],
 						"outputs": [],
-						"execution_count": 93
+						"execution_count": 109
 					},
 					{
 						"cell_type": "code",
@@ -3771,10 +3773,10 @@
 							"    print(filename + \" is currently being converted to COG\")\r\n",
 							"    print(\"\")\r\n",
 							"\r\n",
-							"    #tiff_to_cog(tiff)"
+							"    tiff_to_cog(tiff)"
 						],
 						"outputs": [],
-						"execution_count": 98
+						"execution_count": 108
 					},
 					{
 						"cell_type": "code",
@@ -3820,7 +3822,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "5a5ef098-a786-46c0-8ffc-9f983fe23d0f"
+						"spark.autotune.trackingId": "a507a6b3-94d4-4a00-9048-825ac6b4a075"
 					}
 				},
 				"metadata": {
@@ -3845,7 +3847,8 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56
+						"memory": 56,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
