@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "GEOTIFF_STAC_DEST",
+				"folderPath": "RBU_STAC_DEST",
 				"container": "liamdest"
 			}
 		}
