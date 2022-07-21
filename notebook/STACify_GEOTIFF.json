@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "69a3f9fc-1627-4782-9686-7858750a0a2d"
+				"spark.autotune.trackingId": "6a5b0805-c8b1-4922-801e-389dba562a82"
 			}
 		},
 		"metadata": {
@@ -200,12 +200,12 @@
 					"import os\r\n",
 					"\r\n",
 					"def tiff_to_cog(tiff_path):\r\n",
-					"    options = gdal.TranslateOptions(format='COG')\r\n",
+					"    options = gdal.TranslateOptions(format='COG',creationOptions = ['TFW=YES', 'COMPRESS=JPEG'])\r\n",
 					"    newname = os.path.splitext(tiff_path)[0]+\"_COG.tif\"\r\n",
 					"    gdal.Translate(newname, tiff_path, options=options)\r\n",
 					"    print(\"Converted\")"
 				],
-				"execution_count": 64
+				"execution_count": 66
 			},
 			{
 				"cell_type": "code",
@@ -243,7 +243,7 @@
 					"\r\n",
 					"    tiff_to_cog(tiff)"
 				],
-				"execution_count": 65
+				"execution_count": 67
 			},
 			{
 				"cell_type": "code",
