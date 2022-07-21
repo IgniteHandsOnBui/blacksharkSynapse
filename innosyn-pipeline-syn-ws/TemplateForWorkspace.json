@@ -1256,7 +1256,7 @@
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
-									"wildcardFileName": "*.TIF",
+									"wildcardFileName": "*.tif",
 									"deleteFilesAfterCompletion": false
 								},
 								"formatSettings": {
