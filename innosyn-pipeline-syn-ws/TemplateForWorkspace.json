@@ -1410,11 +1410,6 @@
 						"defaultValue": "https://innoaoaidata.blob.core.windows.net/liamdest/RBU_STAC_DEST/"
 					}
 				},
-				"variables": {
-					"TestOut": {
-						"type": "String"
-					}
-				},
 				"annotations": []
 			},
 			"dependsOn": [
