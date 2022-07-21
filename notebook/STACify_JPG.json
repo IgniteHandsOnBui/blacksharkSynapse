@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "606e2a5d-006a-48ec-ae5c-f16e9371c121"
+				"spark.autotune.trackingId": "73359fba-c812-491b-b89b-6ea0e03ce2a6"
 			}
 		},
 		"metadata": {
@@ -76,7 +76,7 @@
 					"tags": []
 				},
 				"source": [
-					"JPEG_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/RBU_STAC_DEST/\""
+					"JPG_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/RBU_STAC_DEST/\""
 				],
 				"execution_count": 85
 			},
@@ -95,7 +95,7 @@
 				},
 				"source": [
 					"from urllib.parse import urlparse\r\n",
-					"parsed_url = urlparse(JPEG_Dest)\r\n",
+					"parsed_url = urlparse(JPG_Dest)\r\n",
 					"\r\n",
 					"accountName = parsed_url.netloc\r\n",
 					"container = parsed_url.path.split(\"/\")[1]\r\n",
