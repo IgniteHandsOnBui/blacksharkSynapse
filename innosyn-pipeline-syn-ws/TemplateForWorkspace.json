@@ -1256,7 +1256,7 @@
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
-									"wildcardFolderPath": "GEOTIFF_STAC_DEST",
+									"wildcardFolderPath": "GEOTIFF_STAC_DEST*",
 									"wildcardFileName": "*.tif",
 									"deleteFilesAfterCompletion": false
 								},
