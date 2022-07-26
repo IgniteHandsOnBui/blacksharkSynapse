@@ -1,5 +1,5 @@
 {
-	"name": "STACify_XYZ",
+	"name": "STACify_LAS",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "754fc8d8-6d61-409e-9350-c3f9f7bdd520"
+				"spark.autotune.trackingId": "17bfef2d-0d1e-4cd6-b8b8-0003e222e4b3"
 			}
 		},
 		"metadata": {
@@ -51,7 +51,7 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"XYZ_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/XYZ_STAC_DEST/\""
+					"LAS_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/LAS_STAC_DEST/\""
 				],
 				"execution_count": 1
 			},
@@ -70,7 +70,7 @@
 				},
 				"source": [
 					"from urllib.parse import urlparse\r\n",
-					"parsed_url = urlparse(XYZ_Dest)\r\n",
+					"parsed_url = urlparse(LAS_Dest)\r\n",
 					"\r\n",
 					"accountName = parsed_url.netloc\r\n",
 					"container = parsed_url.path.split(\"/\")[1]\r\n",
