@@ -1372,6 +1372,8 @@
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
+									"modifiedDatetimeStart": "2022-07-26T00:00:00.486Z",
+									"modifiedDatetimeEnd": "2022-07-26T00:00:00.083Z",
 									"wildcardFileName": "*.JPG",
 									"deleteFilesAfterCompletion": false
 								},
@@ -1451,6 +1453,12 @@
 					"JPG_Destination_Dir": {
 						"type": "string",
 						"defaultValue": "https://innoaoaidata.blob.core.windows.net/liamdest/RBU_STAC_DEST/"
+					},
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
 					}
 				},
 				"annotations": []
@@ -3506,7 +3514,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "2b8de1e2-7e6d-42f3-9bab-2e44b539f917"
+						"spark.autotune.trackingId": "d0b151f1-8c0d-4340-b4d6-f698782c4436"
 					}
 				},
 				"metadata": {
@@ -3531,8 +3539,7 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -3552,7 +3559,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"GEOTIFF_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/GEOTIFF_STAC_DEST/\""
 						],
@@ -3822,7 +3828,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "a507a6b3-94d4-4a00-9048-825ac6b4a075"
+						"spark.autotune.trackingId": "5a5ef098-a786-46c0-8ffc-9f983fe23d0f"
 					}
 				},
 				"metadata": {
@@ -3847,8 +3853,7 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
