@@ -21,8 +21,14 @@
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
-							"modifiedDatetimeStart": "2022-07-26T00:00:00.486Z",
-							"modifiedDatetimeEnd": "2022-07-26T00:00:00.083Z",
+							"modifiedDatetimeStart": {
+								"value": "@pipeline().parameters.windowStart",
+								"type": "Expression"
+							},
+							"modifiedDatetimeEnd": {
+								"value": "@pipeline().parameters.windowEnd",
+								"type": "Expression"
+							},
 							"wildcardFileName": "*.JPG",
 							"deleteFilesAfterCompletion": false
 						},
