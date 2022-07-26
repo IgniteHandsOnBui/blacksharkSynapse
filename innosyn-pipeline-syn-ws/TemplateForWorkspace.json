@@ -4328,6 +4328,215 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/STACify_LAS')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "Geospatialspark",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "756572b8-4115-4bf2-8de1-fc52b3fe6f93"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+						"name": "Geospatialspark",
+						"type": "Spark",
+						"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"LAS_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/LAS_STAC_DEST/\""
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from urllib.parse import urlparse\r\n",
+							"parsed_url = urlparse(LAS_Dest)\r\n",
+							"\r\n",
+							"accountName = parsed_url.netloc\r\n",
+							"container = parsed_url.path.split(\"/\")[1]\r\n",
+							"\r\n",
+							"try:\r\n",
+							"    mssparkutils.fs.mount(\r\n",
+							"        f\"wasbs://{container}@{accountName}\",\r\n",
+							"        \"/STAC_Dest\",\r\n",
+							"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
+							"    )\r\n",
+							"    print(\"Successful mount of source to /STAC_Dest\")\r\n",
+							"except:\r\n",
+							"    print(\"FAILED TO MOUNT STAC DEST\")\r\n",
+							"    print(\"Either due to the drive already been mounted, or because the path is incorrect.\")\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Return array of all files in directory of type\r\n",
+							"import os\r\n",
+							"\r\n",
+							"def get_blob_file_list(directory, filetype):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to get a full list of files in a directory based on file type\r\n",
+							"    Arguments:\r\n",
+							"        directory: Directory path of folder you want to pull files from\r\n",
+							"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\" or \".JSON\"\r\n",
+							"    Returns:\r\n",
+							"        Array of filepaths/filename w/extension\r\n",
+							"    \"\"\"\r\n",
+							"    file_array = []\r\n",
+							"    for file in os.listdir(directory):\r\n",
+							"        file_ext = os.path.splitext(file)[1]\r\n",
+							"        if file_ext == filetype:\r\n",
+							"            file_array.append(directory+file)\r\n",
+							"    return file_array"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### Metadata to add:\r\n",
+							"1. count - Number of points in this item\r\n",
+							"2. type (lidar, eopc, radar, sonar, other)\r\n",
+							"3. encoding (LASZip ...?)\r\n",
+							"4. schemas \r\n",
+							"5. density\r\n",
+							"6. statistics\r\n",
+							"\r\n",
+							"\r\n",
+							"Schema Object - A sequential array of Items that define the dimensions or channels of the point cloud, their types, and their sizes (in full bytes).\r\n",
+							"1. name (Red, Green, Blue, GpsTime, X, Y, Z, NumberOfReturns,ScanDirectionFlag)\r\n",
+							"2. size (1, 2, 8 ...)\r\n",
+							"3. type (unsigned, floating, ?)\r\n",
+							"\r\n",
+							"Statistics Object:\r\n",
+							"1. name\r\n",
+							"2. position\r\n",
+							"3. average\r\n",
+							"4. count\r\n",
+							"5. maximum\r\n",
+							"6. minimum\r\n",
+							"7. stddev\r\n",
+							"8. variance"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import pdal"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/cv_pumpjack_clip')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
