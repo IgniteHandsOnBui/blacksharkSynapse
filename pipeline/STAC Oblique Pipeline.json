@@ -21,6 +21,8 @@
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
+							"modifiedDatetimeStart": "2022-07-26T00:00:00.486Z",
+							"modifiedDatetimeEnd": "2022-07-26T00:00:00.083Z",
 							"wildcardFileName": "*.JPG",
 							"deleteFilesAfterCompletion": false
 						},
@@ -94,6 +96,12 @@
 			"JPG_Destination_Dir": {
 				"type": "string",
 				"defaultValue": "https://innoaoaidata.blob.core.windows.net/liamdest/RBU_STAC_DEST/"
+			},
+			"windowStart": {
+				"type": "string"
+			},
+			"windowEnd": {
+				"type": "string"
 			}
 		},
 		"annotations": []
