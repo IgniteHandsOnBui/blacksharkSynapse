@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "729fabb8-6bef-41dc-8e8e-163536a516ce"
+				"spark.autotune.trackingId": "754fc8d8-6d61-409e-9350-c3f9f7bdd520"
 			}
 		},
 		"metadata": {
@@ -70,7 +70,7 @@
 				},
 				"source": [
 					"from urllib.parse import urlparse\r\n",
-					"parsed_url = urlparse(JPG_Dest)\r\n",
+					"parsed_url = urlparse(XYZ_Dest)\r\n",
 					"\r\n",
 					"accountName = parsed_url.netloc\r\n",
 					"container = parsed_url.path.split(\"/\")[1]\r\n",
@@ -87,7 +87,7 @@
 					"    print(\"Either due to the drive already been mounted, or because the path is incorrect.\")\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -122,7 +122,60 @@
 					"            file_array.append(directory+file)\r\n",
 					"    return file_array"
 				],
-				"execution_count": null
+				"execution_count": 5
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Metadata to add:\r\n",
+					"1. count - Number of points in this item\r\n",
+					"2. type (lidar, eopc, radar, sonar, other)\r\n",
+					"3. encoding (LASZip ...?)\r\n",
+					"4. schemas \r\n",
+					"5. density\r\n",
+					"6. statistics\r\n",
+					"\r\n",
+					"\r\n",
+					"Schema Object - A sequential array of Items that define the dimensions or channels of the point cloud, their types, and their sizes (in full bytes).\r\n",
+					"1. name (Red, Green, Blue, GpsTime, X, Y, Z, NumberOfReturns,ScanDirectionFlag)\r\n",
+					"2. size (1, 2, 8 ...)\r\n",
+					"3. type (unsigned, floating, ?)\r\n",
+					"\r\n",
+					"Statistics Object:\r\n",
+					"1. name\r\n",
+					"2. position\r\n",
+					"3. average\r\n",
+					"4. count\r\n",
+					"5. maximum\r\n",
+					"6. minimum\r\n",
+					"7. stddev\r\n",
+					"8. variance"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import pdal"
+				],
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
