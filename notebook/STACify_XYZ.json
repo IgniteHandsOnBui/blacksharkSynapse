@@ -1,0 +1,147 @@
+{
+	"name": "STACify_XYZ",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "Geospatialspark",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "56g",
+			"driverCores": 8,
+			"executorMemory": "56g",
+			"executorCores": 8,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "729fabb8-6bef-41dc-8e8e-163536a516ce"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+				"name": "Geospatialspark",
+				"type": "Spark",
+				"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 8,
+				"memory": 56,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"XYZ_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/XYZ_STAC_DEST/\""
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from urllib.parse import urlparse\r\n",
+					"parsed_url = urlparse(JPG_Dest)\r\n",
+					"\r\n",
+					"accountName = parsed_url.netloc\r\n",
+					"container = parsed_url.path.split(\"/\")[1]\r\n",
+					"\r\n",
+					"try:\r\n",
+					"    mssparkutils.fs.mount(\r\n",
+					"        f\"wasbs://{container}@{accountName}\",\r\n",
+					"        \"/STAC_Dest\",\r\n",
+					"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
+					"    )\r\n",
+					"    print(\"Successful mount of source to /STAC_Dest\")\r\n",
+					"except:\r\n",
+					"    print(\"FAILED TO MOUNT STAC DEST\")\r\n",
+					"    print(\"Either due to the drive already been mounted, or because the path is incorrect.\")\r\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Return array of all files in directory of type\r\n",
+					"import os\r\n",
+					"\r\n",
+					"def get_blob_file_list(directory, filetype):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to get a full list of files in a directory based on file type\r\n",
+					"    Arguments:\r\n",
+					"        directory: Directory path of folder you want to pull files from\r\n",
+					"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\" or \".JSON\"\r\n",
+					"    Returns:\r\n",
+					"        Array of filepaths/filename w/extension\r\n",
+					"    \"\"\"\r\n",
+					"    file_array = []\r\n",
+					"    for file in os.listdir(directory):\r\n",
+					"        file_ext = os.path.splitext(file)[1]\r\n",
+					"        if file_ext == filetype:\r\n",
+					"            file_array.append(directory+file)\r\n",
+					"    return file_array"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
