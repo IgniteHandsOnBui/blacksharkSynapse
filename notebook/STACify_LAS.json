@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "17bfef2d-0d1e-4cd6-b8b8-0003e222e4b3"
+				"spark.autotune.trackingId": "b59e1503-ee98-49c2-b869-59a530da3a55"
 			}
 		},
 		"metadata": {
@@ -173,7 +173,17 @@
 					}
 				},
 				"source": [
-					"import pdal"
+					"import pdal\r\n",
+					"import subprocess\r\n",
+					"import json\r\n",
+					"\r\n",
+					"result = subprocess.run(['pdal', 'info', '/path/to/file.ply'],\r\n",
+					"                        stderr = subprocess.PIPE,  # stderr and stdout get\r\n",
+					"                        stdout = subprocess.PIPE)  # captured as bytestrings\r\n",
+					"\r\n",
+					"# decode stdout from bytestring and convert to a dictionary\r\n",
+					"json_result = json.loads(result.stdout.decode())\r\n",
+					"print(json_result)"
 				],
 				"execution_count": 7
 			},
