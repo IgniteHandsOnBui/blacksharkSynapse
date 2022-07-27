@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5a5ef098-a786-46c0-8ffc-9f983fe23d0f"
+				"spark.autotune.trackingId": "c446c111-93ab-4003-bbfc-fc0a91a07127"
 			}
 		},
 		"metadata": {
@@ -78,9 +78,9 @@
 					]
 				},
 				"source": [
-					"JPG_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/RBU_STAC_DEST/\""
+					"JPG_Dest = \"https://innoaoaidata.blob.core.windows.net/innosource/temp/\""
 				],
-				"execution_count": 85
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -114,7 +114,7 @@
 					"    print(\"Either due to the drive already been mounted, or because the path is incorrect.\")\r\n",
 					""
 				],
-				"execution_count": 86
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
