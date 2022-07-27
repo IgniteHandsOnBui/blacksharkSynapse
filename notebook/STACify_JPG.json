@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c446c111-93ab-4003-bbfc-fc0a91a07127"
+				"spark.autotune.trackingId": "08fe43c5-05eb-412d-8ea9-e47484aac08f"
 			}
 		},
 		"metadata": {
@@ -78,9 +78,9 @@
 					]
 				},
 				"source": [
-					"JPG_Dest = \"https://innoaoaidata.blob.core.windows.net/innosource/temp/\""
+					"JPG_Dest = \"https://innoaoaidata.blob.core.windows.net/innosource/temp_dest/\""
 				],
-				"execution_count": 1
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
