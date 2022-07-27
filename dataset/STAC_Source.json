@@ -10,8 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "RBU_STAC_SOURCE",
-				"container": "liamsource"
+				"folderPath": "temp",
+				"container": "innosource"
 			}
 		}
 	}
