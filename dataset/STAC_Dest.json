@@ -10,8 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "RBU_STAC_DEST",
-				"container": "liamdest"
+				"folderPath": "temp_dest",
+				"container": "innosource"
 			}
 		}
 	}
