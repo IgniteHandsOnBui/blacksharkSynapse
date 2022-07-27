@@ -1372,14 +1372,6 @@
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
-									"modifiedDatetimeStart": {
-										"value": "@pipeline().parameters.windowStart",
-										"type": "Expression"
-									},
-									"modifiedDatetimeEnd": {
-										"value": "@pipeline().parameters.windowEnd",
-										"type": "Expression"
-									},
 									"wildcardFileName": "*.JPG",
 									"deleteFilesAfterCompletion": false
 								},
@@ -1490,8 +1482,8 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": "RBU_STAC_DEST",
-						"container": "liamdest"
+						"folderPath": "temp_dest",
+						"container": "innosource"
 					}
 				}
 			},
@@ -1536,8 +1528,8 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": "RBU_STAC_SOURCE",
-						"container": "liamsource"
+						"folderPath": "temp",
+						"container": "innosource"
 					}
 				}
 			},
@@ -3834,7 +3826,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "5a5ef098-a786-46c0-8ffc-9f983fe23d0f"
+						"spark.autotune.trackingId": "08fe43c5-05eb-412d-8ea9-e47484aac08f"
 					}
 				},
 				"metadata": {
@@ -3859,7 +3851,8 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56
+						"memory": 56,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -3894,10 +3887,10 @@
 							]
 						},
 						"source": [
-							"JPG_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/RBU_STAC_DEST/\""
+							"JPG_Dest = \"https://innoaoaidata.blob.core.windows.net/innosource/temp_dest/\""
 						],
 						"outputs": [],
-						"execution_count": 85
+						"execution_count": 2
 					},
 					{
 						"cell_type": "code",
@@ -3932,7 +3925,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 86
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -4348,7 +4341,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "756572b8-4115-4bf2-8de1-fc52b3fe6f93"
+						"spark.autotune.trackingId": "b59e1503-ee98-49c2-b869-59a530da3a55"
 					}
 				},
 				"metadata": {
@@ -4373,15 +4366,13 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"LAS_Dest = \"https://innoaoaidata.blob.core.windows.net/liamdest/LAS_STAC_DEST/\""
 						],
@@ -4508,7 +4499,17 @@
 							}
 						},
 						"source": [
-							"import pdal"
+							"import pdal\r\n",
+							"import subprocess\r\n",
+							"import json\r\n",
+							"\r\n",
+							"result = subprocess.run(['pdal', 'info', '/path/to/file.ply'],\r\n",
+							"                        stderr = subprocess.PIPE,  # stderr and stdout get\r\n",
+							"                        stdout = subprocess.PIPE)  # captured as bytestrings\r\n",
+							"\r\n",
+							"# decode stdout from bytestring and convert to a dictionary\r\n",
+							"json_result = json.loads(result.stdout.decode())\r\n",
+							"print(json_result)"
 						],
 						"outputs": [],
 						"execution_count": 7
