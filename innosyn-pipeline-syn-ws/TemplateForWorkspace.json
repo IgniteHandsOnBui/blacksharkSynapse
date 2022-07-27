@@ -1450,7 +1450,7 @@
 				"parameters": {
 					"JPG_Destination_Dir": {
 						"type": "string",
-						"defaultValue": "https://innoaoaidata.blob.core.windows.net/liamdest/RBU_STAC_DEST/"
+						"defaultValue": "https://innoaoaidata.blob.core.windows.net/innosource/temp_dest/"
 					},
 					"windowStart": {
 						"type": "string"
@@ -3851,8 +3851,7 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
