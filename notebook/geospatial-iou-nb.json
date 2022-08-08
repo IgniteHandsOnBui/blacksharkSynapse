@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2d5856a9-cc83-495b-acb7-6f96bf2edb2d"
+				"spark.autotune.trackingId": "2509a8d7-41b0-40e3-bcc2-a12b55ac8e4d"
 			}
 		},
 		"metadata": {
@@ -50,18 +50,21 @@
 		"cells": [
 			{
 				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
 				"source": [
-					"import shapely\r\n",
-					"from shapely.geometry import Point, Polygon, LineString, GeometryCollection\r\n",
-					"import numpy as np\r\n",
-					"import geopandas as gpd\r\n",
-					"import cv2\r\n",
-					"import matplotlib.pyplot as plt\r\n",
-					"import rasterio.warp\r\n",
-					"from shapely.geometry import shape\r\n",
-					"import fiona"
+					"import rasterio"
 				],
-				"execution_count": 29
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -90,7 +93,7 @@
 					"    print(\"FAILED TO MOUNT\")\r\n",
 					"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
 				],
-				"execution_count": 2
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -126,7 +129,7 @@
 					"            file_array.append(directory+file)\r\n",
 					"    return file_array"
 				],
-				"execution_count": 3
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -146,10 +149,10 @@
 					"\r\n",
 					"jobId = mssparkutils.env.getJobId()\r\n",
 					"img_path = f'/synfs/'+jobId+'/dinnosa/geospatial_transformation/'\r\n",
-					"outarray = get_blob_file_list(img_path, \".shp\")\r\n",
+					"outarray = get_blob_file_list(img_path, \".tif\")\r\n",
 					"outarray"
 				],
-				"execution_count": 14
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -165,9 +168,62 @@
 					}
 				},
 				"source": [
-					"gdf_cali = gpd.read_file('/synfs/70/dinnosa/geospatial_transformation/EXAMPLE_AOI.geojson')\r\n",
-					"\r\n",
+					"filepath =('/synfs/116/dinnosa/geospatial_transformation/01.tif')\r\n",
 					""
+				],
+				"execution_count": 13
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"crs = rasterio.crs.CRS({\"init\": \"epsg:4326\"})"
+				],
+				"execution_count": 19
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"src.name"
+				],
+				"execution_count": 22
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"src.mode"
 				],
 				"execution_count": 23
 			},
@@ -185,44 +241,9 @@
 					}
 				},
 				"source": [
-					" # align on projection\r\n",
-					"\r\n",
-					"california_aoi_path = (img_path + 'Cali_sub.shp')\r\n",
-					"gpkg_aoi_path = (img_path + 'gpkg_00.shp')\r\n",
-					"\r\n",
-					"# https://gis.stackexchange.com/questions/266098/how-to-convert-a-geoseries-to-a-geodataframe-with-geopandas\r\n",
-					"\r\n",
-					"polys_cali = []\r\n",
-					"for pol in fiona.open(california_aoi_path):\r\n",
-					"    poly = shape(pol['geometry'])\r\n",
-					"    if isinstance(poly, MultiPolygon):\r\n",
-					"        polys_cali += poly\r\n",
-					"    else:\r\n",
-					"        polys_cali.append(poly)\r\n",
-					"mp_cali = MultiPolygon(polys_cali)\r\n",
-					"\r\n",
-					"polys_gpkg = []\r\n",
-					"for pol in fiona.open(gpkg_aoi_path):\r\n",
-					"    poly = shape(pol['geometry'])\r\n",
-					"    if isinstance(poly, MultiPolygon):\r\n",
-					"        polys_gpkg += poly\r\n",
-					"    else:\r\n",
-					"        polys_gpkg.append(poly)\r\n",
-					"mp_gpkg = MultiPolygon(polys_gpkg)\r\n",
-					"\r\n",
-					"mp_gpkg\r\n",
-					"\r\n",
-					"# gdf_cali = gpd.read_file(mp_cali)\r\n",
-					"# gdf_gpkg = gpd.read_file(mp_gpkg)\r\n",
-					"\r\n",
-					"\r\n",
-					"# gdf_cali = gdf_cali.to_crs(4326)\r\n",
-					"# gdf_gpkg = gdf_gpkg.to_crs(4326)\r\n",
-					"\r\n",
-					"# gdf_cali.crs\r\n",
-					"# gdf_gpkg.crs"
+					"src.closed"
 				],
-				"execution_count": 33
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -238,9 +259,9 @@
 					}
 				},
 				"source": [
-					"mp_gpkg[0][]"
+					"src.bounds"
 				],
-				"execution_count": 34
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -256,22 +277,9 @@
 					}
 				},
 				"source": [
-					"from shapely.geometry import MultiPolygon\r\n",
-					"\r\n",
-					"\r\n",
-					"shapefile = ('/synfs/70/dinnosa/geospatial_transformation/Cali_sub.shp')\r\n",
-					"\r\n",
-					"\r\n",
-					"polys = []\r\n",
-					"for pol in fiona.open(shapefile):\r\n",
-					"    poly = shape(pol['geometry'])\r\n",
-					"    if isinstance(poly, MultiPolygon):\r\n",
-					"        polys += poly\r\n",
-					"    else:\r\n",
-					"        polys.append(poly)\r\n",
-					"mp = MultiPolygon(polys)"
+					"W = src.width"
 				],
-				"execution_count": 27
+				"execution_count": 30
 			},
 			{
 				"cell_type": "code",
@@ -287,12 +295,120 @@
 					}
 				},
 				"source": [
-					"f, ax = plt.subplots(1)\r\n",
-					"gdf_cali.plot(ax=ax)\r\n",
-					"#gdf_gpkg.plot(ax=ax,cmap=None,)\r\n",
-					"plt.show()"
+					"H =src.height"
 				],
-				"execution_count": 37
+				"execution_count": 31
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"src.dtype"
+				],
+				"execution_count": 35
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"new_dataset = rasterio.open(\r\n",
+					"    '/synfs/115/dinnosa/geospatial_transformation/01.tif',\r\n",
+					"    'w',\r\n",
+					"    driver='GTiff',\r\n",
+					"    height= H,\r\n",
+					"    width=W,\r\n",
+					"    count=1,\r\n",
+					"    dtype=Z.dtype,\r\n",
+					"    crs='epsg:4326',\r\n",
+					"    transform=transform,\r\n",
+					")"
+				],
+				"execution_count": 32
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import rasterio as rio\r\n",
+					"from rasterio.transform import from_gcps\r\n",
+					"from rasterio.control import GroundControlPoint"
+				],
+				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"tl = GroundControlPoint(3817, 2652\r\n",
+					", -118.959608, 35.427667)\r\n",
+					"bl = GroundControlPoint(3565, 4417, -118.959332, -118.959332, 35.427637)\r\n",
+					"br = GroundControlPoint(6913, 4685, -118.959303, 35.428006)\r\n",
+					"gcps = [tl, bl, br]"
+				],
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"transform = from_gcps(gcps)\r\n",
+					"crs = 'epsg:3857'\r\n",
+					"\r\n",
+					"with rio.open(filepath, 'r+') as ds:\r\n",
+					"    ds.crs = crs\r\n",
+					"    ds.transform = transform"
+				],
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
