@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9e25753f-5af8-417a-b8d5-e30402ca4c87"
+				"spark.autotune.trackingId": "672bfd70-f366-4d29-aca0-eb01a069a1d7"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 					"    print(\"FAILED TO MOUNT\")\r\n",
 					"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
 				],
-				"execution_count": 185
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -95,7 +95,7 @@
 					"src = rasterio.open(img_path)\r\n",
 					"show(src)"
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -119,7 +119,7 @@
 					"        f_img = img_dir+f\r\n",
 					"        print(f_img)"
 				],
-				"execution_count": 186
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -168,7 +168,7 @@
 					"                parsed_list = np.vstack([parsed_list, parsed_row])\r\n",
 					"    return parsed_list"
 				],
-				"execution_count": 96
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -202,7 +202,7 @@
 					"\r\n",
 					"    return path"
 				],
-				"execution_count": 175
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -225,7 +225,7 @@
 					"\r\n",
 					"def clip_pumpjacks(pumpjack_list, img_dir, img_dir_out):\r\n",
 					"    \"\"\"\r\n",
-					"    Function for clipping images 1500, 1500 from Azure Machine Learning provided bonding box. Currently the read/writes of images are done via GDAL\r\n",
+					"    Function for clipping images dynamically based on the Azure Machine Learning provided bonding box. Currently the read/writes of images are done via GDAL\r\n",
 					"    Arguments:\r\n",
 					"        pumpjack_list: list of pumpjacks returned from parse_AML_json function\r\n",
 					"        img_dir: directory of where the pumpjack images to be clipped are located\r\n",
@@ -259,14 +259,33 @@
 					"        middleX_pixel = int(topX_pixel + .5*(bottomX_pixel-topX_pixel))\r\n",
 					"        middleY_pixel = int(topY_pixel + .5*(bottomY_pixel-topY_pixel))\r\n",
 					"\r\n",
-					"        new_topX_pixel = middleX_pixel - 750\r\n",
-					"        new_topY_pixel = middleY_pixel - 750\r\n",
+					"        X_difference = bottomX_pixel-topX_pixel\r\n",
+					"        Y_difference = bottomY_pixel-topY_pixel\r\n",
 					"\r\n",
+					"\r\n",
+					"        if X_difference >= Y_difference:\r\n",
+					"            final_x_pixels = X_difference * 2\r\n",
+					"            final_y_pixels = X_difference * 2\r\n",
+					"\r\n",
+					"            new_topX_pixel = middleX_pixel - X_difference\r\n",
+					"            new_topY_pixel = middleY_pixel - X_difference\r\n",
+					"\r\n",
+					"        elif X_difference < Y_difference:\r\n",
+					"            final_x_pixels = Y_difference * 2\r\n",
+					"            final_y_pixels = Y_difference * 2\r\n",
+					"\r\n",
+					"            new_topX_pixel = middleX_pixel - Y_difference\r\n",
+					"            new_topY_pixel = middleY_pixel - Y_difference\r\n",
+					"        \r\n",
+					"        else:\r\n",
+					"            print(\"how did you do this?\")\r\n",
+					"        \r\n",
 					"        jpg_in = img_file\r\n",
-					"        jpg_out_nonunique = img_dir_out + pumpjack[0] +\".jpg\"\r\n",
+					"        jpg_out_nonunique = img_dir_out + pumpjack[0]\r\n",
 					"        jpg_out = uniquify(jpg_out_nonunique)\r\n",
 					"        print(jpg_out)\r\n",
-					"        srcWin_option = [new_topX_pixel, new_topY_pixel, 1500, 1500]\r\n",
+					"        \r\n",
+					"        srcWin_option = [new_topX_pixel, new_topY_pixel, final_x_pixels, final_y_pixels]\r\n",
 					"        options = gdal.TranslateOptions(format='JPEG', srcWin = srcWin_option)\r\n",
 					"        gdal.Translate(jpg_out, jpg_in, options=options)\r\n",
 					"\r\n",
@@ -279,9 +298,10 @@
 					"        # print(\"middleY_pixel = \"+ str(middleY_pixel))\r\n",
 					"        # print('')\r\n",
 					"        # print(str(bottomY_pixel-topY_pixel))\r\n",
+					"\r\n",
 					"    return True"
 				],
-				"execution_count": 203
+				"execution_count": 37
 			},
 			{
 				"cell_type": "code",
@@ -301,7 +321,7 @@
 					"\r\n",
 					"img_dir = f'/synfs/'+jobId+'/testliam/UI/06-15-2022_053557_UTC/geotagged_subset/'\r\n",
 					"aml_json_path = f'/synfs/'+jobId+'/testliam/Labeling/export/dataset/b2efe480-107f-e1c2-5e78-7af2427f8f00/b5779ff4-ec96-455f-82df-92de2386cafd/labeledDatapoints_1.jsonl'\r\n",
-					"img_dir_out = f'/synfs/'+jobId+'/testliam/UI/geotagged_subset_pumpjacks_clip/python_out/'\r\n",
+					"img_dir_out = f'/synfs/'+jobId+'/testliam/UI/geotagged_subset_pumpjacks_clip/dynamic_python_out/'\r\n",
 					"\r\n",
 					"#pumpjack_list = parse_AML_json(aml_json_path)\r\n",
 					"\r\n",
@@ -309,7 +329,7 @@
 					"\r\n",
 					"clip_pumpjacks(pumpjack_list, img_dir, img_dir_out)"
 				],
-				"execution_count": 201
+				"execution_count": 39
 			},
 			{
 				"cell_type": "code",
