@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8f7f61ae-5355-4568-bf20-f3ead15a8f4b"
+				"spark.autotune.trackingId": "381fc599-fad0-41aa-86ef-546d8917c1e4"
 			}
 		},
 		"metadata": {
@@ -62,24 +62,6 @@
 					}
 				},
 				"source": [
-					"import rasterio"
-				],
-				"execution_count": 1
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
 					"from notebookutils import mssparkutils\r\n",
 					"# hhttps://innoaoaidata.blob.core.windows.net/innosource\r\n",
 					"try:\r\n",
@@ -93,7 +75,7 @@
 					"    print(\"FAILED TO MOUNT\")\r\n",
 					"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
 				],
-				"execution_count": 38
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +111,7 @@
 					"            file_array.append(directory+file)\r\n",
 					"    return file_array"
 				],
-				"execution_count": 54
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -152,7 +134,7 @@
 					"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
 					"outarray"
 				],
-				"execution_count": 55
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -169,6 +151,7 @@
 				},
 				"source": [
 					"from osgeo import gdal, ogr, osr\r\n",
+					"from osgeo import gdalconst\r\n",
 					"#import struct\r\n",
 					"#import sys\r\n",
 					"#import os\r\n",
@@ -176,25 +159,7 @@
 					"#import ogrtest\r\n",
 					"#sys.path.append( '../pymod' )"
 				],
-				"execution_count": 23
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"-gcp  "
-				],
-				"execution_count": null
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -212,10 +177,11 @@
 				"source": [
 					"def test_gdal_translate_lib_8():\r\n",
 					"\r\n",
-					"    gcpList = [gdal.GCP(3856, 2589,-118.959608,35.427667,0), gdal.GCP(3581,4159,-118.959332,35.427637,0), gdal.GCP(6883,4311,-118.959303,35.428006,0), gdal.GCP(2229,4347,-118.9593293,35.4274999 ,20)]\r\n",
-					"    ds = gdal.Open('/synfs/128/dinnosa/python_practice/picture.JPG')\r\n",
-					"    fs = ('/synfs/128/dinnosa/python_practice/picture.tif')\r\n",
-					"    ds = gdal.Translate(fs, ds, outputSRS = 'EPSG:3857', GCPs = gcpList)\r\n",
+					"    gcpList = [gdal.GCP(-118.959608,35.427667,0, 3856, 2589), gdal.GCP(-118.959332,35.427637,0,3581,4159), gdal.GCP(-118.959303,35.428006,0, 6883,4311), gdal.GCP(-118.9593293,35.4274999,0,2229,4347)]\r\n",
+					"    ds = gdal.Open('/synfs/129/dinnosa/python_practice/picture.JPG')\r\n",
+					"    fs = ('/synfs/129/dinnosa/python_practice/picture_04.tif')\r\n",
+					"    #ds = gdal.Translate(fs, ds, outputSRS = 'EPSG:3857', GCPs = gcpList)\r\n",
+					"    ds = gdal.Translate(fs, ds, GCPs = gcpList)\r\n",
 					"\r\n",
 					"    #gcps = ds.GetGCPs()\r\n",
 					"\r\n",
@@ -223,7 +189,7 @@
 					"\r\n",
 					"    return 'success'"
 				],
-				"execution_count": 48
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
@@ -241,7 +207,7 @@
 				"source": [
 					"test_gdal_translate_lib_8()"
 				],
-				"execution_count": 49
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",
@@ -257,11 +223,91 @@
 					}
 				},
 				"source": [
-					"input_file = ('/synfs/128/dinnosa/python_practice/picture.tif')\r\n",
-					"output_file=('/synfs/128/dinnosa/python_practice/picture_warped.tif')\r\n",
+					"gdal.Info('/synfs/129/dinnosa/python_practice/picture_04.tif')"
+				],
+				"execution_count": 45
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"input_file = ('/synfs/129/dinnosa/python_practice/picture_00.tif')\r\n",
+					"output_file=('/synfs/129/dinnosa/python_practice/picture_warped.tif')\r\n",
 					""
 				],
-				"execution_count": 50
+				"execution_count": 22
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# driver = gdal.GetDriverByName('GTiff')\r\n",
+					"# output = driver.Create(outputfilePath, x, y, nbands, bandreferencefile.DataType)\r\n",
+					"# output.SetGeoTransform(referencefileTrans)\r\n",
+					"# output.SetProjection(referencefileProj)\r\n",
+					"# options = gdal.WarpOptions(srcSRS=inputProj, dstSRS=referencefileProj, resampleAlg=gdalconst.GRA_Bilinear)\r\n",
+					"# gdal.Warp(output, inputfilePath, options=options)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# gdalwarp -tps -r bilinear -s_srs EPSG:4326 -t_srs EPSG:3857 -overwrite picture_translate_00.tif map-reprojected_03.tif\r\n",
+					"options = gdal.WarpOptions(srcSRS='EPSG:4326', dstSRS='EPSG:3857', resampleAlg=gdalconst.GRA_Bilinear)\r\n",
+					"\r\n",
+					""
+				],
+				"execution_count": 23
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"test = gdal.Warp(output_file, input_file, options=options)"
+				],
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
@@ -296,9 +342,9 @@
 					}
 				},
 				"source": [
-					"gdal.Warp(output_file, input_file,options=\"gdalwarp -tps -r bilinear -s_srs EPSG:4326 -t_srs EPSG:3857\")"
+					"gdal.Warp(output_file, input_file,options=\"-r bilinear -s_srs EPSG:4326 -t_srs EPSG:3857\")"
 				],
-				"execution_count": 52
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
