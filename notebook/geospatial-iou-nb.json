@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2509a8d7-41b0-40e3-bcc2-a12b55ac8e4d"
+				"spark.autotune.trackingId": "8f7f61ae-5355-4568-bf20-f3ead15a8f4b"
 			}
 		},
 		"metadata": {
@@ -93,7 +93,7 @@
 					"    print(\"FAILED TO MOUNT\")\r\n",
 					"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
 				],
-				"execution_count": 5
+				"execution_count": 38
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"            file_array.append(directory+file)\r\n",
 					"    return file_array"
 				],
-				"execution_count": 7
+				"execution_count": 54
 			},
 			{
 				"cell_type": "code",
@@ -148,11 +148,11 @@
 					"# create directory for NB\r\n",
 					"\r\n",
 					"jobId = mssparkutils.env.getJobId()\r\n",
-					"img_path = f'/synfs/'+jobId+'/dinnosa/geospatial_transformation/'\r\n",
-					"outarray = get_blob_file_list(img_path, \".tif\")\r\n",
+					"img_path = f'/synfs/'+jobId+'/dinnosa/python_practice'\r\n",
+					"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
 					"outarray"
 				],
-				"execution_count": 8
+				"execution_count": 55
 			},
 			{
 				"cell_type": "code",
@@ -168,62 +168,13 @@
 					}
 				},
 				"source": [
-					"filepath =('/synfs/116/dinnosa/geospatial_transformation/01.tif')\r\n",
-					""
-				],
-				"execution_count": 13
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"crs = rasterio.crs.CRS({\"init\": \"epsg:4326\"})"
-				],
-				"execution_count": 19
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"src.name"
-				],
-				"execution_count": 22
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"src.mode"
+					"from osgeo import gdal, ogr, osr\r\n",
+					"#import struct\r\n",
+					"#import sys\r\n",
+					"#import os\r\n",
+					"#import gdaltest\r\n",
+					"#import ogrtest\r\n",
+					"#sys.path.append( '../pymod' )"
 				],
 				"execution_count": 23
 			},
@@ -241,9 +192,9 @@
 					}
 				},
 				"source": [
-					"src.closed"
+					"-gcp  "
 				],
-				"execution_count": 24
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -259,9 +210,20 @@
 					}
 				},
 				"source": [
-					"src.bounds"
+					"def test_gdal_translate_lib_8():\r\n",
+					"\r\n",
+					"    gcpList = [gdal.GCP(3856, 2589,-118.959608,35.427667,0), gdal.GCP(3581,4159,-118.959332,35.427637,0), gdal.GCP(6883,4311,-118.959303,35.428006,0), gdal.GCP(2229,4347,-118.9593293,35.4274999 ,20)]\r\n",
+					"    ds = gdal.Open('/synfs/128/dinnosa/python_practice/picture.JPG')\r\n",
+					"    fs = ('/synfs/128/dinnosa/python_practice/picture.tif')\r\n",
+					"    ds = gdal.Translate(fs, ds, outputSRS = 'EPSG:3857', GCPs = gcpList)\r\n",
+					"\r\n",
+					"    #gcps = ds.GetGCPs()\r\n",
+					"\r\n",
+					"    ds = None\r\n",
+					"\r\n",
+					"    return 'success'"
 				],
-				"execution_count": 25
+				"execution_count": 48
 			},
 			{
 				"cell_type": "code",
@@ -277,9 +239,9 @@
 					}
 				},
 				"source": [
-					"W = src.width"
+					"test_gdal_translate_lib_8()"
 				],
-				"execution_count": 30
+				"execution_count": 49
 			},
 			{
 				"cell_type": "code",
@@ -295,9 +257,11 @@
 					}
 				},
 				"source": [
-					"H =src.height"
+					"input_file = ('/synfs/128/dinnosa/python_practice/picture.tif')\r\n",
+					"output_file=('/synfs/128/dinnosa/python_practice/picture_warped.tif')\r\n",
+					""
 				],
-				"execution_count": 31
+				"execution_count": 50
 			},
 			{
 				"cell_type": "code",
@@ -313,9 +277,10 @@
 					}
 				},
 				"source": [
-					"src.dtype"
+					"# gdalwarp -tps -r bilinear -s_srs EPSG:4326 -t_srs EPSG:3857 -overwrite picture_translate_00.tif map-reprojected_03.ti\r\n",
+					"gdal.Warp(output_file, input_file, srcSRS = \"EPSG: 4326\", dstSRS = \"EPSG: 3857\")"
 				],
-				"execution_count": 35
+				"execution_count": 51
 			},
 			{
 				"cell_type": "code",
@@ -331,19 +296,123 @@
 					}
 				},
 				"source": [
-					"new_dataset = rasterio.open(\r\n",
-					"    '/synfs/115/dinnosa/geospatial_transformation/01.tif',\r\n",
-					"    'w',\r\n",
-					"    driver='GTiff',\r\n",
-					"    height= H,\r\n",
-					"    width=W,\r\n",
-					"    count=1,\r\n",
-					"    dtype=Z.dtype,\r\n",
-					"    crs='epsg:4326',\r\n",
-					"    transform=transform,\r\n",
-					")"
+					"gdal.Warp(output_file, input_file,options=\"gdalwarp -tps -r bilinear -s_srs EPSG:4326 -t_srs EPSG:3857\")"
 				],
-				"execution_count": 32
+				"execution_count": 52
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"options=\"-overwrite -multi -wm 80% -t_srs EPSG:4283 -co TILED=YES -co BIGTIFF=YES -co COMPRESS=DEFLATE -co NUM_THREADS=ALL_CPUS\""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"gdal.Warp.help"
+				],
+				"execution_count": 22
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from pathlib import Path\r\n",
+					"from osgeo import gdal, osr\r\n",
+					"\r\n",
+					"# Adapted from https://svn.osgeo.org/gdal/trunk/autotest/alg/warp.py\r\n",
+					"def warp_with_gcps(input_path, output_path, gcps, gcp_epsg=3301, output_epsg=3301):\r\n",
+					"    # Open the source dataset and add GCPs to it\r\n",
+					"    src_ds = gdal.OpenShared(str(input_path), gdal.GA_ReadOnly)\r\n",
+					"    gcp_srs = osr.SpatialReference()\r\n",
+					"    gcp_srs.ImportFromEPSG(gcp_epsg)\r\n",
+					"    gcp_crs_wkt = gcp_srs.ExportToWkt()\r\n",
+					"    src_ds.SetGCPs(gcps, gcp_crs_wkt)\r\n",
+					"\r\n",
+					"    # Define target SRS\r\n",
+					"    dst_srs = osr.SpatialReference()\r\n",
+					"    dst_srs.ImportFromEPSG(output_epsg)\r\n",
+					"    dst_wkt = dst_srs.ExportToWkt()\r\n",
+					"\r\n",
+					"    error_threshold = 0.125  # error threshold --> use same value as in gdalwarp\r\n",
+					"    resampling = gdal.GRA_Bilinear\r\n",
+					"\r\n",
+					"    # Call AutoCreateWarpedVRT() to fetch default values for target raster dimensions and geotransform\r\n",
+					"    tmp_ds = gdal.AutoCreateWarpedVRT(src_ds,\r\n",
+					"                                      None,  # src_wkt : left to default value --> will use the one from source\r\n",
+					"                                      dst_wkt,\r\n",
+					"                                      resampling,\r\n",
+					"                                      error_threshold)\r\n",
+					"    dst_xsize = tmp_ds.RasterXSize\r\n",
+					"    dst_ysize = tmp_ds.RasterYSize\r\n",
+					"    dst_gt = tmp_ds.GetGeoTransform()\r\n",
+					"    tmp_ds = None\r\n",
+					"\r\n",
+					"    # Now create the true target dataset\r\n",
+					"    dst_path = str(Path(output_path).with_suffix(\".tif\"))\r\n",
+					"    dst_ds = gdal.GetDriverByName('GTiff').Create(dst_path, dst_xsize, dst_ysize, src_ds.RasterCount)\r\n",
+					"    dst_ds.SetProjection(dst_wkt)\r\n",
+					"    dst_ds.SetGeoTransform(dst_gt)\r\n",
+					"    dst_ds.GetRasterBand(1).SetNoDataValue(0)\r\n",
+					"\r\n",
+					"    # And run the reprojection\r\n",
+					"    gdal.ReprojectImage(src_ds,\r\n",
+					"                        dst_ds,\r\n",
+					"                        None,  # src_wkt : left to default value --> will use the one from source\r\n",
+					"                        None,  # dst_wkt : left to default value --> will use the one from destination\r\n",
+					"                        resampling,\r\n",
+					"                        0,  # WarpMemoryLimit : left to default value\r\n",
+					"                        error_threshold,\r\n",
+					"                        None,  # Progress callback : could be left to None or unspecified for silent progress\r\n",
+					"                        None)  # Progress callback user data\r\n",
+					"    dst_ds = None\r\n",
+					"\r\n",
+					"input_path = Path(\"x.tif\")\r\n",
+					"output_path = Path(\"y.tif\")\r\n",
+					"# GCP input\r\n",
+					"xyz = [...]\r\n",
+					"row_col = [...]\r\n",
+					"\r\n",
+					"gcps = []\r\n",
+					"for (x, y, z), (row, col) in zip(xyz, row_col):\r\n",
+					"    gcps.append(gdal.GCP(x, y, z, col, row))\r\n",
+					"\r\n",
+					"warp_with_gcps(input_path, output_path, gcps, gcp_epsg=3301, output_epsg=3301)"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -409,6 +478,49 @@
 					"    ds.transform = transform"
 				],
 				"execution_count": 14
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Test outputSRS and GCPs options\r\n",
+					"\r\n",
+					"def test_gdal_translate_lib_8():\r\n",
+					"\r\n",
+					"    gcpList = [gdal.GCP(440720.000,3751320.000,0,0,0), gdal.GCP(441920.000,3751320.000,0,20,0), gdal.GCP(441920.000,3750120.000,0,20,20), gdal.GCP(440720.000,3750120.000,0,0,20)]\r\n",
+					"    ds = gdal.Open('../gcore/data/byte.tif')\r\n",
+					"    ds = gdal.Translate('tmp/test8.tif', ds, outputSRS = 'EPSG:26711', GCPs = gcpList)\r\n",
+					"    if ds is None:\r\n",
+					"        return 'fail'\r\n",
+					"\r\n",
+					"    if ds.GetRasterBand(1).Checksum() != 4672:\r\n",
+					"        gdaltest.post_reason('Bad checksum')\r\n",
+					"        return 'fail'\r\n",
+					"\r\n",
+					"    gcps = ds.GetGCPs()\r\n",
+					"    if len(gcps) != 4:\r\n",
+					"        gdaltest.post_reason( 'GCP count wrong.' )\r\n",
+					"        return 'fail'\r\n",
+					"\r\n",
+					"    if ds.GetGCPProjection().find('26711') == -1:\r\n",
+					"        gdaltest.post_reason( 'Bad GCP projection.' )\r\n",
+					"        return 'fail'\r\n",
+					"\r\n",
+					"    ds = None\r\n",
+					"\r\n",
+					"    return 'success'"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
