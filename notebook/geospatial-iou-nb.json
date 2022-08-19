@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0b37038c-5d7a-4993-8e30-51384b4561fa"
+				"spark.autotune.trackingId": "2e68d1d2-23af-4652-976a-0ca271282480"
 			}
 		},
 		"metadata": {
@@ -49,6 +49,19 @@
 		},
 		"cells": [
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## The pupose of this noteook to georeference imagery collected from SJV"
+				]
+			},
+			{
 				"cell_type": "code",
 				"metadata": {
 					"jupyter": {
@@ -62,6 +75,8 @@
 					}
 				},
 				"source": [
+					"# mount dinno blob storage, necessary to run each time sparkpool is renewed\r\n",
+					"\r\n",
 					"from notebookutils import mssparkutils\r\n",
 					"# hhttps://innoaoaidata.blob.core.windows.net/innosource\r\n",
 					"try:\r\n",
@@ -150,16 +165,21 @@
 					}
 				},
 				"source": [
+					"# import libraries\r\n",
 					"from osgeo import gdal, ogr, osr\r\n",
 					"from osgeo import gdalconst\r\n",
-					"#import struct\r\n",
-					"#import sys\r\n",
-					"#import os\r\n",
-					"#import gdaltest\r\n",
-					"#import ogrtest\r\n",
-					"#sys.path.append( '../pymod' )"
+					"import geopandas as gpd\r\n",
+					"import pandas as pd\r\n",
+					"import psycopg2\r\n",
+					"import io\r\n",
+					"#from geoalchemy2 import Geometry\r\n",
+					"import pandas.io.sql as psql\r\n",
+					"import os\r\n",
+					"import numpy\r\n",
+					"import matplotlib.pyplot as plt\r\n",
+					""
 				],
-				"execution_count": 17
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
