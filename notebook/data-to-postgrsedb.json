@@ -1,0 +1,284 @@
+{
+	"name": "data-to-postgrsedb",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "Geospatialspark",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "56g",
+			"driverCores": 8,
+			"executorMemory": "56g",
+			"executorCores": 8,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "89abfaf6-ce18-48ab-8118-f8a4e7c19d43"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+				"name": "Geospatialspark",
+				"type": "Spark",
+				"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 8,
+				"memory": 56,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Shapefile to Postrgse DB \r\n",
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# mount dinno blob storage, necessary to run each time sparkpool is renewed\r\n",
+					"\r\n",
+					"from notebookutils import mssparkutils\r\n",
+					"# hhttps://innoaoaidata.blob.core.windows.net/innosource\r\n",
+					"try:\r\n",
+					"    mssparkutils.fs.mount(\r\n",
+					"        \"wasbs://coco-lily-ee-output@dinnosa.blob.core.windows.net\",\r\n",
+					"        \"/dinnosa\",\r\n",
+					"        {\"linkedService\":\"dinnosa\"}\r\n",
+					"    )\r\n",
+					"    print(\"Successful mount\")\r\n",
+					"except:\r\n",
+					"    print(\"FAILED TO MOUNT\")\r\n",
+					"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
+				],
+				"execution_count": 6
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# iterate through file to make sure that our files are present\r\n",
+					"\r\n",
+					"import os\r\n",
+					"\r\n",
+					"def get_blob_file_list(directory, filetype):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to get a full list of files in a directory based on file type\r\n",
+					"    Arguments:\r\n",
+					"        directory: Directory path of folder you want to pull files from\r\n",
+					"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\"\r\n",
+					"    Returns:\r\n",
+					"        Array of filepaths/filename w/extension\r\n",
+					"    \"\"\"\r\n",
+					"    file_array = []\r\n",
+					"    for file in os.listdir(directory):\r\n",
+					"        file_ext = os.path.splitext(file)[1]\r\n",
+					"        if file_ext == filetype:\r\n",
+					"            file_array.append(directory+file)\r\n",
+					"    return file_array"
+				],
+				"execution_count": 7
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# create directory for NB\r\n",
+					"\r\n",
+					"jobId = mssparkutils.env.getJobId()\r\n",
+					"img_path = f'/synfs/'+jobId+'/dinnosa/geospatial_transformation'\r\n",
+					"outarray = get_blob_file_list(img_path, \".geojson\")\r\n",
+					"outarray"
+				],
+				"execution_count": 15
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"import geopandas as gpd\r\n",
+					"import time\r\n",
+					"import pandas as pd\r\n",
+					"from sqlalchemy import create_engine\r\n",
+					"import psycopg2\r\n",
+					"import io\r\n",
+					"#from geoalchemy2 import Geometry\r\n",
+					"import pandas.io.sql as psql\r\n",
+					"import os\r\n",
+					"import numpy\r\n",
+					"import matplotlib.pyplot as plt"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# close connection with db\r\n",
+					"\r\n",
+					"conn.commit()\r\n",
+					"cursor.close()\r\n",
+					"conn.close()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Establish connection with postgrse table\r\n",
+					"# stac db documentation references three word four number password\r\n",
+					"\r\n",
+					"host = 'aoai-dev1.postgres.database.azure.com'\r\n",
+					"dbname = \"postgres\"\r\n",
+					"user = \"atlasuserdev1\"\r\n",
+					"password = \"BlackDogPinapple1234\"\r\n",
+					"sslmode = \"require\"\r\n",
+					"\r\n",
+					"conn_string = \"host={0} user={1} dbname={2} password={3} sslmode={4}\".format(host, user, dbname, password, sslmode)\r\n",
+					"conn = psycopg2.connect(conn_string)\r\n",
+					"print(\"Connection established\")\r\n",
+					"\r\n",
+					"cursor = conn.cursor()\r\n",
+					""
+				],
+				"execution_count": 4
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# read in geojson or json file\r\n",
+					"path_to_data = r'/synfs/132/dinnosa/geospatial_transformationgpkg_00_FeaturesToJSON.geojson'\r\n",
+					"gdf = gpd.read_file(path_to_data)"
+				],
+				"execution_count": 25
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"gpd.read_file(path_to_data)"
+				],
+				"execution_count": 23
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
