@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c039029b-89df-460f-be72-f04eb60a2339"
+				"spark.autotune.trackingId": "0202f48c-64bb-4489-965a-a68c1d6ca6a8"
 			}
 		},
 		"metadata": {
@@ -51,9 +51,56 @@
 			{
 				"cell_type": "code",
 				"source": [
-					""
+					"from max_ard import Select"
 				],
-				"execution_count": null
+				"execution_count": 8
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"bbox = [-106.8, 35.1, -106.4, 35.4]\r\n",
+					"datetime =  \"2020-07-01T00:00:00Z/2021-01-25T00:00:00Z\""
+				],
+				"execution_count": 9
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"query = {\r\n",
+					"        \"platform\": {\r\n",
+					"          \"eq\": \"worldview-02\"\r\n",
+					"        },\r\n",
+					"        \"aoi:cloud_free_percentage\": {\r\n",
+					"          \"gte\": 95\r\n",
+					"        },\r\n",
+					"        \"aoi:data_percentage\": {\r\n",
+					"          \"gte\": 75\r\n",
+					"        }\r\n",
+					"    }"
+				],
+				"execution_count": 10
 			}
 		]
 	}
