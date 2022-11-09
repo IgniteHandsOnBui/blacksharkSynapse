@@ -3,17 +3,21 @@
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "Geospatialspark",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
-			"driverMemory": "28g",
-			"driverCores": 4,
-			"executorMemory": "28g",
-			"executorCores": 4,
+			"driverMemory": "56g",
+			"driverCores": 8,
+			"executorMemory": "56g",
+			"executorCores": 8,
 			"numExecutors": 2,
 			"conf": {
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "23478038-af56-4de9-a1a5-41879c32b596"
+				"spark.autotune.trackingId": "6b252a76-27a1-4383-a424-2c0c736a8973"
 			}
 		},
 		"metadata": {
@@ -21,10 +25,25 @@
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",
-				"display_name": "python"
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+				"name": "Geospatialspark",
+				"type": "Spark",
+				"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 8,
+				"memory": 56,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -32,9 +51,111 @@
 			{
 				"cell_type": "code",
 				"source": [
-					""
+					"from max_ard import ARDCollection\r\n",
+					"collection = ARDCollection('s3://maxar-ard-samples/v4/sample-001/', public=True)"
 				],
-				"execution_count": null
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"collection.acquisitions"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"print(collection.dates)\r\n",
+					"print(collection.start_date)\r\n",
+					"print(collection.end_date)"
+				],
+				"execution_count": 4
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": true
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"collection.tiles"
+				],
+				"execution_count": 5
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": true
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"tile = collection.tiles[0]\r\n",
+					"print('Tile:', tile)\r\n",
+					"print('Cell:', tile.cell)\r\n",
+					"for k,v in tile.properties.items():\r\n",
+					"    print(f'  {k}: {v}')"
+				],
+				"execution_count": 6
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"%matplotlib inline\r\n",
+					"from rasterio.plot import show\r\n",
+					"with tile.open_asset('visual') as src:\r\n",
+					"    # setting the output shape to a smaller size makes rasterio read overview instead of full resolution data\r\n",
+					"    arr = src.read(out_shape=(3, int(src.height / 64), int(src.width / 64)))\r\n",
+					"    show(arr)"
+				],
+				"execution_count": 7
 			}
 		]
 	}
