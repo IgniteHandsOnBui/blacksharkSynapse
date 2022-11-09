@@ -1,0 +1,19 @@
+{
+	"name": "maxar_name",
+	"properties": {
+		"description": "maxar ard",
+		"configs": {
+			"ARD_USERNAME": "hilario.lumbreras@chevron.com",
+			"ARD_PASSWORD": "LetsfindData&Inights2022"
+		},
+		"created": "2022-11-09T08:10:29.7440000-06:00",
+		"createdBy": "hilario.lumbreras@chevron.com",
+		"annotations": [
+			"maxar_annotation"
+		],
+		"configMergeRule": {
+			"artifact.currentOperation.ARD_USERNAME": "replace",
+			"artifact.currentOperation.ARD_PASSWORD": "replace"
+		}
+	}
+}
