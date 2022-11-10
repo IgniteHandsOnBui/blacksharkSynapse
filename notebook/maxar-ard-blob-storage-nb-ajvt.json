@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0202f48c-64bb-4489-965a-a68c1d6ca6a8"
+				"spark.autotune.trackingId": "93c7c2b7-b595-41e8-b33f-2bbb28819438"
 			}
 		},
 		"metadata": {
@@ -53,7 +53,7 @@
 				"source": [
 					"from max_ard import Select"
 				],
-				"execution_count": 8
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -72,7 +72,7 @@
 					"bbox = [-106.8, 35.1, -106.4, 35.4]\r\n",
 					"datetime =  \"2020-07-01T00:00:00Z/2021-01-25T00:00:00Z\""
 				],
-				"execution_count": 9
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -100,7 +100,194 @@
 					"        }\r\n",
 					"    }"
 				],
+				"execution_count": 4
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from max_ard.session import get_user_session"
+				],
+				"execution_count": 8
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import os\r\n",
+					"\r\n",
+					"# Set environment variables\r\n",
+					"os.environ['ARD_USERNAME'] = 'anthony.bui@chevron.com'\r\n",
+					"os.environ['ARD_PASSWORD'] = 'cvxMaxar@2022'\r\n",
+					"\r\n",
+					"# Get environment variables\r\n",
+					"ARD_USERNAME = os.getenv('ARD_USERNAME')\r\n",
+					"ARD_USERNAME = os.environ.get('ARD_PASSWORD')"
+				],
+				"execution_count": 9
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"select = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)\r\n",
+					"select.submit()"
+				],
 				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"select.wait_for_success()"
+				],
+				"execution_count": 12
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"select"
+				],
+				"execution_count": 13
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"results = select.results\r\n",
+					"print(f'Found the following acquisition IDs: {results.acquisition_ids}')\r\n",
+					"print(f'Covering {len(results.stacks)} cells')\r\n",
+					"print('Ordering this selection will use:')\r\n",
+					"print(f'{select.usage.area.total_imagery_sqkm} sq.km')"
+				],
+				"execution_count": 14
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": true
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"tile = results.tiles[0]\r\n",
+					"print('Tile:', tile)\r\n",
+					"print('Cell:', tile.cell)\r\n",
+					"for k,v in tile.properties.items():\r\n",
+					"    print(f'  {k}: {v}')\r\n",
+					""
+				],
+				"execution_count": 15
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"%matplotlib inline\r\n",
+					"from rasterio.plot import show\r\n",
+					"with tile.open_asset('visual') as src:\r\n",
+					"    # setting the output shape to a smaller size makes rasterio read overview instead of full resolution data\r\n",
+					"    arr = src.read(out_shape=(3, int(src.height / 64), int(src.width / 64)))\r\n",
+					"    show(arr)"
+				],
+				"execution_count": 16
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import os\r\n",
+					"print(os.path.expanduser('~'))\r\n",
+					""
+				],
+				"execution_count": 17
 			}
 		]
 	}
