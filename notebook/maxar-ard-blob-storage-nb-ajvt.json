@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ae7a15ba-7738-4349-8b02-9419e165c3cf"
+				"spark.autotune.trackingId": "775908fe-b36f-4c2f-9e8c-c8d7c596b564"
 			}
 		},
 		"metadata": {
@@ -53,7 +53,7 @@
 				"source": [
 					"from max_ard import Select"
 				],
-				"execution_count": 2
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -260,14 +260,15 @@
 					}
 				},
 				"source": [
-					"%matplotlib inline\r\n",
-					"from rasterio.plot import show\r\n",
-					"with tile.open_asset('visual') as src:\r\n",
-					"    # setting the output shape to a smaller size makes rasterio read overview instead of full resolution data\r\n",
-					"    arr = src.read(out_shape=(3, int(src.height / 64), int(src.width / 64)))\r\n",
-					"    show(arr)"
+					"output_config = {\r\n",
+					"    \"azure_blob_storage\": {\r\n",
+					"        \"sas_url\": \"https://rawdatajbqezt.blob.core.windows.net/maxar-ard?sp=r&st=2022-11-11T14:37:45Z&se=2022-11-30T22:37:45Z&spr=https&sv=2021-06-08&sr=c&sig=7emtL5p02%2F%2BUhzZTDTG4ZhQEyWLKgxedL2K9CCvaLaI%3D\",\r\n",
+					"        \"container\": \"maxar-ard\",\r\n",
+					"        \"prefix\": \"prefix-1\"\r\n",
+					"    }\r\n",
+					"}"
 				],
-				"execution_count": 16
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -283,11 +284,14 @@
 					}
 				},
 				"source": [
-					"import os\r\n",
-					"print(os.path.expanduser('~'))\r\n",
-					"os."
+					"%matplotlib inline\r\n",
+					"from rasterio.plot import show\r\n",
+					"with tile.open_asset('visual') as src:\r\n",
+					"    # setting the output shape to a smaller size makes rasterio read overview instead of full resolution data\r\n",
+					"    arr = src.read(out_shape=(3, int(src.height / 64), int(src.width / 64)))\r\n",
+					"    show(arr)"
 				],
-				"execution_count": 1
+				"execution_count": 16
 			}
 		]
 	}
