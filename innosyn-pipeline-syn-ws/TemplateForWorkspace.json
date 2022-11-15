@@ -6208,7 +6208,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "842e207d-3ca9-4fc6-87bb-9072f0834757"
+						"spark.autotune.trackingId": "f12b26a9-be00-43c8-afeb-c3c45920958d"
 					}
 				},
 				"metadata": {
@@ -6297,7 +6297,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 120
+						"execution_count": 325
 					},
 					{
 						"cell_type": "code",
@@ -6324,7 +6324,7 @@
 							"ARD_USERNAME = os.environ.get('ARD_PASSWORD')   "
 						],
 						"outputs": [],
-						"execution_count": 121
+						"execution_count": 326
 					},
 					{
 						"cell_type": "code",
@@ -6343,7 +6343,7 @@
 							"r = get_user_session()"
 						],
 						"outputs": [],
-						"execution_count": 122
+						"execution_count": 327
 					},
 					{
 						"cell_type": "markdown",
@@ -6378,7 +6378,7 @@
 							"print(manager.get_account_usage())"
 						],
 						"outputs": [],
-						"execution_count": 123
+						"execution_count": 328
 					},
 					{
 						"cell_type": "code",
@@ -6397,7 +6397,7 @@
 							"manager.list_credentials()"
 						],
 						"outputs": [],
-						"execution_count": 124
+						"execution_count": 329
 					},
 					{
 						"cell_type": "code",
@@ -6419,7 +6419,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 125
+						"execution_count": 330
 					},
 					{
 						"cell_type": "code",
@@ -6442,7 +6442,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 126
+						"execution_count": 331
 					},
 					{
 						"cell_type": "code",
@@ -6463,7 +6463,7 @@
 							"creds"
 						],
 						"outputs": [],
-						"execution_count": 127
+						"execution_count": 332
 					},
 					{
 						"cell_type": "code",
@@ -6482,7 +6482,7 @@
 							"creds.created"
 						],
 						"outputs": [],
-						"execution_count": 128
+						"execution_count": 333
 					},
 					{
 						"cell_type": "code",
@@ -6502,7 +6502,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 129
+						"execution_count": 334
 					},
 					{
 						"cell_type": "code",
@@ -6522,7 +6522,7 @@
 							"manager.list_credentials()"
 						],
 						"outputs": [],
-						"execution_count": 130
+						"execution_count": 335
 					},
 					{
 						"cell_type": "markdown",
@@ -6535,6 +6535,19 @@
 						},
 						"source": [
 							"# select ARD to tiles of SW portion of pipeline"
+						]
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# 2015"
 						]
 					},
 					{
@@ -6552,7 +6565,7 @@
 						},
 						"source": [
 							"from max_ard import Select\r\n",
-							"bbox = [-121.91, 38.00, -121.85, 38.03]\r\n",
+							"bbox = [-121.91, 37.988, -121.865, 38.03]\r\n",
 							"datetime =  \"2015-10-01T00:00:00Z/2015-12-31T00:00:00Z\"\r\n",
 							"query = {\r\n",
 							"        \"platform\": {\r\n",
@@ -6566,10 +6579,10 @@
 							"        }\r\n",
 							"    }\r\n",
 							"\r\n",
-							"s = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
+							"s_2015 = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
 						],
 						"outputs": [],
-						"execution_count": 154
+						"execution_count": 423
 					},
 					{
 						"cell_type": "code",
@@ -6586,14 +6599,14 @@
 						},
 						"source": [
 							"from max_ard.exceptions import NotSubmitted\r\n",
-							"print(s.request)\r\n",
+							"print(s_2015.request)\r\n",
 							"try:\r\n",
 							"    print(s.state)\r\n",
 							"except NotSubmitted:\r\n",
 							"    print('The Select has not been submitted yet and does not have a state')"
 						],
 						"outputs": [],
-						"execution_count": 155
+						"execution_count": 424
 					},
 					{
 						"cell_type": "code",
@@ -6609,12 +6622,12 @@
 							}
 						},
 						"source": [
-							"s.submit()\r\n",
-							"print(s.state)\r\n",
-							"print(s.select_id)"
+							"s_2015.submit()\r\n",
+							"print(s_2015.state)\r\n",
+							"print(s_2015.select_id)"
 						],
 						"outputs": [],
-						"execution_count": 156
+						"execution_count": 425
 					},
 					{
 						"cell_type": "code",
@@ -6630,11 +6643,11 @@
 							}
 						},
 						"source": [
-							"s.wait_for_success()\r\n",
-							"print(f'Select {s.select_id} is complete')"
+							"s_2015.wait_for_success()\r\n",
+							"print(f'Select {s_2015.select_id} is complete')"
 						],
 						"outputs": [],
-						"execution_count": 159
+						"execution_count": 426
 					},
 					{
 						"cell_type": "code",
@@ -6650,11 +6663,11 @@
 							}
 						},
 						"source": [
-							"geojson = s.get_link_contents('geojson')\r\n",
+							"geojson = s_2015.get_link_contents('geojson')\r\n",
 							"print(geojson)"
 						],
 						"outputs": [],
-						"execution_count": 163
+						"execution_count": 427
 					},
 					{
 						"cell_type": "code",
@@ -6670,11 +6683,127 @@
 							}
 						},
 						"source": [
-							"link = s.get_signed_link('html')\r\n",
+							"link = s_2015.get_signed_link('html')\r\n",
 							"print(link)"
 						],
 						"outputs": [],
-						"execution_count": 164
+						"execution_count": 431
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard import Order\r\n",
+							"s_2015.usage.cost.total_imagery_cost"
+						],
+						"outputs": [],
+						"execution_count": 445
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"results = s_2015.results\r\n",
+							"print(f'Found the following acquisition IDs: {results.acquisition_ids}')\r\n",
+							"print(f'Covering {len(results.stacks)} cells')\r\n",
+							"print('Ordering this selection will use:')\r\n",
+							"print(f'{s_2015.usage.area.total_imagery_sqkm} sq.km')"
+						],
+						"outputs": [],
+						"execution_count": 446
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"aquisition_2015 = results.acquisition_ids\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 447
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# a GCS order for acquisitions using `output_config` and a credentials file\r\n",
+							"output_config = {\r\n",
+							"    \"azure_blob_storage\": {\r\n",
+							"        \"sas_url\": \"https://stacdldev1.blob.core.windows.net/?sv=2021-08-06&ss=btqf&srt=sco&st=2022-11-07T16%3A35%3A10Z&se=2023-01-01T16%3A35%3A00Z&sp=rwlacup&sig=BPkvu2Cho6ZcnJAfD0oGqsPDUFow73R0D9QRQq84m9U%3D\",\r\n",
+							"        \"container\": \"my-ard-container\",\r\n",
+							"        \"prefix\": \"example/prefix\",\r\n",
+							"        \"dry_run\": \"True\"\r\n",
+							"    }\r\n",
+							"}\r\n",
+							"\r\n",
+							"order = Order(output_config=output_config, acquisitions= aquisition_2015)\r\n",
+							"\r\n",
+							"# add notifications if needed, then submit the order\r\n",
+							"order.add_email_notification('hilario.lumbreras@chevron.com')\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 448
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"order.submit()"
+						],
+						"outputs": [],
+						"execution_count": 449
 					},
 					{
 						"cell_type": "markdown",
@@ -7273,7 +7402,7 @@
 							"print('hello world')"
 						],
 						"outputs": [],
-						"execution_count": 200
+						"execution_count": 337
 					},
 					{
 						"cell_type": "code",
