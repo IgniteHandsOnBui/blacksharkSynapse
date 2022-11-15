@@ -1324,7 +1324,13 @@
 							"sparkPool": {
 								"referenceName": "Geospatialspark",
 								"type": "BigDataPoolReference"
-							}
+							},
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"numExecutors": null
 						}
 					}
 				],
@@ -1439,7 +1445,13 @@
 							"sparkPool": {
 								"referenceName": "Geospatialspark",
 								"type": "BigDataPoolReference"
-							}
+							},
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"numExecutors": null
 						}
 					}
 				],
@@ -4558,7 +4570,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "9e25753f-5af8-417a-b8d5-e30402ca4c87"
+						"spark.autotune.trackingId": "03486a86-2210-4b0d-be2b-d6608f1d90fe"
 					}
 				},
 				"metadata": {
@@ -4606,7 +4618,7 @@
 							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
 						],
 						"outputs": [],
-						"execution_count": 185
+						"execution_count": 1
 					},
 					{
 						"cell_type": "code",
@@ -4636,7 +4648,7 @@
 							"show(src)"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 2
 					},
 					{
 						"cell_type": "code",
@@ -4661,7 +4673,7 @@
 							"        print(f_img)"
 						],
 						"outputs": [],
-						"execution_count": 186
+						"execution_count": 3
 					},
 					{
 						"cell_type": "code",
@@ -4711,7 +4723,7 @@
 							"    return parsed_list"
 						],
 						"outputs": [],
-						"execution_count": 96
+						"execution_count": 4
 					},
 					{
 						"cell_type": "code",
@@ -4746,7 +4758,7 @@
 							"    return path"
 						],
 						"outputs": [],
-						"execution_count": 175
+						"execution_count": 5
 					},
 					{
 						"cell_type": "code",
@@ -4769,7 +4781,7 @@
 							"\r\n",
 							"def clip_pumpjacks(pumpjack_list, img_dir, img_dir_out):\r\n",
 							"    \"\"\"\r\n",
-							"    Function for clipping images 1500, 1500 from Azure Machine Learning provided bonding box. Currently the read/writes of images are done via GDAL\r\n",
+							"    Function for clipping images dynamically based on the Azure Machine Learning provided bonding box. Currently the read/writes of images are done via GDAL\r\n",
 							"    Arguments:\r\n",
 							"        pumpjack_list: list of pumpjacks returned from parse_AML_json function\r\n",
 							"        img_dir: directory of where the pumpjack images to be clipped are located\r\n",
@@ -4803,14 +4815,33 @@
 							"        middleX_pixel = int(topX_pixel + .5*(bottomX_pixel-topX_pixel))\r\n",
 							"        middleY_pixel = int(topY_pixel + .5*(bottomY_pixel-topY_pixel))\r\n",
 							"\r\n",
-							"        new_topX_pixel = middleX_pixel - 750\r\n",
-							"        new_topY_pixel = middleY_pixel - 750\r\n",
+							"        X_difference = bottomX_pixel-topX_pixel\r\n",
+							"        Y_difference = bottomY_pixel-topY_pixel\r\n",
 							"\r\n",
+							"\r\n",
+							"        if X_difference >= Y_difference:\r\n",
+							"            final_x_pixels = X_difference * 2\r\n",
+							"            final_y_pixels = X_difference * 2\r\n",
+							"\r\n",
+							"            new_topX_pixel = middleX_pixel - X_difference\r\n",
+							"            new_topY_pixel = middleY_pixel - X_difference\r\n",
+							"\r\n",
+							"        elif X_difference < Y_difference:\r\n",
+							"            final_x_pixels = Y_difference * 2\r\n",
+							"            final_y_pixels = Y_difference * 2\r\n",
+							"\r\n",
+							"            new_topX_pixel = middleX_pixel - Y_difference\r\n",
+							"            new_topY_pixel = middleY_pixel - Y_difference\r\n",
+							"        \r\n",
+							"        else:\r\n",
+							"            print(\"how did you do this?\")\r\n",
+							"        \r\n",
 							"        jpg_in = img_file\r\n",
-							"        jpg_out_nonunique = img_dir_out + pumpjack[0] +\".jpg\"\r\n",
+							"        jpg_out_nonunique = img_dir_out + pumpjack[0]\r\n",
 							"        jpg_out = uniquify(jpg_out_nonunique)\r\n",
 							"        print(jpg_out)\r\n",
-							"        srcWin_option = [new_topX_pixel, new_topY_pixel, 1500, 1500]\r\n",
+							"        \r\n",
+							"        srcWin_option = [new_topX_pixel, new_topY_pixel, final_x_pixels, final_y_pixels]\r\n",
 							"        options = gdal.TranslateOptions(format='JPEG', srcWin = srcWin_option)\r\n",
 							"        gdal.Translate(jpg_out, jpg_in, options=options)\r\n",
 							"\r\n",
@@ -4823,10 +4854,11 @@
 							"        # print(\"middleY_pixel = \"+ str(middleY_pixel))\r\n",
 							"        # print('')\r\n",
 							"        # print(str(bottomY_pixel-topY_pixel))\r\n",
+							"\r\n",
 							"    return True"
 						],
 						"outputs": [],
-						"execution_count": 203
+						"execution_count": 37
 					},
 					{
 						"cell_type": "code",
@@ -4846,7 +4878,7 @@
 							"\r\n",
 							"img_dir = f'/synfs/'+jobId+'/testliam/UI/06-15-2022_053557_UTC/geotagged_subset/'\r\n",
 							"aml_json_path = f'/synfs/'+jobId+'/testliam/Labeling/export/dataset/b2efe480-107f-e1c2-5e78-7af2427f8f00/b5779ff4-ec96-455f-82df-92de2386cafd/labeledDatapoints_1.jsonl'\r\n",
-							"img_dir_out = f'/synfs/'+jobId+'/testliam/UI/geotagged_subset_pumpjacks_clip/python_out/'\r\n",
+							"img_dir_out = f'/synfs/'+jobId+'/testliam/UI/geotagged_subset_pumpjacks_clip/dynamic_python_out/'\r\n",
 							"\r\n",
 							"#pumpjack_list = parse_AML_json(aml_json_path)\r\n",
 							"\r\n",
@@ -4855,7 +4887,7 @@
 							"clip_pumpjacks(pumpjack_list, img_dir, img_dir_out)"
 						],
 						"outputs": [],
-						"execution_count": 201
+						"execution_count": 39
 					},
 					{
 						"cell_type": "code",
@@ -4881,7 +4913,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/geospatial-iou-nb')]",
+			"name": "[concat(parameters('workspaceName'), '/data-to-postgrsedb')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -4901,7 +4933,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "2d5856a9-cc83-495b-acb7-6f96bf2edb2d"
+						"spark.autotune.trackingId": "89abfaf6-ce18-48ab-8118-f8a4e7c19d43"
 					}
 				},
 				"metadata": {
@@ -4932,20 +4964,18 @@
 				},
 				"cells": [
 					{
-						"cell_type": "code",
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
 						"source": [
-							"import shapely\r\n",
-							"from shapely.geometry import Point, Polygon, LineString, GeometryCollection\r\n",
-							"import numpy as np\r\n",
-							"import geopandas as gpd\r\n",
-							"import cv2\r\n",
-							"import matplotlib.pyplot as plt\r\n",
-							"import rasterio.warp\r\n",
-							"from shapely.geometry import shape\r\n",
-							"import fiona"
-						],
-						"outputs": [],
-						"execution_count": 29
+							"## Shapefile to Postrgse DB \r\n",
+							""
+						]
 					},
 					{
 						"cell_type": "code",
@@ -4961,6 +4991,302 @@
 							}
 						},
 						"source": [
+							"# mount dinno blob storage, necessary to run each time sparkpool is renewed\r\n",
+							"\r\n",
+							"from notebookutils import mssparkutils\r\n",
+							"# hhttps://innoaoaidata.blob.core.windows.net/innosource\r\n",
+							"try:\r\n",
+							"    mssparkutils.fs.mount(\r\n",
+							"        \"wasbs://coco-lily-ee-output@dinnosa.blob.core.windows.net\",\r\n",
+							"        \"/dinnosa\",\r\n",
+							"        {\"linkedService\":\"dinnosa\"}\r\n",
+							"    )\r\n",
+							"    print(\"Successful mount\")\r\n",
+							"except:\r\n",
+							"    print(\"FAILED TO MOUNT\")\r\n",
+							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# iterate through file to make sure that our files are present\r\n",
+							"\r\n",
+							"import os\r\n",
+							"\r\n",
+							"def get_blob_file_list(directory, filetype):\r\n",
+							"    \"\"\"\r\n",
+							"    Function to get a full list of files in a directory based on file type\r\n",
+							"    Arguments:\r\n",
+							"        directory: Directory path of folder you want to pull files from\r\n",
+							"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\"\r\n",
+							"    Returns:\r\n",
+							"        Array of filepaths/filename w/extension\r\n",
+							"    \"\"\"\r\n",
+							"    file_array = []\r\n",
+							"    for file in os.listdir(directory):\r\n",
+							"        file_ext = os.path.splitext(file)[1]\r\n",
+							"        if file_ext == filetype:\r\n",
+							"            file_array.append(directory+file)\r\n",
+							"    return file_array"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# create directory for NB\r\n",
+							"\r\n",
+							"jobId = mssparkutils.env.getJobId()\r\n",
+							"img_path = f'/synfs/'+jobId+'/dinnosa/geospatial_transformation'\r\n",
+							"outarray = get_blob_file_list(img_path, \".geojson\")\r\n",
+							"outarray"
+						],
+						"outputs": [],
+						"execution_count": 15
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"import geopandas as gpd\r\n",
+							"import time\r\n",
+							"import pandas as pd\r\n",
+							"from sqlalchemy import create_engine\r\n",
+							"import psycopg2\r\n",
+							"import io\r\n",
+							"#from geoalchemy2 import Geometry\r\n",
+							"import pandas.io.sql as psql\r\n",
+							"import os\r\n",
+							"import numpy\r\n",
+							"import matplotlib.pyplot as plt"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# close connection with db\r\n",
+							"\r\n",
+							"conn.commit()\r\n",
+							"cursor.close()\r\n",
+							"conn.close()"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Establish connection with postgrse table\r\n",
+							"# stac db documentation references three word four number password\r\n",
+							"\r\n",
+							"host = 'aoai-dev1.postgres.database.azure.com'\r\n",
+							"dbname = \"postgres\"\r\n",
+							"user = \"atlasuserdev1\"\r\n",
+							"password = \"BlackDogPinapple1234\"\r\n",
+							"sslmode = \"require\"\r\n",
+							"\r\n",
+							"conn_string = \"host={0} user={1} dbname={2} password={3} sslmode={4}\".format(host, user, dbname, password, sslmode)\r\n",
+							"conn = psycopg2.connect(conn_string)\r\n",
+							"print(\"Connection established\")\r\n",
+							"\r\n",
+							"cursor = conn.cursor()\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# read in geojson or json file\r\n",
+							"path_to_data = r'/synfs/132/dinnosa/geospatial_transformationgpkg_00_FeaturesToJSON.geojson'\r\n",
+							"gdf = gpd.read_file(path_to_data)"
+						],
+						"outputs": [],
+						"execution_count": 25
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"gpd.read_file(path_to_data)"
+						],
+						"outputs": [],
+						"execution_count": 23
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/geospatial-iou-nb')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "Geospatialspark",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "2e68d1d2-23af-4652-976a-0ca271282480"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+						"name": "Geospatialspark",
+						"type": "Spark",
+						"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## The pupose of this noteook to georeference imagery collected from SJV"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# mount dinno blob storage, necessary to run each time sparkpool is renewed\r\n",
+							"\r\n",
 							"from notebookutils import mssparkutils\r\n",
 							"# hhttps://innoaoaidata.blob.core.windows.net/innosource\r\n",
 							"try:\r\n",
@@ -5031,12 +5357,12 @@
 							"# create directory for NB\r\n",
 							"\r\n",
 							"jobId = mssparkutils.env.getJobId()\r\n",
-							"img_path = f'/synfs/'+jobId+'/dinnosa/geospatial_transformation/'\r\n",
-							"outarray = get_blob_file_list(img_path, \".shp\")\r\n",
+							"img_path = f'/synfs/'+jobId+'/dinnosa/python_practice'\r\n",
+							"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
 							"outarray"
 						],
 						"outputs": [],
-						"execution_count": 14
+						"execution_count": 4
 					},
 					{
 						"cell_type": "code",
@@ -5052,12 +5378,115 @@
 							}
 						},
 						"source": [
-							"gdf_cali = gpd.read_file('/synfs/70/dinnosa/geospatial_transformation/EXAMPLE_AOI.geojson')\r\n",
+							"# import libraries\r\n",
+							"from osgeo import gdal, ogr, osr\r\n",
+							"from osgeo import gdalconst\r\n",
+							"import geopandas as gpd\r\n",
+							"import pandas as pd\r\n",
+							"import psycopg2\r\n",
+							"import io\r\n",
+							"#from geoalchemy2 import Geometry\r\n",
+							"import pandas.io.sql as psql\r\n",
+							"import os\r\n",
+							"import numpy\r\n",
+							"import matplotlib.pyplot as plt\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"def test_gdal_translate_lib_8():\r\n",
+							"\r\n",
+							"    gcpList = [gdal.GCP(-118.959608,35.427667,0, 3856, 2589), gdal.GCP(-118.959332,35.427637,0,3581,4159), gdal.GCP(-118.959303,35.428006,0, 6883,4311), gdal.GCP(-118.9593293,35.4274999,0,2229,4347)]\r\n",
+							"    ds = gdal.Open('/synfs/129/dinnosa/python_practice/picture.JPG')\r\n",
+							"    fs = ('/synfs/129/dinnosa/python_practice/picture_04.tif')\r\n",
+							"    #ds = gdal.Translate(fs, ds, outputSRS = 'EPSG:3857', GCPs = gcpList)\r\n",
+							"    ds = gdal.Translate(fs, ds, GCPs = gcpList)\r\n",
+							"\r\n",
+							"    #gcps = ds.GetGCPs()\r\n",
+							"\r\n",
+							"    ds = None\r\n",
+							"\r\n",
+							"    return 'success'"
+						],
+						"outputs": [],
+						"execution_count": 43
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"test_gdal_translate_lib_8()"
+						],
+						"outputs": [],
+						"execution_count": 44
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"input_file = ('/synfs/129/dinnosa/python_practice/picture_04.tif')\r\n",
+							"output_file=('/synfs/129/dinnosa/python_practice/picture_warped.tif')\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 46
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# gdalwarp -tps -r bilinear -s_srs EPSG:4326 -t_srs EPSG:3857 -overwrite picture_translate_00.tif map-reprojected_03.tif\r\n",
+							"options = gdal.WarpOptions(srcSRS='EPSG:4326', dstSRS='EPSG:3857', resampleAlg=gdalconst.GRA_Bilinear)\r\n",
 							"\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 23
+						"execution_count": 47
 					},
 					{
 						"cell_type": "code",
@@ -5073,45 +5502,12 @@
 							}
 						},
 						"source": [
-							" # align on projection\r\n",
 							"\r\n",
-							"california_aoi_path = (img_path + 'Cali_sub.shp')\r\n",
-							"gpkg_aoi_path = (img_path + 'gpkg_00.shp')\r\n",
-							"\r\n",
-							"# https://gis.stackexchange.com/questions/266098/how-to-convert-a-geoseries-to-a-geodataframe-with-geopandas\r\n",
-							"\r\n",
-							"polys_cali = []\r\n",
-							"for pol in fiona.open(california_aoi_path):\r\n",
-							"    poly = shape(pol['geometry'])\r\n",
-							"    if isinstance(poly, MultiPolygon):\r\n",
-							"        polys_cali += poly\r\n",
-							"    else:\r\n",
-							"        polys_cali.append(poly)\r\n",
-							"mp_cali = MultiPolygon(polys_cali)\r\n",
-							"\r\n",
-							"polys_gpkg = []\r\n",
-							"for pol in fiona.open(gpkg_aoi_path):\r\n",
-							"    poly = shape(pol['geometry'])\r\n",
-							"    if isinstance(poly, MultiPolygon):\r\n",
-							"        polys_gpkg += poly\r\n",
-							"    else:\r\n",
-							"        polys_gpkg.append(poly)\r\n",
-							"mp_gpkg = MultiPolygon(polys_gpkg)\r\n",
-							"\r\n",
-							"mp_gpkg\r\n",
-							"\r\n",
-							"# gdf_cali = gpd.read_file(mp_cali)\r\n",
-							"# gdf_gpkg = gpd.read_file(mp_gpkg)\r\n",
-							"\r\n",
-							"\r\n",
-							"# gdf_cali = gdf_cali.to_crs(4326)\r\n",
-							"# gdf_gpkg = gdf_gpkg.to_crs(4326)\r\n",
-							"\r\n",
-							"# gdf_cali.crs\r\n",
-							"# gdf_gpkg.crs"
+							"ds = gdal.Warp('/synfs/129/dinnosa/python_practice/picture_warped.tif', '/synfs/129/dinnosa/python_practice/picture_04.tif', srcSRS='EPSG:4326', dstSRS='EPSG:3857', outputType=gdal.GDT_Int16)\r\n",
+							"ds = None"
 						],
 						"outputs": [],
-						"execution_count": 33
+						"execution_count": 55
 					},
 					{
 						"cell_type": "code",
@@ -5127,10 +5523,10 @@
 							}
 						},
 						"source": [
-							"mp_gpkg[0][]"
+							"gdal.Info('/synfs/129/dinnosa/python_practice/picture_warped.tif')"
 						],
 						"outputs": [],
-						"execution_count": 34
+						"execution_count": 56
 					},
 					{
 						"cell_type": "code",
@@ -5146,23 +5542,22 @@
 							}
 						},
 						"source": [
-							"from shapely.geometry import MultiPolygon\r\n",
+							"def test_gdal_translate_lib_8():\r\n",
 							"\r\n",
+							"    gcpList = [gdal.GCP(-118.959608,35.427667,0, 3856, 2589), gdal.GCP(-118.959332,35.427637,0,3581,4159), gdal.GCP(-118.959303,35.428006,0, 6883,4311)]\r\n",
+							"    ds = gdal.Open('/synfs/129/dinnosa/python_practice/picture.JPG')\r\n",
+							"    fs = ('/synfs/129/dinnosa/python_practice/picture_05.tif')\r\n",
+							"    #ds = gdal.Translate(fs, ds, outputSRS = 'EPSG:3857', GCPs = gcpList)\r\n",
+							"    ds = gdal.Translate(fs, ds, GCPs = gcpList)\r\n",
 							"\r\n",
-							"shapefile = ('/synfs/70/dinnosa/geospatial_transformation/Cali_sub.shp')\r\n",
+							"    #gcps = ds.GetGCPs()\r\n",
 							"\r\n",
+							"    ds = None\r\n",
 							"\r\n",
-							"polys = []\r\n",
-							"for pol in fiona.open(shapefile):\r\n",
-							"    poly = shape(pol['geometry'])\r\n",
-							"    if isinstance(poly, MultiPolygon):\r\n",
-							"        polys += poly\r\n",
-							"    else:\r\n",
-							"        polys.append(poly)\r\n",
-							"mp = MultiPolygon(polys)"
+							"    return 'success'"
 						],
 						"outputs": [],
-						"execution_count": 27
+						"execution_count": 57
 					},
 					{
 						"cell_type": "code",
@@ -5178,13 +5573,51 @@
 							}
 						},
 						"source": [
-							"f, ax = plt.subplots(1)\r\n",
-							"gdf_cali.plot(ax=ax)\r\n",
-							"#gdf_gpkg.plot(ax=ax,cmap=None,)\r\n",
-							"plt.show()"
+							"test_gdal_translate_lib_8()"
 						],
 						"outputs": [],
-						"execution_count": 37
+						"execution_count": 58
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"input_file = ('/synfs/129/dinnosa/python_practice/picture_05.tif')\r\n",
+							"output_file=('/synfs/129/dinnosa/python_practice/picture_warped_3gcp.tif')"
+						],
+						"outputs": [],
+						"execution_count": 59
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"\r\n",
+							"ds = gdal.Warp(output_file, input_file, srcSRS='EPSG:4326', dstSRS='EPSG:3857', outputType=gdal.GDT_Int16)\r\n",
+							"ds = None"
+						],
+						"outputs": [],
+						"execution_count": 60
 					},
 					{
 						"cell_type": "code",
@@ -5208,6 +5641,1527 @@
 				]
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/maxar-ard-blob-storage-nb-ajvt')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "Geospatialspark",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "775908fe-b36f-4c2f-9e8c-c8d7c596b564"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+						"name": "Geospatialspark",
+						"type": "Spark",
+						"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from max_ard import Select"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"bbox = [-106.8, 35.1, -106.4, 35.4]\r\n",
+							"datetime =  \"2020-07-01T00:00:00Z/2021-01-25T00:00:00Z\""
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"query = {\r\n",
+							"        \"platform\": {\r\n",
+							"          \"eq\": \"worldview-02\"\r\n",
+							"        },\r\n",
+							"        \"aoi:cloud_free_percentage\": {\r\n",
+							"          \"gte\": 95\r\n",
+							"        },\r\n",
+							"        \"aoi:data_percentage\": {\r\n",
+							"          \"gte\": 75\r\n",
+							"        }\r\n",
+							"    }"
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard.session import get_user_session"
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import os\r\n",
+							"\r\n",
+							"# Set environment variables\r\n",
+							"os.environ['ARD_USERNAME'] = 'anthony.bui@chevron.com'\r\n",
+							"os.environ['ARD_PASSWORD'] = 'cvxMaxar@2022'\r\n",
+							"\r\n",
+							"# Get environment variables\r\n",
+							"ARD_USERNAME = os.getenv('ARD_USERNAME')\r\n",
+							"ARD_USERNAME = os.environ.get('ARD_PASSWORD')"
+						],
+						"outputs": [],
+						"execution_count": 9
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"select = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)\r\n",
+							"select.submit()"
+						],
+						"outputs": [],
+						"execution_count": 10
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"select.wait_for_success()"
+						],
+						"outputs": [],
+						"execution_count": 12
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"select"
+						],
+						"outputs": [],
+						"execution_count": 13
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"results = select.results\r\n",
+							"print(f'Found the following acquisition IDs: {results.acquisition_ids}')\r\n",
+							"print(f'Covering {len(results.stacks)} cells')\r\n",
+							"print('Ordering this selection will use:')\r\n",
+							"print(f'{select.usage.area.total_imagery_sqkm} sq.km')"
+						],
+						"outputs": [],
+						"execution_count": 14
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": true
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"tile = results.tiles[0]\r\n",
+							"print('Tile:', tile)\r\n",
+							"print('Cell:', tile.cell)\r\n",
+							"for k,v in tile.properties.items():\r\n",
+							"    print(f'  {k}: {v}')\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 15
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"output_config = {\r\n",
+							"    \"azure_blob_storage\": {\r\n",
+							"        \"sas_url\": \"https://rawdatajbqezt.blob.core.windows.net/maxar-ard?sp=r&st=2022-11-11T14:37:45Z&se=2022-11-30T22:37:45Z&spr=https&sv=2021-06-08&sr=c&sig=7emtL5p02%2F%2BUhzZTDTG4ZhQEyWLKgxedL2K9CCvaLaI%3D\",\r\n",
+							"        \"container\": \"maxar-ard\",\r\n",
+							"        \"prefix\": \"prefix-1\"\r\n",
+							"    }\r\n",
+							"}"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"%matplotlib inline\r\n",
+							"from rasterio.plot import show\r\n",
+							"with tile.open_asset('visual') as src:\r\n",
+							"    # setting the output shape to a smaller size makes rasterio read overview instead of full resolution data\r\n",
+							"    arr = src.read(out_shape=(3, int(src.height / 64), int(src.width / 64)))\r\n",
+							"    show(arr)"
+						],
+						"outputs": [],
+						"execution_count": 16
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/maxar-ard-nb-ajvt')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "Geospatialspark",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "6b252a76-27a1-4383-a424-2c0c736a8973"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+						"name": "Geospatialspark",
+						"type": "Spark",
+						"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from max_ard import ARDCollection\r\n",
+							"collection = ARDCollection('s3://maxar-ard-samples/v4/sample-001/', public=True)"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"collection.acquisitions"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"print(collection.dates)\r\n",
+							"print(collection.start_date)\r\n",
+							"print(collection.end_date)"
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": true
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"collection.tiles"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": true
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"tile = collection.tiles[0]\r\n",
+							"print('Tile:', tile)\r\n",
+							"print('Cell:', tile.cell)\r\n",
+							"for k,v in tile.properties.items():\r\n",
+							"    print(f'  {k}: {v}')"
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"%matplotlib inline\r\n",
+							"from rasterio.plot import show\r\n",
+							"with tile.open_asset('visual') as src:\r\n",
+							"    # setting the output shape to a smaller size makes rasterio read overview instead of full resolution data\r\n",
+							"    arr = src.read(out_shape=(3, int(src.height / 64), int(src.width / 64)))\r\n",
+							"    show(arr)"
+						],
+						"outputs": [],
+						"execution_count": 7
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/maxar_ard')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "Geospatialspark",
+					"type": "BigDataPoolReference"
+				},
+				"targetSparkConfiguration": {
+					"referenceName": "maxar_name",
+					"type": "SparkConfigurationReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "dbbe6b25-0882-4d86-890f-6d78a62492ee"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+						"name": "Geospatialspark",
+						"type": "Spark",
+						"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30,
+					"targetSparkConfiguration": "maxar_name"
+				},
+				"cells": [
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# instal libraries"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"outputs_hidden": true
+							}
+						},
+						"source": [
+							"pip install max-ard[full] --extra-index-url https://packages.ard.maxar.com/"
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Authenticate individual "
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard.session import get_user_session\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import os\r\n",
+							"\r\n",
+							"# Set environment variables\r\n",
+							"os.environ['ARD_USERNAME'] = 'hilario.lumbreras@chevron.com'\r\n",
+							"os.environ['ARD_PASSWORD'] = 'LetsfindData&Inights2022'\r\n",
+							"\r\n",
+							"# Get environment variables\r\n",
+							"ARD_USERNAME = os.getenv('ARD_USERNAME')\r\n",
+							"ARD_USERNAME = os.environ.get('ARD_PASSWORD')   "
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"r = get_user_session()"
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## Check Azure credentials"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard import AccountManager\r\n",
+							"manager = AccountManager()\r\n",
+							"# usage objects have a formatted __repr__\r\n",
+							"print(manager.get_account_usage())"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"manager.list_credentials()"
+						],
+						"outputs": [],
+						"execution_count": 51
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Azure Blob Storage SAS URL\r\n",
+							"token = \"https://stacdldev1.blob.core.windows.net/?sv=2021-08-06&ss=btqf&srt=sco&st=2022-11-07T16%3A35%3A10Z&se=2023-01-01T16%3A35%3A00Z&sp=rwlacup&sig=BPkvu2Cho6ZcnJAfD0oGqsPDUFow73R0D9QRQq84m9U%3D\"\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 11
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# add a token\r\n",
+							"manager.add_credentials(\"our-shared-credentials\", token, \"description of the credentials\")\r\n",
+							"\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 12
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# get a credential object\r\n",
+							"creds = manager.get_credentials(\"our-shared-credentials\")\r\n",
+							"creds"
+						],
+						"outputs": [],
+						"execution_count": 14
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"creds.created"
+						],
+						"outputs": [],
+						"execution_count": 15
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"creds.description\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 16
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# list all credentials\r\n",
+							"manager.list_credentials()"
+						],
+						"outputs": [],
+						"execution_count": 17
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Attempt a dry Run with example bouding bbox"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard import ARDCollection\r\n",
+							"\r\n",
+							"collection = ARDCollection('s3://maxar-ard-samples/v4/sample-001/', public=True)"
+						],
+						"outputs": [],
+						"execution_count": 52
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"collection.acquisitions"
+						],
+						"outputs": [],
+						"execution_count": 53
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"collection.stacks"
+						],
+						"outputs": [],
+						"execution_count": 54
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"print(collection.dates)\r\n",
+							"print(collection.start_date)\r\n",
+							"print(collection.end_date)"
+						],
+						"outputs": [],
+						"execution_count": 55
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"print(collection.zones)"
+						],
+						"outputs": [],
+						"execution_count": 56
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"collection.tiles"
+						],
+						"outputs": [],
+						"execution_count": 57
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"tile = collection.get_tile('1040010022712A00', 'z10-120020223032')\r\n",
+							"print('Tile:', tile)\r\n",
+							"print('Cell:', tile.cell)\r\n",
+							"print('Properties:')\r\n",
+							"for k,v in tile.properties.items():\r\n",
+							"    print(f'  {k}: {v}')"
+						],
+						"outputs": [],
+						"execution_count": 58
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from shapely.geometry import shape\r\n",
+							"shape(tile.cell)"
+						],
+						"outputs": [],
+						"execution_count": 59
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"tile.data_mask"
+						],
+						"outputs": [],
+						"execution_count": 60
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"tile.water_mask"
+						],
+						"outputs": [],
+						"execution_count": 61
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"tile.no_water_mask"
+						],
+						"outputs": [],
+						"execution_count": 62
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"%matplotlib inline\r\n",
+							"from rasterio.plot import show\r\n",
+							"\r\n",
+							"\r\n",
+							"with tile.visual as src:\r\n",
+							"    # read from overviews\r\n",
+							"    arr = src.read(out_shape=(3, int(src.height / 64), int(src.width / 64)))\r\n",
+							"    show(arr)"
+						],
+						"outputs": [],
+						"execution_count": 63
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"print('Full collection:', len(collection.tiles))\r\n",
+							"\r\n",
+							"aoi = 'POINT(-122.446 37.793)' # a point over the western half of San Francisco\r\n",
+							"\r\n",
+							"aoi_coll  = ARDCollection('s3://maxar-ard-samples/v4/sample-001/', aoi=aoi, public=True)\r\n",
+							"print(\"AOI'ed collection:\", len(aoi_coll.tiles))"
+						],
+						"outputs": [],
+						"execution_count": 64
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from rasterio.plot import show\r\n",
+							"for tile in aoi_coll.tiles:\r\n",
+							"    with tile.visual as src:\r\n",
+							"        # read overview\r\n",
+							"        arr = src.read(out_shape=(3, int(src.height / 64), int(src.width / 64)))\r\n",
+							"        show(arr)"
+						],
+						"outputs": [],
+						"execution_count": 65
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# select ARD to tiles"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard import Select"
+						],
+						"outputs": [],
+						"execution_count": 18
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"bbox = [-106.8, 35.1, -106.4, 35.4]\r\n",
+							"datetime =  \"2020-07-01T00:00:00Z/2021-01-25T00:00:00Z\""
+						],
+						"outputs": [],
+						"execution_count": 19
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"query = {\r\n",
+							"        \"platform\": {\r\n",
+							"          \"eq\": \"worldview-02\"\r\n",
+							"        },\r\n",
+							"        \"aoi:cloud_free_percentage\": {\r\n",
+							"          \"gte\": 95\r\n",
+							"        },\r\n",
+							"        \"aoi:data_percentage\": {\r\n",
+							"          \"gte\": 75\r\n",
+							"        }\r\n",
+							"    }"
+						],
+						"outputs": [],
+						"execution_count": 20
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"select = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)\r\n",
+							"select.submit()"
+						],
+						"outputs": [],
+						"execution_count": 21
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"select.wait_for_success()"
+						],
+						"outputs": [],
+						"execution_count": 22
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"select"
+						],
+						"outputs": [],
+						"execution_count": 23
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"results = select.results\r\n",
+							"print(f'Found the following acquisition IDs: {results.acquisition_ids}')\r\n",
+							"print(f'Covering {len(results.stacks)} cells')\r\n",
+							"print('Ordering this selection will use:')\r\n",
+							"print(f'{select.usage.area.total_imagery_sqkm} sq.km')"
+						],
+						"outputs": [],
+						"execution_count": 24
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# follow the select example notebook"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"s = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
+						],
+						"outputs": [],
+						"execution_count": 25
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard.exceptions import NotSubmitted\r\n",
+							"print(s.request)\r\n",
+							"try:\r\n",
+							"    print(s.state)\r\n",
+							"except NotSubmitted:\r\n",
+							"    print('The Select has not been submitted yet and does not have a state')"
+						],
+						"outputs": [],
+						"execution_count": 26
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"s.submit()\r\n",
+							"print(s.state)\r\n",
+							"print(s.select_id)"
+						],
+						"outputs": [],
+						"execution_count": 28
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# "
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"s.wait_for_success()\r\n",
+							"print(f'Select {s.select_id} is complete')"
+						],
+						"outputs": [],
+						"execution_count": 29
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"geojson = s.get_link_contents('geojson')\r\n",
+							"print(geojson[:100] + '...')"
+						],
+						"outputs": [],
+						"execution_count": 30
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from os import listdir\r\n",
+							"s.copy_file('geojson')\r\n",
+							"listdir('.')"
+						],
+						"outputs": [],
+						"execution_count": 31
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"link = s.get_signed_link('html')\r\n",
+							"print(link)"
+						],
+						"outputs": [],
+						"execution_count": 32
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# create a link with our AOI"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard import Select"
+						],
+						"outputs": [],
+						"execution_count": 33
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# bottom L and Upper R\r\n",
+							"bbox = [-106.8, 35.1, -106.4, 35.4]\r\n",
+							"datetime =  \"2020-07-01T00:00:00Z/2021-01-25T00:00:00Z\""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/sparkConfigurations/maxar_name')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/orbital-ai-analytics-nb')]",
@@ -5646,232 +7600,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/reproject-image-chips-nb')]",
-			"type": "Microsoft.Synapse/workspaces/notebooks",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"nbformat": 4,
-				"nbformat_minor": 2,
-				"bigDataPool": {
-					"referenceName": "Geospatialspark",
-					"type": "BigDataPoolReference"
-				},
-				"sessionProperties": {
-					"driverMemory": "56g",
-					"driverCores": 8,
-					"executorMemory": "56g",
-					"executorCores": 8,
-					"numExecutors": 2,
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "2",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "8b0494b4-c3fa-4d0e-a19a-85e1efd1ae00"
-					}
-				},
-				"metadata": {
-					"saveOutput": true,
-					"enableDebugMode": false,
-					"kernelspec": {
-						"name": "synapse_pyspark",
-						"display_name": "Synapse PySpark"
-					},
-					"language_info": {
-						"name": "python"
-					},
-					"a365ComputeOptions": {
-						"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
-						"name": "Geospatialspark",
-						"type": "Spark",
-						"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
-						"auth": {
-							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net"
-						},
-						"sparkVersion": "3.1",
-						"nodeCount": 10,
-						"cores": 8,
-						"memory": 56
-					},
-					"sessionKeepAliveTimeout": 30
-				},
-				"cells": [
-					{
-						"cell_type": "code",
-						"source": [
-							"from osgeo import gdal\r\n",
-							"from os.path import exists"
-						],
-						"outputs": [],
-						"execution_count": 4
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"from notebookutils import mssparkutils\r\n",
-							"# hhttps://innoaoaidata.blob.core.windows.net/innosource\r\n",
-							"try:\r\n",
-							"    mssparkutils.fs.mount(\r\n",
-							"        \"wasbs://innosource@innoaoaidata.blob.core.windows.net\",\r\n",
-							"        \"/aoai_source\",\r\n",
-							"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
-							"    )\r\n",
-							"    print(\"Successful mount\")\r\n",
-							"except:\r\n",
-							"    print(\"FAILED TO MOUNT\")\r\n",
-							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")\r\n",
-							"\r\n",
-							"\r\n",
-							"try:\r\n",
-							"    mssparkutils.fs.mount(\r\n",
-							"        \"wasbs://hilario@innoaoaidata.blob.core.windows.net\",\r\n",
-							"        \"/aoai_dest\",\r\n",
-							"        {\"linkedService\":\"innoaoaidata_STAC\"}\r\n",
-							"    )\r\n",
-							"    print(\"Successful mount\")\r\n",
-							"except:\r\n",
-							"    print(\"FAILED TO MOUNT)\r\n",
-							"    print(\"Either due to the drive already been mounted, or because the path is incorrect\")"
-						],
-						"outputs": [],
-						"execution_count": 15
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"import os\r\n",
-							"\r\n",
-							"def get_blob_file_list(directory, filetype):\r\n",
-							"    \"\"\"\r\n",
-							"    Function to get a full list of files in a directory based on file type\r\n",
-							"    Arguments:\r\n",
-							"        directory: Directory path of folder you want to pull files from\r\n",
-							"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\"\r\n",
-							"    Returns:\r\n",
-							"        Array of filepaths/filename w/extension\r\n",
-							"    \"\"\"\r\n",
-							"    file_array = []\r\n",
-							"    for file in os.listdir(directory):\r\n",
-							"        file_ext = os.path.splitext(file)[1]\r\n",
-							"        if file_ext == filetype:\r\n",
-							"            file_array.append(directory+file)\r\n",
-							"    return file_array"
-						],
-						"outputs": [],
-						"execution_count": 11
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"jobId = mssparkutils.env.getJobId()\r\n",
-							"img_path = f'/synfs/'+jobId+'/aoai_source'\r\n",
-							"outarray = get_blob_file_list(img_path, \".tif\")\r\n",
-							"outarray"
-						],
-						"outputs": [],
-						"execution_count": 16
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"#gdal.Translate(epsg:4326)\r\n",
-							"\r\n",
-							"input_tif = '/synfs/68/aoai_sourcec2022CPPAOI_CopyRaster63_cog.tif'\r\n",
-							"output_tif = '/synfs/68/hello.tif'\r\n",
-							"\r\n",
-							"warp = gdal.Warp(input_tif, output_tif ,dstSRS='EPSG:4326')\r\n",
-							"warp = None # Closes the files"
-						],
-						"outputs": [],
-						"execution_count": 24
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"jobId"
-						],
-						"outputs": [],
-						"execution_count": 19
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							""
-						],
-						"outputs": [],
-						"execution_count": null
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/stac-planetary-computer-nb')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -6163,6 +7891,28 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/maxar_name')]",
+			"type": "Microsoft.Synapse/workspaces/sparkConfigurations",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "maxar ard",
+				"configs": {
+					"ARD_USERNAME": "hilario.lumbreras@chevron.com",
+					"ARD_PASSWORD": "LetsfindData&Inights2022"
+				},
+				"created": "2022-11-09T08:10:29.7440000-06:00",
+				"createdBy": "hilario.lumbreras@chevron.com",
+				"annotations": [
+					"maxar_annotation"
+				],
+				"configMergeRule": {
+					"artifact.currentOperation.ARD_USERNAME": "replace",
+					"artifact.currentOperation.ARD_PASSWORD": "replace"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/pooldl2xmc')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -6211,9 +7961,9 @@
 				"nodeSizeFamily": "MemoryOptimized",
 				"sparkVersion": "3.1",
 				"libraryRequirements": {
-					"content": "name: aoi-env\r\nchannels:\r\n  - defaults\r\ndependencies:\r\n  - azure-storage-file-datalake\r\n  - gdal=3.3.0\r\n  - libgdal\r\n  - pip>=20.1.1\r\n  - pyproj\r\n  - shapely\r\n  - pip:\r\n      - azure-storage-blob==0.37.1\r\n      - rasterio\r\n      - geopandas\r\n      - numpy\r\n      - opencv-python\r\n",
-					"filename": "environment (2).yml",
-					"time": "2022-06-27T14:26:52.5580015Z"
+					"content": "name: aoi-env\r\nchannels:\r\n  - defaults\r\ndependencies:\r\n  - azure-storage-file-datalake\r\n  - gdal=3.3.0\r\n  - libgdal\r\n  - pip>=20.1.1\r\n  - pyproj\r\n  - shapely\r\n  - pip:\r\n      - azure-storage-blob==0.37.1\r\n      - rasterio\r\n      - geopandas\r\n      - numpy\r\n      - opencv-python\r\n      - rioxarray\r\n      - earthpy\r\n      - psycopg2\r\n      - max_ard\r\n",
+					"filename": "environment (4).yml",
+					"time": "2022-11-08T19:04:35.6323702Z"
 				},
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": false,
@@ -6277,6 +8027,47 @@
 				},
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": false,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "southcentralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/NetworkMapping')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"autoPause": {
+					"enabled": true,
+					"delayInMinutes": 15
+				},
+				"autoScale": {
+					"enabled": true,
+					"maxNodeCount": 10,
+					"minNodeCount": 3
+				},
+				"nodeCount": 10,
+				"nodeSize": "Medium",
+				"nodeSizeFamily": "MemoryOptimized",
+				"sparkVersion": "3.2",
+				"isComputeIsolationEnabled": false,
+				"sessionLevelPackagesEnabled": true,
+				"customLibraries": [
+					{
+						"name": "graphframes-0.8.2-py3-none-any.whl",
+						"path": "innosyn-pipeline-syn-ws/libraries/graphframes-0.8.2-py3-none-any.whl",
+						"containerName": "prep",
+						"uploadedTimestamp": "0001-01-01T00:00:00+00:00",
+						"type": "whl"
+					},
+					{
+						"name": "graphframes-0.8.2-spark3.2-s_2.12.jar",
+						"path": "innosyn-pipeline-syn-ws/libraries/graphframes-0.8.2-spark3.2-s_2.12.jar",
+						"containerName": "prep",
+						"uploadedTimestamp": "0001-01-01T00:00:00+00:00",
+						"type": "jar"
+					}
+				],
 				"annotations": []
 			},
 			"dependsOn": [],
