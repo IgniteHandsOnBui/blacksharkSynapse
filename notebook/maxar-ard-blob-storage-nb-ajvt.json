@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "775908fe-b36f-4c2f-9e8c-c8d7c596b564"
+				"spark.autotune.trackingId": "8ba5f059-5292-4d28-ac64-9f6d2f4c7f12"
 			}
 		},
 		"metadata": {
@@ -53,7 +53,7 @@
 				"source": [
 					"from max_ard import Select"
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -144,7 +144,7 @@
 					"ARD_USERNAME = os.getenv('ARD_USERNAME')\r\n",
 					"ARD_USERNAME = os.environ.get('ARD_PASSWORD')"
 				],
-				"execution_count": 9
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -163,7 +163,7 @@
 					"select = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)\r\n",
 					"select.submit()"
 				],
-				"execution_count": 10
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -181,7 +181,7 @@
 				"source": [
 					"select.wait_for_success()"
 				],
-				"execution_count": 12
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -199,7 +199,7 @@
 				"source": [
 					"select"
 				],
-				"execution_count": 13
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -221,7 +221,7 @@
 					"print('Ordering this selection will use:')\r\n",
 					"print(f'{select.usage.area.total_imagery_sqkm} sq.km')"
 				],
-				"execution_count": 14
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -244,7 +244,7 @@
 					"    print(f'  {k}: {v}')\r\n",
 					""
 				],
-				"execution_count": 15
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -268,7 +268,28 @@
 					"    }\r\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from max_ard import Order\r\n",
+					"order = Order(output_config=output_config, acquisitions=['1030010052208D00'], dry_run=True)\r\n",
+					"order.add_email_notification('anthony.bui@chevron.com')\r\n",
+					"#order.submit()"
+				],
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
