@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8ba5f059-5292-4d28-ac64-9f6d2f4c7f12"
+				"spark.autotune.trackingId": "b507284b-db23-4ac9-86fe-c3b48f1d273b"
 			}
 		},
 		"metadata": {
@@ -51,7 +51,7 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"from max_ard import Select"
+					"pip install max-ard[full] --extra-index-url https://packages.ard.maxar.com/"
 				],
 				"execution_count": 2
 			},
@@ -69,10 +69,145 @@
 					}
 				},
 				"source": [
-					"bbox = [-106.8, 35.1, -106.4, 35.4]\r\n",
-					"datetime =  \"2020-07-01T00:00:00Z/2021-01-25T00:00:00Z\""
+					"from max_ard.session import get_user_session"
 				],
-				"execution_count": 3
+				"execution_count": 49
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import os\r\n",
+					"\r\n",
+					"# Set environment variables\r\n",
+					"os.environ['ARD_USERNAME'] = 'anthony.bui@chevron.com'\r\n",
+					"os.environ['ARD_PASSWORD'] = 'cvxMaxar@2022'\r\n",
+					"\r\n",
+					"# Get environment variables\r\n",
+					"ARD_USERNAME = os.getenv('ARD_USERNAME')\r\n",
+					"ARD_USERNAME = os.environ.get('ARD_PASSWORD')"
+				],
+				"execution_count": 50
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from max_ard import Select\r\n",
+					"bbox = [-121.91, 38.00, -121.85, 38.03]\r\n",
+					"datetime =  \"2020-07-01T00:00:00Z/2021-01-25T00:00:00Z\"\r\n",
+					"query = {\r\n",
+					"        \"platform\": {\r\n",
+					"          \"eq\": \"worldview-02\"\r\n",
+					"        },\r\n",
+					"        \"aoi:cloud_free_percentage\": {\r\n",
+					"          \"gte\": 95\r\n",
+					"        },\r\n",
+					"        \"aoi:data_percentage\": {\r\n",
+					"          \"gte\": 75\r\n",
+					"        }\r\n",
+					"    }\r\n",
+					"\r\n",
+					"select = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
+				],
+				"execution_count": 53
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"select.submit()\r\n",
+					"print(select.state)\r\n",
+					"print(select.select_id)"
+				],
+				"execution_count": 54
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"select.wait_for_success()\r\n",
+					"print(f'Select {select.select_id} is complete')"
+				],
+				"execution_count": 55
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"geojson = select.get_link_contents('geojson')\r\n",
+					"print(geojson)"
+				],
+				"execution_count": 56
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"link = select.get_signed_link('html')\r\n",
+					"print(link)"
+				],
+				"execution_count": 57
 			},
 			{
 				"cell_type": "code",
@@ -101,105 +236,6 @@
 					"    }"
 				],
 				"execution_count": 4
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"from max_ard.session import get_user_session"
-				],
-				"execution_count": 8
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"import os\r\n",
-					"\r\n",
-					"# Set environment variables\r\n",
-					"os.environ['ARD_USERNAME'] = 'anthony.bui@chevron.com'\r\n",
-					"os.environ['ARD_PASSWORD'] = 'cvxMaxar@2022'\r\n",
-					"\r\n",
-					"# Get environment variables\r\n",
-					"ARD_USERNAME = os.getenv('ARD_USERNAME')\r\n",
-					"ARD_USERNAME = os.environ.get('ARD_PASSWORD')"
-				],
-				"execution_count": 5
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"select = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)\r\n",
-					"select.submit()"
-				],
-				"execution_count": 6
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"select.wait_for_success()"
-				],
-				"execution_count": 7
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"select"
-				],
-				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
