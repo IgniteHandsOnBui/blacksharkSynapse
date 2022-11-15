@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4764ef55-ca7b-42aa-80c1-b54caab1d407"
+				"spark.autotune.trackingId": "6d6b8399-4752-4b4f-bf80-fc57796eb90a"
 			}
 		},
 		"metadata": {
@@ -76,7 +76,7 @@
 				"source": [
 					"pip install max-ard[full] --extra-index-url https://packages.ard.maxar.com/"
 				],
-				"execution_count": 24
+				"execution_count": 1
 			},
 			{
 				"cell_type": "markdown",
@@ -108,7 +108,7 @@
 					"from max_ard.session import get_user_session\r\n",
 					""
 				],
-				"execution_count": 26
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -134,7 +134,7 @@
 					"ARD_USERNAME = os.getenv('ARD_USERNAME')\r\n",
 					"ARD_USERNAME = os.environ.get('ARD_PASSWORD')   "
 				],
-				"execution_count": 27
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -152,7 +152,7 @@
 				"source": [
 					"r = get_user_session()"
 				],
-				"execution_count": 28
+				"execution_count": 4
 			},
 			{
 				"cell_type": "markdown",
@@ -186,7 +186,7 @@
 					"# usage objects have a formatted __repr__\r\n",
 					"print(manager.get_account_usage())"
 				],
-				"execution_count": 48
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
