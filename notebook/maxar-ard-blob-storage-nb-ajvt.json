@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "66954e2d-f3c9-493d-b626-5744010270ab"
+				"spark.autotune.trackingId": "e8243b33-cb4d-40c0-895d-85c6e37ed8f8"
 			}
 		},
 		"metadata": {
@@ -51,74 +51,9 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"from max_ard import Select"
-				],
-				"execution_count": 81
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"bbox = [-106.8, 35.1, -106.4, 35.4]\r\n",
-					"datetime =  \"2020-07-01T00:00:00Z/2021-01-25T00:00:00Z\""
-				],
-				"execution_count": 3
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"query = {\r\n",
-					"        \"platform\": {\r\n",
-					"          \"eq\": \"worldview-02\"\r\n",
-					"        },\r\n",
-					"        \"aoi:cloud_free_percentage\": {\r\n",
-					"          \"gte\": 95\r\n",
-					"        },\r\n",
-					"        \"aoi:data_percentage\": {\r\n",
-					"          \"gte\": 75\r\n",
-					"        }\r\n",
-					"    }"
-				],
-				"execution_count": 4
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
 					"from max_ard.session import get_user_session"
 				],
-				"execution_count": 8
+				"execution_count": 83
 			},
 			{
 				"cell_type": "code",
@@ -144,7 +79,7 @@
 					"ARD_USERNAME = os.getenv('ARD_USERNAME')\r\n",
 					"ARD_USERNAME = os.environ.get('ARD_PASSWORD')"
 				],
-				"execution_count": 5
+				"execution_count": 85
 			},
 			{
 				"cell_type": "code",
@@ -160,10 +95,24 @@
 					}
 				},
 				"source": [
-					"select = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)\r\n",
-					"select.submit()"
+					"from max_ard import Select\r\n",
+					"bbox = [-121.91, 38.00, -121.85, 38.03]\r\n",
+					"datetime =  \"2019-10-01T00:00:00Z/2019-12-31T00:00:00Z\"\r\n",
+					"query = {\r\n",
+					"        \"platform\": {\r\n",
+					"          \"eq\": \"worldview-02\"\r\n",
+					"        },\r\n",
+					"        \"aoi:cloud_free_percentage\": {\r\n",
+					"          \"gte\": 95\r\n",
+					"        },\r\n",
+					"        \"aoi:data_percentage\": {\r\n",
+					"          \"gte\": 75\r\n",
+					"        }\r\n",
+					"    }\r\n",
+					"\r\n",
+					"select = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
 				],
-				"execution_count": 6
+				"execution_count": 86
 			},
 			{
 				"cell_type": "code",
@@ -179,9 +128,14 @@
 					}
 				},
 				"source": [
-					"select.wait_for_success()"
+					"from max_ard.exceptions import NotSubmitted\r\n",
+					"print(select.request)\r\n",
+					"try:\r\n",
+					"    print(select.state)\r\n",
+					"except NotSubmitted:\r\n",
+					"    print('The Select has not been submitted yet and does not have a state')"
 				],
-				"execution_count": 7
+				"execution_count": 87
 			},
 			{
 				"cell_type": "code",
@@ -197,9 +151,68 @@
 					}
 				},
 				"source": [
-					"select"
+					"select.submit()\r\n",
+					"print(select.state)\r\n",
+					"print(select.select_id)"
 				],
-				"execution_count": 8
+				"execution_count": 88
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"select.wait_for_success()\r\n",
+					"print(f'Select {select.select_id} is complete')"
+				],
+				"execution_count": 89
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"geojson = select.get_link_contents('geojson')\r\n",
+					"print(geojson)"
+				],
+				"execution_count": 90
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"link = select.get_signed_link('html')\r\n",
+					"print(link)"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
