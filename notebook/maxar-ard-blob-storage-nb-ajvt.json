@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3487c654-1ff7-4c0a-b9db-29e4b625dda2"
+				"spark.autotune.trackingId": "66954e2d-f3c9-493d-b626-5744010270ab"
 			}
 		},
 		"metadata": {
@@ -287,7 +287,7 @@
 					"from max_ard import Order\r\n",
 					"order = Order(output_config=output_config, acquisitions=['1030010052208D00'], dry_run=True)\r\n",
 					"order.add_email_notification('anthony.bui@chevron.com')\r\n",
-					"#order.submit()"
+					"order.submit()"
 				],
 				"execution_count": 12
 			},
