@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "da1512e0-0321-4ccd-9fd8-118db991fe11"
+				"spark.autotune.trackingId": "f97794ee-c4d4-4594-830d-d88875c08428"
 			}
 		},
 		"metadata": {
@@ -645,7 +645,7 @@
 				},
 				"source": [
 					"from max_ard import Select\r\n",
-					"bbox = [-121.91, 38.00, -121.85, 38.03]\r\n",
+					"bbox = [-121.91, 38.02, -121.88, 38.025]\r\n",
 					"datetime =  \"2019-10-01T00:00:00Z/2019-12-31T00:00:00Z\"\r\n",
 					"query = {\r\n",
 					"        \"platform\": {\r\n",
@@ -661,7 +661,7 @@
 					"\r\n",
 					"s = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
 				],
-				"execution_count": 171
+				"execution_count": 217
 			},
 			{
 				"cell_type": "code",
@@ -684,7 +684,7 @@
 					"except NotSubmitted:\r\n",
 					"    print('The Select has not been submitted yet and does not have a state')"
 				],
-				"execution_count": 172
+				"execution_count": 218
 			},
 			{
 				"cell_type": "code",
@@ -704,7 +704,7 @@
 					"print(s.state)\r\n",
 					"print(s.select_id)"
 				],
-				"execution_count": 173
+				"execution_count": 219
 			},
 			{
 				"cell_type": "code",
@@ -723,7 +723,7 @@
 					"s.wait_for_success()\r\n",
 					"print(f'Select {s.select_id} is complete')"
 				],
-				"execution_count": 174
+				"execution_count": 220
 			},
 			{
 				"cell_type": "code",
@@ -742,7 +742,7 @@
 					"geojson = s.get_link_contents('geojson')\r\n",
 					"print(geojson)"
 				],
-				"execution_count": 175
+				"execution_count": 221
 			},
 			{
 				"cell_type": "markdown",
@@ -774,7 +774,7 @@
 					"link = s.get_signed_link('html')\r\n",
 					"print(link)"
 				],
-				"execution_count": 176
+				"execution_count": 222
 			},
 			{
 				"cell_type": "markdown",
@@ -805,7 +805,7 @@
 				"source": [
 					"s.usage.cost.total_imagery_cost"
 				],
-				"execution_count": null
+				"execution_count": 223
 			},
 			{
 				"cell_type": "code",
@@ -823,7 +823,7 @@
 				"source": [
 					"print(s.usage)"
 				],
-				"execution_count": 177
+				"execution_count": 224
 			},
 			{
 				"cell_type": "code",
@@ -842,7 +842,7 @@
 					"acquisition = results.acquisitions[0]\r\n",
 					"acquisition"
 				],
-				"execution_count": 192
+				"execution_count": 227
 			},
 			{
 				"cell_type": "code",
@@ -858,9 +858,85 @@
 					}
 				},
 				"source": [
-					"results.get_acquisition('103001009C0BE200')"
+					"results.get_acquisition('103001009C0BE200')\r\n",
+					"\r\n",
+					"# this is the tile I want\r\n",
+					"# Z10-120020230231"
 				],
-				"execution_count": 193
+				"execution_count": 228
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"stack = results.stacks[0]\r\n",
+					"stack"
+				],
+				"execution_count": 229
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"results.get_stack('Z13-031133231113')"
+				],
+				"execution_count": 230
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"print(stack)"
+				],
+				"execution_count": 231
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"shape(stack)"
+				],
+				"execution_count": 232
 			},
 			{
 				"cell_type": "code",
@@ -878,7 +954,29 @@
 				"source": [
 					"from max_ard import Order"
 				],
-				"execution_count": 188
+				"execution_count": 233
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"results = s.results\r\n",
+					"print(f'Found the following acquisition IDs: {results.acquisition_ids}')\r\n",
+					"print(f'Covering {len(results.stacks)} cells')\r\n",
+					"print('Ordering this selection will use:')\r\n",
+					"print(f'{s.usage.area.total_imagery_sqkm} sq.km')"
+				],
+				"execution_count": 234
 			},
 			{
 				"cell_type": "code",
@@ -899,12 +997,71 @@
 					"    \"azure_blob_storage\": {\r\n",
 					"        \"sas_url\": \"https://stacdldev1.blob.core.windows.net/?sv=2021-08-06&ss=btqf&srt=sco&st=2022-11-07T16%3A35%3A10Z&se=2023-01-01T16%3A35%3A00Z&sp=rwlacup&sig=BPkvu2Cho6ZcnJAfD0oGqsPDUFow73R0D9QRQq84m9U%3D\",\r\n",
 					"        \"container\": \"my-ard-container\",\r\n",
-					"        \"prefix\": \"example/prefix\"\r\n",
+					"        \"prefix\": \"example/prefix\",\r\n",
+					"        \"dry_run\": \"True\"\r\n",
 					"    }\r\n",
 					"}\r\n",
 					""
 				],
-				"execution_count": 191
+				"execution_count": 235
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"order = Order(output_config=output_config, acquisitions=['103001009C0BE200'])\r\n",
+					"\r\n",
+					"# add notifications if needed, then submit the order\r\n",
+					"order.add_email_notification('hilario.lumbreras@chevron.com')\r\n",
+					""
+				],
+				"execution_count": 239
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"print('hello world')"
+				],
+				"execution_count": 200
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"order.submit()"
+				],
+				"execution_count": 240
 			},
 			{
 				"cell_type": "code",
