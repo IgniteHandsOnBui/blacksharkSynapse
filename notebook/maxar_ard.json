@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3a500dd0-ab25-43c9-a8a4-c0152e364803"
+				"spark.autotune.trackingId": "898a1b59-aa34-4a1a-a5f1-7576b56a6f0e"
 			}
 		},
 		"metadata": {
@@ -335,7 +335,7 @@
 					}
 				},
 				"source": [
-					"# Attempt a dry Run"
+					"# Attempt a dry Run with example bouding bbox"
 				]
 			},
 			{
@@ -937,6 +937,19 @@
 				"execution_count": 32
 			},
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# create a link with our AOI"
+				]
+			},
+			{
 				"cell_type": "code",
 				"metadata": {
 					"jupyter": {
@@ -950,7 +963,27 @@
 					}
 				},
 				"source": [
-					""
+					"from max_ard import Select"
+				],
+				"execution_count": 33
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# bottom L and Upper R\r\n",
+					"bbox = [-106.8, 35.1, -106.4, 35.4]\r\n",
+					"datetime =  \"2020-07-01T00:00:00Z/2021-01-25T00:00:00Z\""
 				],
 				"execution_count": null
 			}
