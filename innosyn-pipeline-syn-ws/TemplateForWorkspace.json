@@ -5663,7 +5663,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "b507284b-db23-4ac9-86fe-c3b48f1d273b"
+						"spark.autotune.trackingId": "e8243b33-cb4d-40c0-895d-85c6e37ed8f8"
 					}
 				},
 				"metadata": {
@@ -5696,29 +5696,10 @@
 					{
 						"cell_type": "code",
 						"source": [
-							"pip install max-ard[full] --extra-index-url https://packages.ard.maxar.com/"
-						],
-						"outputs": [],
-						"execution_count": 2
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
 							"from max_ard.session import get_user_session"
 						],
 						"outputs": [],
-						"execution_count": 49
+						"execution_count": 83
 					},
 					{
 						"cell_type": "code",
@@ -5745,7 +5726,7 @@
 							"ARD_USERNAME = os.environ.get('ARD_PASSWORD')"
 						],
 						"outputs": [],
-						"execution_count": 50
+						"execution_count": 85
 					},
 					{
 						"cell_type": "code",
@@ -5763,7 +5744,7 @@
 						"source": [
 							"from max_ard import Select\r\n",
 							"bbox = [-121.91, 38.00, -121.85, 38.03]\r\n",
-							"datetime =  \"2020-07-01T00:00:00Z/2021-01-25T00:00:00Z\"\r\n",
+							"datetime =  \"2019-10-01T00:00:00Z/2019-12-31T00:00:00Z\"\r\n",
 							"query = {\r\n",
 							"        \"platform\": {\r\n",
 							"          \"eq\": \"worldview-02\"\r\n",
@@ -5779,7 +5760,31 @@
 							"select = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
 						],
 						"outputs": [],
-						"execution_count": 53
+						"execution_count": 86
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard.exceptions import NotSubmitted\r\n",
+							"print(select.request)\r\n",
+							"try:\r\n",
+							"    print(select.state)\r\n",
+							"except NotSubmitted:\r\n",
+							"    print('The Select has not been submitted yet and does not have a state')"
+						],
+						"outputs": [],
+						"execution_count": 87
 					},
 					{
 						"cell_type": "code",
@@ -5800,7 +5805,7 @@
 							"print(select.select_id)"
 						],
 						"outputs": [],
-						"execution_count": 54
+						"execution_count": 88
 					},
 					{
 						"cell_type": "code",
@@ -5820,7 +5825,7 @@
 							"print(f'Select {select.select_id} is complete')"
 						],
 						"outputs": [],
-						"execution_count": 55
+						"execution_count": 89
 					},
 					{
 						"cell_type": "code",
@@ -5840,7 +5845,7 @@
 							"print(geojson)"
 						],
 						"outputs": [],
-						"execution_count": 56
+						"execution_count": 90
 					},
 					{
 						"cell_type": "code",
@@ -5860,36 +5865,7 @@
 							"print(link)"
 						],
 						"outputs": [],
-						"execution_count": 57
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"query = {\r\n",
-							"        \"platform\": {\r\n",
-							"          \"eq\": \"worldview-02\"\r\n",
-							"        },\r\n",
-							"        \"aoi:cloud_free_percentage\": {\r\n",
-							"          \"gte\": 95\r\n",
-							"        },\r\n",
-							"        \"aoi:data_percentage\": {\r\n",
-							"          \"gte\": 75\r\n",
-							"        }\r\n",
-							"    }"
-						],
-						"outputs": [],
-						"execution_count": 4
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -5980,7 +5956,7 @@
 							"from max_ard import Order\r\n",
 							"order = Order(output_config=output_config, acquisitions=['1030010052208D00'], dry_run=True)\r\n",
 							"order.add_email_notification('anthony.bui@chevron.com')\r\n",
-							"#order.submit()"
+							"order.submit()"
 						],
 						"outputs": [],
 						"execution_count": 12
@@ -6208,7 +6184,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "4f592967-a9aa-4ef9-8ebd-d0bcf8d70e4a"
+						"spark.autotune.trackingId": "32eca32a-fb85-4af7-9e29-8983b7caf490"
 					}
 				},
 				"metadata": {
@@ -6297,7 +6273,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 325
+						"execution_count": 4
 					},
 					{
 						"cell_type": "code",
@@ -6324,7 +6300,7 @@
 							"ARD_USERNAME = os.environ.get('ARD_PASSWORD')   "
 						],
 						"outputs": [],
-						"execution_count": 326
+						"execution_count": 5
 					},
 					{
 						"cell_type": "code",
@@ -6343,7 +6319,7 @@
 							"r = get_user_session()"
 						],
 						"outputs": [],
-						"execution_count": 327
+						"execution_count": 6
 					},
 					{
 						"cell_type": "markdown",
@@ -6378,7 +6354,7 @@
 							"print(manager.get_account_usage())"
 						],
 						"outputs": [],
-						"execution_count": 328
+						"execution_count": 7
 					},
 					{
 						"cell_type": "code",
@@ -6397,7 +6373,7 @@
 							"manager.list_credentials()"
 						],
 						"outputs": [],
-						"execution_count": 329
+						"execution_count": 8
 					},
 					{
 						"cell_type": "code",
@@ -6419,7 +6395,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 330
+						"execution_count": 9
 					},
 					{
 						"cell_type": "code",
@@ -6442,7 +6418,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 331
+						"execution_count": 10
 					},
 					{
 						"cell_type": "code",
@@ -6463,7 +6439,7 @@
 							"creds"
 						],
 						"outputs": [],
-						"execution_count": 332
+						"execution_count": 11
 					},
 					{
 						"cell_type": "code",
@@ -6482,7 +6458,7 @@
 							"creds.created"
 						],
 						"outputs": [],
-						"execution_count": 333
+						"execution_count": 12
 					},
 					{
 						"cell_type": "code",
@@ -6502,7 +6478,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 334
+						"execution_count": 13
 					},
 					{
 						"cell_type": "code",
@@ -6522,7 +6498,7 @@
 							"manager.list_credentials()"
 						],
 						"outputs": [],
-						"execution_count": 335
+						"execution_count": 14
 					},
 					{
 						"cell_type": "markdown",
@@ -6535,19 +6511,6 @@
 						},
 						"source": [
 							"# select ARD to tiles of SW portion of pipeline"
-						]
-					},
-					{
-						"cell_type": "markdown",
-						"metadata": {
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"# 2015"
 						]
 					},
 					{
@@ -6565,7 +6528,7 @@
 						},
 						"source": [
 							"from max_ard import Select\r\n",
-							"bbox = [-121.91, 37.988, -121.865, 38.03]\r\n",
+							"bbox = [-121.91, 38.00, -121.85, 38.03]\r\n",
 							"datetime =  \"2015-10-01T00:00:00Z/2015-12-31T00:00:00Z\"\r\n",
 							"query = {\r\n",
 							"        \"platform\": {\r\n",
@@ -6579,10 +6542,10 @@
 							"        }\r\n",
 							"    }\r\n",
 							"\r\n",
-							"s_2015 = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
+							"s = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
 						],
 						"outputs": [],
-						"execution_count": 423
+						"execution_count": 154
 					},
 					{
 						"cell_type": "code",
@@ -6599,14 +6562,14 @@
 						},
 						"source": [
 							"from max_ard.exceptions import NotSubmitted\r\n",
-							"print(s_2015.request)\r\n",
+							"print(s.request)\r\n",
 							"try:\r\n",
 							"    print(s.state)\r\n",
 							"except NotSubmitted:\r\n",
 							"    print('The Select has not been submitted yet and does not have a state')"
 						],
 						"outputs": [],
-						"execution_count": 424
+						"execution_count": 155
 					},
 					{
 						"cell_type": "code",
@@ -6622,12 +6585,12 @@
 							}
 						},
 						"source": [
-							"s_2015.submit()\r\n",
-							"print(s_2015.state)\r\n",
-							"print(s_2015.select_id)"
+							"s.submit()\r\n",
+							"print(s.state)\r\n",
+							"print(s.select_id)"
 						],
 						"outputs": [],
-						"execution_count": 425
+						"execution_count": 156
 					},
 					{
 						"cell_type": "code",
@@ -6643,11 +6606,11 @@
 							}
 						},
 						"source": [
-							"s_2015.wait_for_success()\r\n",
-							"print(f'Select {s_2015.select_id} is complete')"
+							"s.wait_for_success()\r\n",
+							"print(f'Select {s.select_id} is complete')"
 						],
 						"outputs": [],
-						"execution_count": 426
+						"execution_count": 159
 					},
 					{
 						"cell_type": "code",
@@ -6663,11 +6626,11 @@
 							}
 						},
 						"source": [
-							"geojson = s_2015.get_link_contents('geojson')\r\n",
+							"geojson = s.get_link_contents('geojson')\r\n",
 							"print(geojson)"
 						],
 						"outputs": [],
-						"execution_count": 427
+						"execution_count": 163
 					},
 					{
 						"cell_type": "code",
@@ -6683,127 +6646,11 @@
 							}
 						},
 						"source": [
-							"link = s_2015.get_signed_link('html')\r\n",
+							"link = s.get_signed_link('html')\r\n",
 							"print(link)"
 						],
 						"outputs": [],
-						"execution_count": 431
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"from max_ard import Order\r\n",
-							"s_2015.usage.cost.total_imagery_cost"
-						],
-						"outputs": [],
-						"execution_count": 445
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"results = s_2015.results\r\n",
-							"print(f'Found the following acquisition IDs: {results.acquisition_ids}')\r\n",
-							"print(f'Covering {len(results.stacks)} cells')\r\n",
-							"print('Ordering this selection will use:')\r\n",
-							"print(f'{s_2015.usage.area.total_imagery_sqkm} sq.km')"
-						],
-						"outputs": [],
-						"execution_count": 446
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"aquisition_2015 = results.acquisition_ids\r\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 447
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"# a GCS order for acquisitions using `output_config` and a credentials file\r\n",
-							"output_config = {\r\n",
-							"    \"azure_blob_storage\": {\r\n",
-							"        \"sas_url\": \"https://stacdldev1.blob.core.windows.net/?sv=2021-08-06&ss=btqf&srt=sco&st=2022-11-07T16%3A35%3A10Z&se=2023-01-01T16%3A35%3A00Z&sp=rwlacup&sig=BPkvu2Cho6ZcnJAfD0oGqsPDUFow73R0D9QRQq84m9U%3D\",\r\n",
-							"        \"container\": \"my-ard-container\",\r\n",
-							"        \"prefix\": \"example/prefix\",\r\n",
-							"        \"dry_run\": \"True\"\r\n",
-							"    }\r\n",
-							"}\r\n",
-							"\r\n",
-							"order = Order(output_config=output_config, acquisitions= aquisition_2015)\r\n",
-							"\r\n",
-							"# add notifications if needed, then submit the order\r\n",
-							"order.add_email_notification('hilario.lumbreras@chevron.com')\r\n",
-							"\r\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 448
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": true
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"order.submit()"
-						],
-						"outputs": [],
-						"execution_count": 449
+						"execution_count": 164
 					},
 					{
 						"cell_type": "markdown",
@@ -6833,7 +6680,7 @@
 						},
 						"source": [
 							"from max_ard import Select\r\n",
-							"bbox =[-121.91, 37.988, -121.865, 38.03]\r\n",
+							"bbox = [-121.91, 38.00, -121.85, 38.03]\r\n",
 							"datetime =  \"2017-10-01T00:00:00Z/2017-12-31T00:00:00Z\"\r\n",
 							"query = {\r\n",
 							"        \"platform\": {\r\n",
@@ -6847,10 +6694,10 @@
 							"        }\r\n",
 							"    }\r\n",
 							"\r\n",
-							"s_2017 = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
+							"s = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
 						],
 						"outputs": [],
-						"execution_count": 457
+						"execution_count": 165
 					},
 					{
 						"cell_type": "code",
@@ -6867,14 +6714,14 @@
 						},
 						"source": [
 							"from max_ard.exceptions import NotSubmitted\r\n",
-							"print(s_2017.request)\r\n",
+							"print(s.request)\r\n",
 							"try:\r\n",
-							"    print(s_2017.state)\r\n",
+							"    print(s.state)\r\n",
 							"except NotSubmitted:\r\n",
 							"    print('The Select has not been submitted yet and does not have a state')"
 						],
 						"outputs": [],
-						"execution_count": 458
+						"execution_count": 166
 					},
 					{
 						"cell_type": "code",
@@ -6890,12 +6737,12 @@
 							}
 						},
 						"source": [
-							"s_2017.submit()\r\n",
-							"print(s_2017.state)\r\n",
-							"print(s_2017.select_id)"
+							"s.submit()\r\n",
+							"print(s.state)\r\n",
+							"print(s.select_id)"
 						],
 						"outputs": [],
-						"execution_count": 459
+						"execution_count": 167
 					},
 					{
 						"cell_type": "code",
@@ -6911,11 +6758,11 @@
 							}
 						},
 						"source": [
-							"s_2017.wait_for_success()\r\n",
-							"print(f'Select {s_2017.select_id} is complete')"
+							"s.wait_for_success()\r\n",
+							"print(f'Select {s.select_id} is complete')"
 						],
 						"outputs": [],
-						"execution_count": 460
+						"execution_count": 168
 					},
 					{
 						"cell_type": "code",
@@ -6931,11 +6778,11 @@
 							}
 						},
 						"source": [
-							"geojson = s_2017.get_link_contents('geojson')\r\n",
+							"geojson = s.get_link_contents('geojson')\r\n",
 							"print(geojson)"
 						],
 						"outputs": [],
-						"execution_count": 461
+						"execution_count": 169
 					},
 					{
 						"cell_type": "code",
@@ -6951,125 +6798,11 @@
 							}
 						},
 						"source": [
-							"link = s_2017.get_signed_link('html')\r\n",
+							"link = s.get_signed_link('html')\r\n",
 							"print(link)"
 						],
 						"outputs": [],
-						"execution_count": 462
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"from max_ard import Order\r\n",
-							"s_2017.usage.cost.total_imagery_cost"
-						],
-						"outputs": [],
-						"execution_count": 463
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"results_2017 = s_2017.results\r\n",
-							"print(f'Found the following acquisition IDs: {results_2017.acquisition_ids}')\r\n",
-							"print(f'Covering {len(results_2017.stacks)} cells')\r\n",
-							"print('Ordering this selection will use:')\r\n",
-							"print(f'{s_2017.usage.area.total_imagery_sqkm} sq.km')"
-						],
-						"outputs": [],
-						"execution_count": 465
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"aquisition_2017 = results_2017.acquisition_ids"
-						],
-						"outputs": [],
-						"execution_count": 466
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"# a GCS order for acquisitions using `output_config` and a credentials file\r\n",
-							"output_config = {\r\n",
-							"    \"azure_blob_storage\": {\r\n",
-							"        \"sas_url\": \"https://stacdldev1.blob.core.windows.net/?sv=2021-08-06&ss=btqf&srt=sco&st=2022-11-07T16%3A35%3A10Z&se=2023-01-01T16%3A35%3A00Z&sp=rwlacup&sig=BPkvu2Cho6ZcnJAfD0oGqsPDUFow73R0D9QRQq84m9U%3D\",\r\n",
-							"        \"container\": \"my-ard-container\",\r\n",
-							"        \"prefix\": \"example/prefix\",\r\n",
-							"        \"dry_run\": \"True\"\r\n",
-							"    }\r\n",
-							"}\r\n",
-							"\r\n",
-							"order = Order(output_config=output_config, acquisitions= aquisition_2017)\r\n",
-							"\r\n",
-							"# add notifications if needed, then submit the order\r\n",
-							"order.add_email_notification('hilario.lumbreras@chevron.com')\r\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 467
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": true
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"order.submit()"
-						],
-						"outputs": [],
-						"execution_count": 468
+						"execution_count": 170
 					},
 					{
 						"cell_type": "markdown",
@@ -7099,7 +6832,7 @@
 						},
 						"source": [
 							"from max_ard import Select\r\n",
-							"bbox = [-121.91, 37.988, -121.865, 38.03]\r\n",
+							"bbox = [-121.91, 38.00, -121.85, 38.03]\r\n",
 							"datetime =  \"2019-10-01T00:00:00Z/2019-12-31T00:00:00Z\"\r\n",
 							"query = {\r\n",
 							"        \"platform\": {\r\n",
@@ -7113,10 +6846,10 @@
 							"        }\r\n",
 							"    }\r\n",
 							"\r\n",
-							"s_2019 = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
+							"s = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
 						],
 						"outputs": [],
-						"execution_count": 473
+						"execution_count": 171
 					},
 					{
 						"cell_type": "code",
@@ -7133,14 +6866,14 @@
 						},
 						"source": [
 							"from max_ard.exceptions import NotSubmitted\r\n",
-							"print(s_2019.request)\r\n",
+							"print(s.request)\r\n",
 							"try:\r\n",
-							"    print(s_2019.state)\r\n",
+							"    print(s.state)\r\n",
 							"except NotSubmitted:\r\n",
 							"    print('The Select has not been submitted yet and does not have a state')"
 						],
 						"outputs": [],
-						"execution_count": 474
+						"execution_count": 172
 					},
 					{
 						"cell_type": "code",
@@ -7156,12 +6889,12 @@
 							}
 						},
 						"source": [
-							"s_2019.submit()\r\n",
-							"print(s_2019.state)\r\n",
-							"print(s_2019.select_id)"
+							"s.submit()\r\n",
+							"print(s.state)\r\n",
+							"print(s.select_id)"
 						],
 						"outputs": [],
-						"execution_count": 475
+						"execution_count": 173
 					},
 					{
 						"cell_type": "code",
@@ -7177,11 +6910,11 @@
 							}
 						},
 						"source": [
-							"s_2019.wait_for_success()\r\n",
-							"print(f'Select {s_2019.select_id} is complete')"
+							"s.wait_for_success()\r\n",
+							"print(f'Select {s.select_id} is complete')"
 						],
 						"outputs": [],
-						"execution_count": 476
+						"execution_count": 174
 					},
 					{
 						"cell_type": "code",
@@ -7197,11 +6930,11 @@
 							}
 						},
 						"source": [
-							"geojson = s_2019.get_link_contents('geojson')\r\n",
+							"geojson = s.get_link_contents('geojson')\r\n",
 							"print(geojson)"
 						],
 						"outputs": [],
-						"execution_count": 477
+						"execution_count": 175
 					},
 					{
 						"cell_type": "markdown",
@@ -7230,11 +6963,24 @@
 							}
 						},
 						"source": [
-							"link = s_2019.get_signed_link('html')\r\n",
+							"link = s.get_signed_link('html')\r\n",
 							"print(link)"
 						],
 						"outputs": [],
-						"execution_count": 479
+						"execution_count": 176
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# figure out cost"
+						]
 					},
 					{
 						"cell_type": "code",
@@ -7250,11 +6996,10 @@
 							}
 						},
 						"source": [
-							"from max_ard import Order\r\n",
-							"s_2019.usage.cost.total_imagery_cost"
+							"s.usage.cost.total_imagery_cost"
 						],
 						"outputs": [],
-						"execution_count": 480
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -7270,14 +7015,10 @@
 							}
 						},
 						"source": [
-							"results_2019 = s_2019.results\r\n",
-							"print(f'Found the following acquisition IDs: {results_2019.acquisition_ids}')\r\n",
-							"print(f'Covering {len(results_2019.stacks)} cells')\r\n",
-							"print('Ordering this selection will use:')\r\n",
-							"print(f'{s_2019.usage.area.total_imagery_sqkm} sq.km')"
+							"print(s.usage)"
 						],
 						"outputs": [],
-						"execution_count": 481
+						"execution_count": 177
 					},
 					{
 						"cell_type": "code",
@@ -7293,10 +7034,49 @@
 							}
 						},
 						"source": [
-							"aquisition_2019 = results_2019.acquisition_ids"
+							"acquisition = results.acquisitions[0]\r\n",
+							"acquisition"
 						],
 						"outputs": [],
-						"execution_count": 482
+						"execution_count": 192
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"results.get_acquisition('103001009C0BE200')"
+						],
+						"outputs": [],
+						"execution_count": 193
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard import Order"
+						],
+						"outputs": [],
+						"execution_count": 188
 					},
 					{
 						"cell_type": "code",
@@ -7317,38 +7097,13 @@
 							"    \"azure_blob_storage\": {\r\n",
 							"        \"sas_url\": \"https://stacdldev1.blob.core.windows.net/?sv=2021-08-06&ss=btqf&srt=sco&st=2022-11-07T16%3A35%3A10Z&se=2023-01-01T16%3A35%3A00Z&sp=rwlacup&sig=BPkvu2Cho6ZcnJAfD0oGqsPDUFow73R0D9QRQq84m9U%3D\",\r\n",
 							"        \"container\": \"my-ard-container\",\r\n",
-							"        \"prefix\": \"example/prefix\",\r\n",
-							"        \"dry_run\": \"True\"\r\n",
+							"        \"prefix\": \"example/prefix\"\r\n",
 							"    }\r\n",
 							"}\r\n",
-							"\r\n",
-							"order = Order(output_config=output_config, acquisitions= aquisition_2019)\r\n",
-							"\r\n",
-							"# add notifications if needed, then submit the order\r\n",
-							"order.add_email_notification('hilario.lumbreras@chevron.com')\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 483
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"order.submit()"
-						],
-						"outputs": [],
-						"execution_count": 484
+						"execution_count": 191
 					},
 					{
 						"cell_type": "code",
@@ -8284,6 +8039,1231 @@
 			},
 			"dependsOn": [],
 			"location": "southcentralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/maxar_hqxb')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "hqxb",
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "Geospatialspark",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "304ee424-f102-49e7-b7a5-4eefcee85539"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+						"name": "Geospatialspark",
+						"type": "Spark",
+						"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# instal libraries"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"outputs_hidden": true
+							}
+						},
+						"source": [
+							"pip install max-ard[full] --extra-index-url https://packages.ard.maxar.com/"
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Authenticate individual "
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard.session import get_user_session\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"import os\r\n",
+							"\r\n",
+							"# Set environment variables\r\n",
+							"os.environ['ARD_USERNAME'] = 'hilario.lumbreras@chevron.com'\r\n",
+							"os.environ['ARD_PASSWORD'] = 'LetsfindData&Inights2022'\r\n",
+							"\r\n",
+							"# Get environment variables\r\n",
+							"ARD_USERNAME = os.getenv('ARD_USERNAME')\r\n",
+							"ARD_USERNAME = os.environ.get('ARD_PASSWORD')   "
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"r = get_user_session()"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## Check Azure credentials"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard import AccountManager\r\n",
+							"manager = AccountManager()\r\n",
+							"# usage objects have a formatted __repr__\r\n",
+							"print(manager.get_account_usage())"
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"manager.list_credentials()"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Azure Blob Storage SAS URL\r\n",
+							"token = \"https://stacdldev1.blob.core.windows.net/?sv=2021-08-06&ss=btqf&srt=sco&st=2022-11-07T16%3A35%3A10Z&se=2023-01-01T16%3A35%3A00Z&sp=rwlacup&sig=BPkvu2Cho6ZcnJAfD0oGqsPDUFow73R0D9QRQq84m9U%3D\"\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# add a token\r\n",
+							"manager.add_credentials(\"our-shared-credentials\", token, \"description of the credentials\")\r\n",
+							"\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 9
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# get a credential object\r\n",
+							"creds = manager.get_credentials(\"our-shared-credentials\")\r\n",
+							"creds"
+						],
+						"outputs": [],
+						"execution_count": 10
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"creds.created"
+						],
+						"outputs": [],
+						"execution_count": 11
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"creds.description\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 12
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# list all credentials\r\n",
+							"manager.list_credentials()"
+						],
+						"outputs": [],
+						"execution_count": 13
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"output_config = {\r\n",
+							"    \"azure_blob_storage\": {\r\n",
+							"        \"sas_url\": \"https://rawdatajbqezt.blob.core.windows.net/maxar-ard?sp=racwdlme&st=2022-11-16T13:50:16Z&se=2022-12-31T21:50:16Z&spr=https&sv=2021-06-08&sr=c&sig=zLUkM92Jrgft7eXBxXo%2FWmJuB1VehfDr%2FVNyGVboPN8%3D\",\r\n",
+							"        \"container\": \"maxar-ard\",\r\n",
+							"        \"prefix\": \"maxar/2015\",\r\n",
+							"    }\r\n",
+							"}"
+						],
+						"outputs": [],
+						"execution_count": 40
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# select ARD to tiles of SW portion of pipeline"
+						]
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# 2015"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard import Select\r\n",
+							"bbox = [-121.91, 37.988, -121.865, 38.03]\r\n",
+							"datetime =  \"2015-10-01T00:00:00Z/2015-12-31T00:00:00Z\"\r\n",
+							"query = {\r\n",
+							"        \"platform\": {\r\n",
+							"          \"eq\": \"worldview-02\"\r\n",
+							"        },\r\n",
+							"        \"aoi:cloud_free_percentage\": {\r\n",
+							"          \"gte\": 95\r\n",
+							"        },\r\n",
+							"        \"aoi:data_percentage\": {\r\n",
+							"          \"gte\": 75\r\n",
+							"        }\r\n",
+							"    }\r\n",
+							"\r\n",
+							"s_2015 = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
+						],
+						"outputs": [],
+						"execution_count": 16
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard.exceptions import NotSubmitted\r\n",
+							"print(s_2015.request)\r\n",
+							"try:\r\n",
+							"    print(s_2015.state)\r\n",
+							"except NotSubmitted:\r\n",
+							"    print('The Select has not been submitted yet and does not have a state')"
+						],
+						"outputs": [],
+						"execution_count": 17
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"s_2015.submit()\r\n",
+							"print(s_2015.state)\r\n",
+							"print(s_2015.select_id)"
+						],
+						"outputs": [],
+						"execution_count": 18
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"s_2015.wait_for_success()\r\n",
+							"print(f'Select {s_2015.select_id} is complete')"
+						],
+						"outputs": [],
+						"execution_count": 19
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"geojson = s_2015.get_link_contents('geojson')\r\n",
+							"print(geojson)"
+						],
+						"outputs": [],
+						"execution_count": 20
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"link = s_2015.get_signed_link('html')\r\n",
+							"print(link)"
+						],
+						"outputs": [],
+						"execution_count": 21
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard import Order\r\n",
+							"s_2015.usage.cost.total_imagery_cost"
+						],
+						"outputs": [],
+						"execution_count": 22
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"results = s_2015.results\r\n",
+							"print(f'Found the following acquisition IDs: {results.acquisition_ids}')\r\n",
+							"print(f'Covering {len(results.stacks)} cells')\r\n",
+							"print('Ordering this selection will use:')\r\n",
+							"print(f'{s_2015.usage.area.total_imagery_sqkm} sq.km')"
+						],
+						"outputs": [],
+						"execution_count": 23
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"aquisition_2015 = results.acquisition_ids\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 24
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# # a GCS order for acquisitions using `output_config` and a credentials file\r\n",
+							"\r\n",
+							"\r\n",
+							"#order = Order(output_config=output_config, acquisitions= aquisition_2015)\r\n",
+							"#order = Order(output_config=output_config, select_id=s_2015.select_id)\r\n",
+							"# add notifications if needed, then submit the order\r\n",
+							"\r\n",
+							"order = Order(output_config= output_config, bbox=bbox, acquisitions= aquisition_2015, dry_run=False)\r\n",
+							"order.add_email_notification('hilario.lumbreras@chevron.com')\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 43
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"order.submit()"
+						],
+						"outputs": [],
+						"execution_count": 44
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# 2017"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard import Select\r\n",
+							"bbox =[-121.91, 37.988, -121.865, 38.03]\r\n",
+							"datetime =  \"2017-10-01T00:00:00Z/2017-12-31T00:00:00Z\"\r\n",
+							"query = {\r\n",
+							"        \"platform\": {\r\n",
+							"          \"eq\": \"worldview-02\"\r\n",
+							"        },\r\n",
+							"        \"aoi:cloud_free_percentage\": {\r\n",
+							"          \"gte\": 95\r\n",
+							"        },\r\n",
+							"        \"aoi:data_percentage\": {\r\n",
+							"          \"gte\": 75\r\n",
+							"        }\r\n",
+							"    }\r\n",
+							"\r\n",
+							"s_2017 = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
+						],
+						"outputs": [],
+						"execution_count": 457
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard.exceptions import NotSubmitted\r\n",
+							"print(s_2017.request)\r\n",
+							"try:\r\n",
+							"    print(s_2017.state)\r\n",
+							"except NotSubmitted:\r\n",
+							"    print('The Select has not been submitted yet and does not have a state')"
+						],
+						"outputs": [],
+						"execution_count": 458
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"s_2017.submit()\r\n",
+							"print(s_2017.state)\r\n",
+							"print(s_2017.select_id)"
+						],
+						"outputs": [],
+						"execution_count": 459
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"s_2017.wait_for_success()\r\n",
+							"print(f'Select {s_2017.select_id} is complete')"
+						],
+						"outputs": [],
+						"execution_count": 460
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"geojson = s_2017.get_link_contents('geojson')\r\n",
+							"print(geojson)"
+						],
+						"outputs": [],
+						"execution_count": 461
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"link = s_2017.get_signed_link('html')\r\n",
+							"print(link)"
+						],
+						"outputs": [],
+						"execution_count": 462
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard import Order\r\n",
+							"s_2017.usage.cost.total_imagery_cost"
+						],
+						"outputs": [],
+						"execution_count": 463
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"results_2017 = s_2017.results\r\n",
+							"print(f'Found the following acquisition IDs: {results_2017.acquisition_ids}')\r\n",
+							"print(f'Covering {len(results_2017.stacks)} cells')\r\n",
+							"print('Ordering this selection will use:')\r\n",
+							"print(f'{s_2017.usage.area.total_imagery_sqkm} sq.km')"
+						],
+						"outputs": [],
+						"execution_count": 465
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"aquisition_2017 = results_2017.acquisition_ids"
+						],
+						"outputs": [],
+						"execution_count": 466
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# a GCS order for acquisitions using `output_config` and a credentials file\r\n",
+							"output_config = {\r\n",
+							"    \"azure_blob_storage\": {\r\n",
+							"        \"sas_url\": \"https://stacdldev1.blob.core.windows.net/?sv=2021-08-06&ss=btqf&srt=sco&st=2022-11-07T16%3A35%3A10Z&se=2023-01-01T16%3A35%3A00Z&sp=rwlacup&sig=BPkvu2Cho6ZcnJAfD0oGqsPDUFow73R0D9QRQq84m9U%3D\",\r\n",
+							"        \"container\": \"my-ard-container\",\r\n",
+							"        \"prefix\": \"example/prefix\",\r\n",
+							"        \"dry_run\": \"True\"\r\n",
+							"    }\r\n",
+							"}\r\n",
+							"\r\n",
+							"order = Order(output_config=output_config, acquisitions= aquisition_2017)\r\n",
+							"\r\n",
+							"# add notifications if needed, then submit the order\r\n",
+							"order.add_email_notification('hilario.lumbreras@chevron.com')\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 467
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": true
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"order.submit()"
+						],
+						"outputs": [],
+						"execution_count": 468
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# 2019"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard import Select\r\n",
+							"bbox = [-121.91, 37.988, -121.865, 38.03]\r\n",
+							"datetime =  \"2019-10-01T00:00:00Z/2019-12-31T00:00:00Z\"\r\n",
+							"query = {\r\n",
+							"        \"platform\": {\r\n",
+							"          \"eq\": \"worldview-02\"\r\n",
+							"        },\r\n",
+							"        \"aoi:cloud_free_percentage\": {\r\n",
+							"          \"gte\": 95\r\n",
+							"        },\r\n",
+							"        \"aoi:data_percentage\": {\r\n",
+							"          \"gte\": 75\r\n",
+							"        }\r\n",
+							"    }\r\n",
+							"\r\n",
+							"s_2019 = Select(datetime=datetime, bbox=bbox, query=query, stack_depth=3)"
+						],
+						"outputs": [],
+						"execution_count": 473
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard.exceptions import NotSubmitted\r\n",
+							"print(s_2019.request)\r\n",
+							"try:\r\n",
+							"    print(s_2019.state)\r\n",
+							"except NotSubmitted:\r\n",
+							"    print('The Select has not been submitted yet and does not have a state')"
+						],
+						"outputs": [],
+						"execution_count": 474
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"s_2019.submit()\r\n",
+							"print(s_2019.state)\r\n",
+							"print(s_2019.select_id)"
+						],
+						"outputs": [],
+						"execution_count": 475
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"s_2019.wait_for_success()\r\n",
+							"print(f'Select {s_2019.select_id} is complete')"
+						],
+						"outputs": [],
+						"execution_count": 476
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"geojson = s_2019.get_link_contents('geojson')\r\n",
+							"print(geojson)"
+						],
+						"outputs": [],
+						"execution_count": 477
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"link = s_2019.get_signed_link('html')\r\n",
+							"print(link)"
+						],
+						"outputs": [],
+						"execution_count": 479
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from max_ard import Order\r\n",
+							"s_2019.usage.cost.total_imagery_cost"
+						],
+						"outputs": [],
+						"execution_count": 480
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"results_2019 = s_2019.results\r\n",
+							"print(f'Found the following acquisition IDs: {results_2019.acquisition_ids}')\r\n",
+							"print(f'Covering {len(results_2019.stacks)} cells')\r\n",
+							"print('Ordering this selection will use:')\r\n",
+							"print(f'{s_2019.usage.area.total_imagery_sqkm} sq.km')"
+						],
+						"outputs": [],
+						"execution_count": 481
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"aquisition_2019 = results_2019.acquisition_ids"
+						],
+						"outputs": [],
+						"execution_count": 482
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# a GCS order for acquisitions using `output_config` and a credentials file\r\n",
+							"output_config = {\r\n",
+							"    \"azure_blob_storage\": {\r\n",
+							"        \"sas_url\": \"https://stacdldev1.blob.core.windows.net/?sv=2021-08-06&ss=btqf&srt=sco&st=2022-11-07T16%3A35%3A10Z&se=2023-01-01T16%3A35%3A00Z&sp=rwlacup&sig=BPkvu2Cho6ZcnJAfD0oGqsPDUFow73R0D9QRQq84m9U%3D\",\r\n",
+							"        \"container\": \"my-ard-container\",\r\n",
+							"        \"prefix\": \"example/prefix\",\r\n",
+							"        \"dry_run\": \"True\"\r\n",
+							"    }\r\n",
+							"}\r\n",
+							"\r\n",
+							"order = Order(output_config=output_config, acquisitions= aquisition_2019)\r\n",
+							"\r\n",
+							"# add notifications if needed, then submit the order\r\n",
+							"order.add_email_notification('hilario.lumbreras@chevron.com')\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 483
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"order.submit()"
+						],
+						"outputs": [],
+						"execution_count": 484
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
 		}
 	]
 }
