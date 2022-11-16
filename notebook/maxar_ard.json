@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "081a55f9-4c16-4885-a268-54b754df26e4"
+				"spark.autotune.trackingId": "1462c389-d7a2-4a27-9a87-22ce5cd5c52f"
 			}
 		},
 		"metadata": {
@@ -108,7 +108,7 @@
 					"from max_ard.session import get_user_session\r\n",
 					""
 				],
-				"execution_count": 2
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -134,7 +134,7 @@
 					"ARD_USERNAME = os.getenv('ARD_USERNAME')\r\n",
 					"ARD_USERNAME = os.environ.get('ARD_PASSWORD')   "
 				],
-				"execution_count": 121
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -152,7 +152,7 @@
 				"source": [
 					"r = get_user_session()"
 				],
-				"execution_count": 122
+				"execution_count": 6
 			},
 			{
 				"cell_type": "markdown",
@@ -186,7 +186,7 @@
 					"# usage objects have a formatted __repr__\r\n",
 					"print(manager.get_account_usage())"
 				],
-				"execution_count": 123
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -204,7 +204,7 @@
 				"source": [
 					"manager.list_credentials()"
 				],
-				"execution_count": 124
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -225,7 +225,7 @@
 					"\r\n",
 					""
 				],
-				"execution_count": 125
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -247,7 +247,7 @@
 					"\r\n",
 					""
 				],
-				"execution_count": 126
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -267,7 +267,7 @@
 					"creds = manager.get_credentials(\"our-shared-credentials\")\r\n",
 					"creds"
 				],
-				"execution_count": 127
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -285,7 +285,7 @@
 				"source": [
 					"creds.created"
 				],
-				"execution_count": 128
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -304,7 +304,7 @@
 					"creds.description\r\n",
 					""
 				],
-				"execution_count": 129
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -323,7 +323,7 @@
 					"# list all credentials\r\n",
 					"manager.list_credentials()"
 				],
-				"execution_count": 130
+				"execution_count": 14
 			},
 			{
 				"cell_type": "markdown",
