@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 2",
+	"properties": {
+		"content": {
+			"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'produced_chevrondatalakedev_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [produced_chevrondatalakedev_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://produced@chevrondatalakedev.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE App120Day (\n\t[resourceId] nvarchar(4000),\n\t[environmentId] nvarchar(4000),\n\t[type] nvarchar(4000),\n\t[subType] nvarchar(4000),\n\t[DocumentVersion] nvarchar(4000),\n\t[name] nvarchar(4000),\n\t[description] nvarchar(4000),\n\t[uri] nvarchar(4000),\n\t[tenantId] nvarchar(4000),\n\t[lifecycleState] nvarchar(4000),\n\t[owner] nvarchar(4000),\n\t[createdTime] nvarchar(4000),\n\t[createdPrincipalId] nvarchar(4000),\n\t[lastModifiedTime] nvarchar(4000),\n\t[lastModifiedPrincipalId] nvarchar(4000),\n\t[lastEnabledTime] nvarchar(4000),\n\t[lastEnabledPrincipalId] nvarchar(4000),\n\t[sharedUsers] int,\n\t[sharedGroups] int,\n\t[actionsresourceworkflowActions] nvarchar(4000),\n\t[settings] nvarchar(4000),\n\t[solution] nvarchar(4000),\n\t[clientDeviceType] nvarchar(4000),\n\t[embeddingHost] nvarchar(4000),\n\t[creationType] nvarchar(4000),\n\t[iconUri] nvarchar(4000),\n\t[documentUri] nvarchar(4000),\n\t[customExtensions] nvarchar(4000),\n\t[isDeleted] bit,\n\t[tenantGuid] nvarchar(4000),\n\t[environmentName] nvarchar(4000),\n\t[environmentRegion] nvarchar(4000),\n\t[environmentState] nvarchar(4000),\n\t[environmentUrl] nvarchar(4000),\n\t[environmentType] nvarchar(4000),\n\t[isDefault] bit,\n\t[securityGroup] nvarchar(4000),\n\t[cdsInstanceId] nvarchar(4000),\n\t[cdsInstanceUrl] nvarchar(4000),\n\t[deletedTime] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'IT/PowerPlatformTelemetry/App120DaysCurrentEnv2022-11-04.parquet',\n\tDATA_SOURCE = [produced_chevrondatalakedev_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n\n\nSELECT TOP 100 * FROM CitiDev-db.App120Day\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "CitiDev-db",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
