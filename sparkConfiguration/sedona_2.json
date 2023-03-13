@@ -1,0 +1,16 @@
+{
+	"name": "sedona_2",
+	"properties": {
+		"configs": {
+			"spark.kryo.registrator": "org.apache.sedona.core.serde.SedonaKryoRegistrator",
+			"spark.serializer": "org.apache.spark.serializer.KryoSerializer"
+		},
+		"created": "2023-03-13T12:35:59.0430000-05:00",
+		"createdBy": "hilario.lumbreras@chevron.com",
+		"annotations": [],
+		"configMergeRule": {
+			"artifact.currentOperation.spark.kryo.registrator": "replace",
+			"artifact.currentOperation.spark.serializer": "replace"
+		}
+	}
+}
