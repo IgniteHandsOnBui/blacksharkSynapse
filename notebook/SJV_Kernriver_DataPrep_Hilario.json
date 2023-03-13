@@ -1,0 +1,828 @@
+{
+	"name": "SJV_Kernriver_DataPrep_Hilario",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "Geospatialspark",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "56g",
+			"driverCores": 8,
+			"executorMemory": "56g",
+			"executorCores": 8,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "623d5b4c-9c26-4afa-8a4b-cc4f4dd3ccae"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
+				"name": "Geospatialspark",
+				"type": "Spark",
+				"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 8,
+				"memory": 56,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"tags": [
+						"parameters"
+					]
+				},
+				"source": [
+					"JPG_Dest = \"https://chevrondatalakedev.blob.core.windows.net/raw/80385099_GIS_STAC_DataPrep/8027984328_GIS_HSE_Imagery/kern_River_pumpjack/test/\"\r\n",
+					"Process_Index = 0"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					" ###mssparkutils.fs.unmount('/STAC_Dest')"
+				],
+				"execution_count": 56
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from urllib.parse import urlparse\r\n",
+					"parsed_url = urlparse(JPG_Dest1)\r\n",
+					"\r\n",
+					"accountName = parsed_url.netloc\r\n",
+					"container = parsed_url.path.split(\"/\")[1]\r\n",
+					"\r\n",
+					"try:\r\n",
+					"    mssparkutils.fs.mount(\r\n",
+					"        f\"wasbs://{container}@{accountName}\",\r\n",
+					"        \"/STAC_Dest1\",\r\n",
+					"        {\"linkedService\":\"ls_chevrondatalake\"}\r\n",
+					"    )\r\n",
+					"    print(\"Successful mount of source to /STAC_Dest1\")\r\n",
+					"except:\r\n",
+					"    print(\"FAILED TO MOUNT STAC DEST1\")\r\n",
+					"    print(\"Either due to the drive already been mounted, or because the path is incorrect.\")"
+				],
+				"execution_count": 57
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Return array of all files in directory of type (of any with no associated XML file)\r\n",
+					"# Added a process_index to split this up into multiple processes\r\n",
+					"import os\r\n",
+					"\r\n",
+					"def get_blob_file_list(directory, filetype):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to get a full list of files in a directory based on file type\r\n",
+					"    Arguments:\r\n",
+					"        directory: Directory path of folder you want to pull files from\r\n",
+					"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\" or \".JSON\"\r\n",
+					"    Returns:\r\n",
+					"        Array of filepaths/filename w/extension\r\n",
+					"    \"\"\"\r\n",
+					"    file_array = []\r\n",
+					"    xml_array = []\r\n",
+					"    for file in os.listdir(directory):\r\n",
+					"        file_ext = os.path.splitext(file)[1]\r\n",
+					"        if file_ext == filetype:\r\n",
+					"            file_array.append(directory+file)\r\n",
+					"        elif file_ext == \".xml\":\r\n",
+					"            xml_array.append(directory+file)\r\n",
+					"        else:\r\n",
+					"            continue\r\n",
+					"            \r\n",
+					"    non_STACified_imgs = [x for x in file_array if x+'.aux.xml' not in xml_array]\r\n",
+					"    return non_STACified_imgs[Process_Index:]"
+				],
+				"execution_count": 58
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Return array of all files in directory of type (that are not correctly named) - CURRENTLY UNUSED\r\n",
+					"import os\r\n",
+					"\r\n",
+					"def get_blob_file_list_unnamed(directory, filetype):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to get a full list of files in a directory based on file type\r\n",
+					"    Arguments:\r\n",
+					"        directory: Directory path of folder you want to pull files from\r\n",
+					"        filetype: .XXXX being the file extension of the file you are searching for (including a dot \".\")- ex- \".JPEG\" or \".JSON\"\r\n",
+					"    Returns:\r\n",
+					"        Array of filepaths/filename w/extension\r\n",
+					"    \"\"\"\r\n",
+					"    file_array = []\r\n",
+					"    collection_abbreviation = \"SJVBU_Kern_River_\"   \r\n",
+					"\r\n",
+					"    for file in os.listdir(directory):\r\n",
+					"        file_ext = os.path.splitext(file)[1]\r\n",
+					"        if file_ext == filetype:\r\n",
+					"            file_name = os.path.splitext(file)[0]\r\n",
+					"            if file_name[0:len(collection_abbreviation)] == collection_abbreviation:\r\n",
+					"                continue\r\n",
+					"            else:\r\n",
+					"                file_array.append(directory+file)\r\n",
+					"            \r\n",
+					"    return file_array"
+				],
+				"execution_count": 59
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"##### Spatial Function 1"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# SPATIAL FUNCTION 1: Get Latitude Longitude (+ reference direction) from EXIF Headers (not in right format)\r\n",
+					"def get_EXIF_lat(jpeg_tags):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to get the Latitude of a JPEG image\r\n",
+					"    Arguments:\r\n",
+					"        jpeg_tags: jpeg object opened in rasterio file\r\n",
+					"    Returns:\r\n",
+					"        string of latitude in format of (dd) (mm) (ss.sss) & GPS Reference in terms of (S or N)\r\n",
+					"    \"\"\"\r\n",
+					"    filetags = jpeg_tags\r\n",
+					"    GPSLatitude = filetags.get(\"EXIF_GPSLatitude\")\r\n",
+					"    GPSLatitudeRef = filetags.get(\"EXIF_GPSLatitudeRef\")\r\n",
+					"    return GPSLatitude, GPSLatitudeRef\r\n",
+					"\r\n",
+					"def get_EXIF_long(jpeg_tags):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to get the Longitude of a JPEG image\r\n",
+					"    Arguments:\r\n",
+					"        jpeg_obj: jpeg object opened in rasterio file\r\n",
+					"    Returns:\r\n",
+					"        string of longitude in format of (dd) (mm) (ss.sss) & GPS Reference in terms of (W or E)\r\n",
+					"    \"\"\"\r\n",
+					"\r\n",
+					"    filetags = jpeg_tags\r\n",
+					"    GPSLongitude = filetags.get(\"EXIF_GPSLongitude\")\r\n",
+					"    GPSLongitudeRef = filetags.get(\"EXIF_GPSLongitudeRef\")\r\n",
+					"\r\n",
+					"    return GPSLongitude, GPSLongitudeRef"
+				],
+				"execution_count": 60
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"##### Spatial Function 2"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# SPATIAL FUNCTION 2: Convert Lat/Longs into correct format\r\n",
+					"def Exif_Cord_Convert(EXIF_Cord, direction):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to convert coordinate from get_EXIF_long + get_EXIF_lat functions (dd)(mm)(ss.sss) to decimal degrees.\r\n",
+					"    Arguments:\r\n",
+					"        EXIF_Cord: return from get_EXIF_long or get_EXIF_lat (first return)\r\n",
+					"        direction: return from get_EXIF_long or get_EXIF_lat (second return) - Either as \"N\",\"S\",\"E\", or \"W\"\r\n",
+					"    Returns:\r\n",
+					"        Decimal Degrees of coordinate.\r\n",
+					"    \"\"\"\r\n",
+					"\r\n",
+					"    new_str = EXIF_Cord.replace(\"(\",\"\")\r\n",
+					"    new_str = new_str.replace(\")\",\"\")\r\n",
+					"\r\n",
+					"    split_str = new_str.split(\" \")\r\n",
+					"    \r\n",
+					"    decimaldegrees = (float(split_str[0]) + float(split_str[1])/60 + float(split_str[2])/(60*60)) * (-1 if direction in ['W', 'S'] else 1)\r\n",
+					"    return decimaldegrees"
+				],
+				"execution_count": 61
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"##### Spatial Function 3"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# SPATIAL FUNCTION 3: Calculate 1x1 meter bounding box around image to comply with STAC Standard. Returns as string.\r\n",
+					"import pyproj\r\n",
+					"from shapely.ops import transform\r\n",
+					"from shapely.geometry import Point\r\n",
+					"from functools import partial\r\n",
+					"\r\n",
+					"def calculate_bb(lat, lon):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to calculate a \"fake\" bounding box of 1m by 1m given a lat/long coordinate in Decimal Degrees. The lat/long is assumed to be in WGS84.\r\n",
+					"    Arguments:\r\n",
+					"        lat: latitude in decimal degrees\r\n",
+					"        long: longitude in decimal degrees\r\n",
+					"    Returns:\r\n",
+					"        array of bounding box to be used for metadata of JPEG.\r\n",
+					"    \"\"\"\r\n",
+					"\r\n",
+					"    proj_wgs84 = pyproj.Proj('+proj=longlat +datum=WGS84')\r\n",
+					"    \r\n",
+					"    # Azimuthal equidistant projection\r\n",
+					"    aeqd_proj = '+proj=aeqd +lat_0={lat} +lon_0={lon} +x_0=0 +y_0=0'\r\n",
+					"    project = partial(\r\n",
+					"        pyproj.transform,\r\n",
+					"        pyproj.Proj(aeqd_proj.format(lat=lat, lon=lon)),\r\n",
+					"        proj_wgs84)\r\n",
+					"    \r\n",
+					"    buf = Point(0, 0).buffer(1)  # buffers 1 meter\r\n",
+					"\r\n",
+					"    return transform(project, buf).bounds"
+				],
+				"execution_count": 62
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"##### Spatial Function 4"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# SPATIAL FUNCTION 4: Calls all above spatial functions\r\n",
+					"def get_bb(jpeg_tags):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to return a faked bounding box using previous functions.\r\n",
+					"    Arguments:\r\n",
+					"        jpeg_obj: JPEG object opened in rasterio which you want faked bounding box from. JPEG must have Latitude/Longitude in EXIF header.\r\n",
+					"    Returns:\r\n",
+					"        array of bounding box to be used for metadata of JPEG.\r\n",
+					"    \"\"\"\r\n",
+					"\r\n",
+					"    EXIFlat, latRef = get_EXIF_lat(jpeg_tags)\r\n",
+					"    EXIFlong, longRef = get_EXIF_long(jpeg_tags)\r\n",
+					"\r\n",
+					"    lat = Exif_Cord_Convert(EXIFlat,latRef)\r\n",
+					"    long = Exif_Cord_Convert(EXIFlong,longRef)\r\n",
+					"\r\n",
+					"    return calculate_bb(lat,long)"
+				],
+				"execution_count": 63
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"##### Datetime Function"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Returns ISO Formatted datetime from EXIF_Datetime header\r\n",
+					"from datetime import datetime\r\n",
+					"\r\n",
+					"def get_jpeg_datetime(jpeg_tags):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to return a STAC-customized DateTime from JPEG image EXIF information. In propper ISO Format.\r\n",
+					"    Arguments:\r\n",
+					"        jpeg_obj: JPEG object which you want STAC-DateTime for. JPEG must have DateTime in EXIF header.\r\n",
+					"    Returns:\r\n",
+					"        STAC-Specific DateTime as a string\r\n",
+					"    \"\"\"\r\n",
+					"\r\n",
+					"    filetags = jpeg_tags\r\n",
+					"    EXIF_Datetime = filetags.get(\"EXIF_DateTime\")\r\n",
+					"    EXIF_datetime_obj = datetime.strptime(EXIF_Datetime, '%Y:%m:%d %H:%M:%S')\r\n",
+					"    STAC_datetime = EXIF_datetime_obj.strftime(\"%Y-%m-%dT%H:%M:%S%z\")\r\n",
+					"\r\n",
+					"    return STAC_datetime"
+				],
+				"execution_count": 64
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"##### Cordinate Reference System Function"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# We know all images are going to be WGS84 so we return the correct EPSG code.\r\n",
+					"\r\n",
+					"def get_jpeg_crs(jpeg_obj):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to return \"EPSG:4326\"\r\n",
+					"    Arguments:\r\n",
+					"        jpeg_obj: not used, but still good practice if we want to extend this function\r\n",
+					"    Returns:\r\n",
+					"        EPSG:4326 as a string which is the GPS-WGS84 Cordinate Reference System\r\n",
+					"    \"\"\"\r\n",
+					"\r\n",
+					"    crs = \"EPSG:4326\"\r\n",
+					"    return crs"
+				],
+				"execution_count": 65
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"##### Sensor function"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# All Images will be captured by RGB camera.\r\n",
+					"\r\n",
+					"def get_jpeg_sensor(jpeg_obj):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to return \"RGB\"\r\n",
+					"    Arguments:\r\n",
+					"        jpeg_obj: not used, but still good practice if we want to extend this function\r\n",
+					"    Returns:\r\n",
+					"        RGB as a string\r\n",
+					"    \"\"\"\r\n",
+					"\r\n",
+					"    sensor_type = \"RGB\"\r\n",
+					"    return sensor_type"
+				],
+				"execution_count": 66
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"##### Renaming JPEG Function"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import os\r\n",
+					"from datetime import datetime\r\n",
+					"\r\n",
+					"def rename_JPEG(jpeg_obj, jpeg_path):\r\n",
+					"    dst_tags = jpeg_obj\r\n",
+					"\r\n",
+					"    collection_abbreviation = \"SJVBU_Kern_River_\"\r\n",
+					"    if os.path.basename(jpeg_path)[0:len(collection_abbreviation)] == collection_abbreviation:\r\n",
+					"        return False\r\n",
+					"\r\n",
+					"    CaptureDate_Time = datetime.strptime(dst_tags.get(\"EXIF_DateTimeOriginal\"), '%Y:%m:%d %H:%M:%S')\r\n",
+					"\r\n",
+					"    CaptureDate = datetime.strftime(CaptureDate_Time, '%Y%m%d')\r\n",
+					"    CaptureTime = datetime.strftime(CaptureDate_Time, '%H%M%S')\r\n",
+					"\r\n",
+					"    jpeg_ItemName = os.path.basename(jpeg_path)[19:-4]\r\n",
+					"    \r\n",
+					"    jpeg_newname = collection_abbreviation + jpeg_ItemName + \"_\" + CaptureDate + \"_\" + CaptureTime + \".JPG\"\r\n",
+					"    jpeg_newname_path = os.path.dirname(jpeg_path)+\"/\"+jpeg_newname\r\n",
+					"\r\n",
+					"    aux_newname = jpeg_newname_path+\".aux.xml\"\r\n",
+					"    aux_oldname = jpeg_path+\".aux.xml\"\r\n",
+					"    #Rename JPG\r\n",
+					"    print(jpeg_path)\r\n",
+					"    print(jpeg_newname_path)\r\n",
+					"    os.rename(jpeg_path, jpeg_newname_path)\r\n",
+					"\r\n",
+					"    return jpeg_newname"
+				],
+				"execution_count": 67
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### MASTER FUNCTION"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Master Function to call all other functions\r\n",
+					"\r\n",
+					"import rasterio\r\n",
+					"import os\r\n",
+					"from datetime import datetime\r\n",
+					"\r\n",
+					"def write_to_collection(jpeg_path):\r\n",
+					"    \"\"\"\r\n",
+					"    Function to add STAC-Spec metadata to JPEG as defined here: https://cdas.azure.chevron.com/Data-Insights/Geospatial-Technology-And-Analytics/Chevron-Atlas/Getting-Started/Data-Preparation.html\r\n",
+					"    Arguments:\r\n",
+					"        jpeg_path: String filepath to tiff that will be converted to COG and have metadata added. \r\n",
+					"    Returns:\r\n",
+					"        jpeg_path string if proccessed\r\n",
+					"        False if not proccessed\r\n",
+					"    \"\"\"\r\n",
+					"    try:\r\n",
+					"        with rasterio.Env(GDAL_DISABLE_READDIR_ON_OPEN=True, CPL_LOG_ERRORS=False):\r\n",
+					"            with rasterio.open(jpeg_path,'r+',driver='JPEG') as dst:\r\n",
+					"                #Get Tags\r\n",
+					"                dst_tags = dst.tags()\r\n",
+					"\r\n",
+					"                # Determine if file has spatial info\r\n",
+					"                tst_tag = dst_tags.get(\"EXIF_GPSLongitude\")\r\n",
+					"                if tst_tag == None:\r\n",
+					"                    print(jpeg_path+ ' has no spatial information. It will be deleted')\r\n",
+					"                    # IF THE FILE HAS NO SPATIAL INFORMATION - IT WILL BE DELETED\r\n",
+					"                    dst = None\r\n",
+					"                    try:\r\n",
+					"                        os.remove(jpeg_path)\r\n",
+					"                    except:\r\n",
+					"                        pass\r\n",
+					"                    return False\r\n",
+					"\r\n",
+					"                BoundingBox = get_bb(dst_tags)\r\n",
+					"\r\n",
+					"                DateTime = get_jpeg_datetime(dst_tags)\r\n",
+					"\r\n",
+					"                jpeg_CRS = get_jpeg_crs(dst)\r\n",
+					"\r\n",
+					"                Sensor = get_jpeg_sensor(dst)\r\n",
+					"\r\n",
+					"                dst.update_tags(datetime = DateTime, start_datetime = None, end_datetime = None, bbox = BoundingBox, crs = jpeg_CRS, sensor = Sensor)\r\n",
+					"                dst = None\r\n",
+					"    except IOError:\r\n",
+					"        print(jpeg_path + ' is invalid JPEG file. It will be deleted')\r\n",
+					"        print(jpeg_path + \"remove\")\r\n",
+					"        os.remove(jpeg_path)\r\n",
+					"        return False\r\n",
+					"\r\n",
+					"    \r\n",
+					"    \r\n",
+					"    #Renaming JPEG + XML (Have to close dataset first hince the dst = None)\r\n",
+					"\r\n",
+					"    newname = rename_JPEG(dst_tags, jpeg_path)\r\n",
+					"\r\n",
+					"    print(\"Added metadata & renamed to \"+ newname)\r\n",
+					"    return newname"
+				],
+				"execution_count": 68
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Bad Code here:\r\n",
+					"import warnings\r\n",
+					"\r\n",
+					"warnings.filterwarnings(\"ignore\")"
+				],
+				"execution_count": 69
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import os\r\n",
+					"import multiprocessing\r\n",
+					"\r\n",
+					"jobId = mssparkutils.env.getJobId()\r\n",
+					"\r\n",
+					"parsed_url = urlparse(JPG_Dest)\r\n",
+					"if parsed_url.path.endswith('/'):\r\n",
+					"    container = '/'.join(parsed_url.path.split('/')[2:])\r\n",
+					"else:\r\n",
+					"    container = '/'.join(parsed_url.path.split('/')[2:])+\"/\"\r\n",
+					"\r\n",
+					"print(\"Processing data in this container: \"+container)\r\n",
+					"img_path = f'/synfs/'+jobId+'/STAC_Dest1/'+container\r\n",
+					"\r\n",
+					"outarray = get_blob_file_list(img_path, \".JPG\")\r\n",
+					"count = 0\r\n",
+					"\r\n",
+					"##### Parallel Code + Run\r\n",
+					"with multiprocessing.Pool() as pool:\r\n",
+					"    items = outarray\r\n",
+					"    with rasterio.Env(GDAL_DISABLE_READDIR_ON_OPEN=True, CPL_LOG_ERRORS=False):\r\n",
+					"        for jpeg_result in pool.imap(write_to_collection, items):\r\n",
+					"            count = count + 1\r\n",
+					"            print(count)\r\n",
+					"        pool.close()\r\n",
+					""
+				],
+				"execution_count": 70
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# mssparkutils.fs.unmount('/STAC_Dest')"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"len(get_blob_file_list(img_path, \".JPG\"))"
+				],
+				"execution_count": 34
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
