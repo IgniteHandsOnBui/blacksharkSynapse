@@ -4,20 +4,24 @@
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
-			"referenceName": "Geospatialspark",
+			"referenceName": "apachesedona",
 			"type": "BigDataPoolReference"
 		},
+		"targetSparkConfiguration": {
+			"referenceName": "sedona_2",
+			"type": "SparkConfigurationReference"
+		},
 		"sessionProperties": {
-			"driverMemory": "56g",
-			"driverCores": 8,
-			"executorMemory": "56g",
-			"executorCores": 8,
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
 			"numExecutors": 2,
 			"conf": {
-				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.enabled": "true",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "623d5b4c-9c26-4afa-8a4b-cc4f4dd3ccae"
+				"spark.autotune.trackingId": "af044dd4-a3e6-41b2-a2fc-15c0e56f2097"
 			}
 		},
 		"metadata": {
@@ -31,21 +35,22 @@
 				"name": "python"
 			},
 			"a365ComputeOptions": {
-				"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/Geospatialspark",
-				"name": "Geospatialspark",
+				"id": "/subscriptions/251b3efb-f673-4fa5-a56e-e2f645fc33fa/resourceGroups/innosyn-pipeline-rg/providers/Microsoft.Synapse/workspaces/innosyn-pipeline-syn-ws/bigDataPools/apachesedona",
+				"name": "apachesedona",
 				"type": "Spark",
-				"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/Geospatialspark",
+				"endpoint": "https://innosyn-pipeline-syn-ws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/apachesedona",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
 				},
-				"sparkVersion": "3.1",
+				"sparkVersion": "3.3",
 				"nodeCount": 10,
-				"cores": 8,
-				"memory": 56,
-				"automaticScaleJobs": false
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": true
 			},
-			"sessionKeepAliveTimeout": 30
+			"sessionKeepAliveTimeout": 30,
+			"targetSparkConfiguration": "sedona_2"
 		},
 		"cells": [
 			{
@@ -75,9 +80,9 @@
 					}
 				},
 				"source": [
-					""
+					"print(\"hello world\")"
 				],
-				"execution_count": null
+				"execution_count": 32
 			},
 			{
 				"cell_type": "code",
